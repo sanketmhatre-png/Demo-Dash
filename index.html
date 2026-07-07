@@ -14,11 +14,11 @@
   --tx:#1e293b;--dm:#64748b;--mu:#94a3b8;--br:#e2e8f0;--br2:#cbd5e1;
 }
 *{margin:0;padding:0;box-sizing:border-box}
-html,body{height:100%;overflow:hidden;font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--tx);font-size:12px}
-.app{display:flex;flex-direction:column;height:100vh;overflow:hidden}
+html,body{min-height:100%;font-family:'Plus Jakarta Sans',sans-serif;background:var(--bg);color:var(--tx);font-size:12px}
+.app{display:flex;flex-direction:column;min-height:100vh}
 
 /* HEADER */
-.hdr{background:linear-gradient(135deg,#080e27,#0f1b3d 40%,#162454);padding:8px 20px;display:flex;align-items:center;gap:14px;flex-shrink:0;box-shadow:0 2px 12px rgba(0,0,0,.3);z-index:10}
+.hdr{background:linear-gradient(135deg,#080e27,#0f1b3d 40%,#162454);padding:8px 20px;display:flex;align-items:center;gap:14px;flex-shrink:0;box-shadow:0 2px 12px rgba(0,0,0,.3);z-index:30;position:sticky;top:0}
 .h-logo{height:34px;background:#fff;border-radius:8px;padding:3px 7px}
 .h-t{color:#fff;font-size:15px;font-weight:800;letter-spacing:-.3px;white-space:nowrap}
 .h-t i{color:var(--bl);font-style:italic}
@@ -30,8 +30,15 @@ html,body{height:100%;overflow:hidden;font-family:'Plus Jakarta Sans',sans-serif
 .h-btn{padding:5px 12px;border-radius:14px;border:1px solid rgba(255,255,255,.25);background:transparent;color:#fff;cursor:pointer;font-size:10px;font-weight:600;font-family:inherit}
 .h-btn:hover{background:rgba(255,255,255,.12)}
 
+/* TABS */
+.tabnav{background:#0a1330;display:flex;gap:2px;padding:0 20px;flex-shrink:0;border-bottom:2px solid var(--bd);position:sticky;top:56px;z-index:29}
+.tbtn{background:transparent;border:none;color:rgba(255,255,255,.5);padding:8px 16px;font-size:11px;font-weight:700;font-family:inherit;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-2px;transition:all .15s}
+.tbtn:hover{color:#fff}
+.tbtn.active{color:#fff;border-bottom-color:var(--bl);background:rgba(59,130,246,.1)}
+.view{display:flex;flex-direction:column}
+
 /* FILTER */
-.fbar{background:#fff;border-bottom:1px solid var(--br);padding:4px 20px;display:flex;align-items:center;gap:8px;flex-shrink:0;flex-wrap:nowrap;overflow-x:auto;height:32px}
+.fbar{background:#fff;border-bottom:1px solid var(--br);padding:4px 20px;display:flex;align-items:center;gap:8px;flex-shrink:0;flex-wrap:nowrap;overflow-x:auto;height:32px;position:sticky;top:90px;z-index:28}
 .fl{font-size:8px;color:var(--mu);text-transform:uppercase;letter-spacing:.6px;font-family:'JetBrains Mono',monospace;font-weight:600}
 .fs,.fd{border:1px solid var(--br);border-radius:4px;background:#fff;color:var(--tx);font-size:10px;padding:2px 6px;outline:none;height:22px;font-family:inherit;cursor:pointer}
 .fs:focus,.fd:focus{border-color:var(--bl)}
@@ -50,8 +57,8 @@ html,body{height:100%;overflow:hidden;font-family:'Plus Jakarta Sans',sans-serif
 .kd{font-size:8px;color:var(--dm);margin-top:1px;font-family:'JetBrains Mono',monospace;white-space:nowrap}
 
 /* CONTENT */
-.main{flex:1;display:flex;flex-direction:column;padding:6px 20px 4px;gap:6px;overflow:hidden;min-height:0}
-.tbls{display:grid;grid-template-columns:1fr 1.4fr;gap:6px;flex:1;min-height:0;height:100%;overflow:hidden}
+.main{display:flex;flex-direction:column;padding:6px 20px 16px;gap:6px}
+.tbls{display:flex;flex-direction:column;gap:8px}
 .cd{background:#fff;border-radius:8px;border:1px solid var(--br);padding:8px 12px;display:flex;flex-direction:column;overflow:hidden;min-height:0}
 .ch{display:flex;align-items:center;justify-content:space-between;margin-bottom:4px;flex-shrink:0}
 .ct{font-size:11px;font-weight:800;color:var(--bdp);text-transform:uppercase;letter-spacing:.2px;display:flex;align-items:center;gap:6px}
@@ -75,27 +82,77 @@ html,body{height:100%;overflow:hidden;font-family:'Plus Jakarta Sans',sans-serif
 .op{font-weight:800;font-family:'JetBrains Mono',monospace;font-size:10px;white-space:nowrap}
 
 /* TABLE */
-.tblw{background:#fff;border-radius:8px;border:1px solid var(--br);display:flex;flex-direction:column;height:100%;overflow:hidden;min-height:0}
-.tbh{display:flex;align-items:center;justify-content:space-between;padding:6px 12px;border-bottom:1px solid var(--br);flex-shrink:0}
-.tbt{font-size:11px;font-weight:800;color:var(--bdp);display:flex;align-items:center;gap:6px}
-.tbt::before{content:'';width:3px;height:12px;background:var(--bd);border-radius:2px}
-.tbb{font-size:8px;padding:2px 6px;border-radius:8px;background:var(--bpl);color:var(--bd);font-family:'JetBrains Mono',monospace;font-weight:700}
+.tblw{background:#fff;border-radius:8px;border:1px solid var(--br);display:flex;flex-direction:column;overflow:hidden;max-height:420px}
+.tbh{display:flex;align-items:center;justify-content:space-between;padding:4px 10px;border-bottom:1px solid var(--br);flex-shrink:0;gap:6px}
+.tbt{font-size:10px;font-weight:800;color:var(--bdp);display:flex;align-items:center;gap:5px;white-space:nowrap}
+.tbt::before{content:'';width:3px;height:10px;background:var(--bd);border-radius:2px}
+.tbb{font-size:7px;padding:2px 5px;border-radius:8px;background:var(--bpl);color:var(--bd);font-family:'JetBrains Mono',monospace;font-weight:700;white-space:nowrap}
 .tbs{flex:1;overflow:auto;min-height:0}
 .tbs::-webkit-scrollbar{width:4px;height:4px}
 .tbs::-webkit-scrollbar-thumb{background:var(--br2);border-radius:6px}
 table{width:100%;border-collapse:collapse}
-thead th{background:var(--bdp);color:#fff;padding:6px 10px;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.4px;font-family:'JetBrains Mono',monospace;text-align:right;white-space:nowrap;position:sticky;top:0;z-index:2}
+thead th{background:var(--bdp);color:#fff;padding:4px 6px;font-size:7px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;font-family:'JetBrains Mono',monospace;text-align:right;white-space:nowrap;position:sticky;top:0;z-index:2}
 thead th:first-child{text-align:left}
-tbody td{padding:5px 10px;border-bottom:1px solid var(--br);text-align:right;font-variant-numeric:tabular-nums;font-family:'JetBrains Mono',monospace;font-size:10px}
-tbody td:first-child{text-align:left;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;color:var(--bdp)}
+tbody td{padding:3px 6px;border-bottom:1px solid var(--br);text-align:right;font-variant-numeric:tabular-nums;font-family:'JetBrains Mono',monospace;font-size:9px}
+tbody td:first-child{text-align:left;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;color:var(--bdp);font-size:9px}
 tbody tr:nth-child(even){background:#fafbfd}
 tbody tr:hover{background:var(--bbg)}
 tbody tr.tot{background:linear-gradient(90deg,var(--bpl),#fff)}
-tbody tr.tot td{border-top:2px solid var(--bdp);font-weight:800;color:var(--bdp)}
+tbody tr.tot td{border-top:2px solid var(--bdp);font-weight:800;color:var(--bdp);padding:4px 6px}
+tbody tr.rowsel{cursor:pointer}
+tbody tr.rowsel:not(.tot):hover{background:var(--bpl)}
+tbody tr.sel{background:var(--bpl)!important;box-shadow:inset 3px 0 0 var(--bd)}
+tbody tr.sel td:first-child{color:var(--bd)}
+.fixed-tbl{table-layout:fixed}
+.fixed-tbl td:first-child,.fixed-tbl th:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#gCompTbl{border-collapse:collapse;font-size:10px;min-width:100%}
+#gCompTbl th{background:var(--bdp);color:#fff;padding:5px 8px;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;font-family:'JetBrains Mono',monospace;text-align:right;white-space:nowrap;position:sticky;top:0;z-index:2;border:1px solid rgba(255,255,255,.1)}
+#gCompTbl th:first-child{text-align:left;position:sticky;left:0;z-index:3;background:var(--bdp)}
+#gCompTbl th.grp{background:#162454;text-align:center;font-size:9px;letter-spacing:.5px}
+#gCompTbl th.grp-blue{background:#1d3a7a}
+#gCompTbl th.grp-purple{background:#3b2b7a}
+#gCompTbl td{padding:5px 8px;border-bottom:1px solid var(--br);text-align:right;font-variant-numeric:tabular-nums;font-family:'JetBrains Mono',monospace;font-size:10px;white-space:nowrap}
+#gCompTbl td:first-child{text-align:left;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;color:var(--bdp);position:sticky;left:0;background:inherit;z-index:1}
+#gCompTbl tbody tr:nth-child(even){background:#fafbfd}
+#gCompTbl tbody tr:hover{background:var(--bbg)}
+#gCompTbl tbody tr.tot{background:linear-gradient(90deg,var(--bpl),#fff)}
+#gCompTbl tbody tr.tot td{border-top:2px solid var(--bdp);font-weight:800;color:var(--bdp)}
 .gg{color:var(--gn);font-weight:800}.go{color:var(--am);font-weight:800}.gb{color:var(--rd);font-weight:800}
-.bar-cell{display:flex;align-items:center;gap:4px;justify-content:flex-end}
-.bar-bg{width:50px;height:6px;background:var(--br);border-radius:3px;overflow:hidden}
-.bar-fill{height:100%;border-radius:3px;background:var(--bd)}
+
+/* CITY VIEW */
+.cityrow{display:flex;gap:6px;margin-bottom:6px;align-items:stretch}
+.cogs-top{display:grid;grid-template-columns:1.3fr 1fr;gap:8px;margin-bottom:8px}
+.cogs-viz{background:#fff;border-radius:8px;border:1px solid var(--br);padding:12px 14px;display:flex;flex-direction:column;gap:12px;overflow-y:auto;max-height:420px}
+.sortbtn{font-size:8.5px;padding:3px 9px;border-radius:10px;border:1px solid var(--br);background:#fff;color:var(--dm);cursor:pointer;font-family:inherit;font-weight:700}
+.sortbtn.active{background:var(--bd);color:#fff;border-color:var(--bd)}
+.sortbtn:hover:not(.active){border-color:var(--bd);color:var(--bd)}
+.viz-title{font-size:9px;font-weight:700;color:var(--dm);text-transform:uppercase;letter-spacing:.4px;margin-bottom:5px;font-family:'JetBrains Mono',monospace}
+.vrow{display:flex;align-items:center;gap:6px;padding:3px 0}
+.vname{width:78px;flex-shrink:0;font-size:9.5px;font-weight:600;color:var(--tx);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vbar-bg{flex:1;height:14px;background:var(--br);border-radius:3px;overflow:hidden;position:relative}
+.vbar-fill{height:100%;border-radius:3px;display:flex;align-items:center;justify-content:flex-end;padding-right:4px}
+.vbar-val{font-size:8px;font-weight:800;color:#fff;white-space:nowrap}
+.vbar-val.out{color:var(--tx);position:absolute;left:calc(100% + 4px);top:50%;transform:translateY(-50%)}
+
+.segbar{display:flex;width:100%;height:26px;border-radius:5px;overflow:hidden;box-shadow:0 0 0 1px var(--br)}
+.seg{height:100%;position:relative;transition:opacity .15s}
+.seg:hover{opacity:.85}
+.seg-legend-row{display:flex;align-items:center;gap:6px;padding:2px 0;font-size:9.5px}
+.seg-dot{width:8px;height:8px;border-radius:2px;flex-shrink:0}
+.seg-name{flex:1;font-weight:600;color:var(--tx);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.seg-pct{font-weight:800;font-family:'JetBrains Mono',monospace;color:var(--bdp)}
+
+/* MEMO */
+.memo{background:#fff;border-radius:8px;border:1px solid var(--br);border-left:4px solid var(--bd);padding:10px 14px;flex-shrink:0;max-height:150px;overflow-y:auto}
+.memo-head{font-size:11px;font-weight:800;color:var(--bdp);margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.memo-body{display:flex;flex-direction:column;gap:6px}
+.memo-item{display:flex;gap:8px;align-items:flex-start;font-size:10.5px;line-height:1.5;color:var(--tx)}
+.memo-tag{flex-shrink:0;font-size:8px;font-weight:800;padding:2px 7px;border-radius:8px;text-transform:uppercase;font-family:'JetBrains Mono',monospace;white-space:nowrap;margin-top:1px}
+.memo-tag.risk{background:var(--rdb);color:var(--rd)}
+.memo-tag.good{background:var(--gnb);color:var(--gn)}
+.memo-tag.info{background:var(--bpl);color:var(--bd)}
+.memo-tag.watch{background:var(--amb);color:var(--am)}
+.memo-item b{color:var(--bdp)}
 
 /* STATUS */
 .sbar{background:#080e27;color:rgba(255,255,255,.3);padding:3px 20px;font-size:8px;font-family:'JetBrains Mono',monospace;display:flex;justify-content:space-between;flex-shrink:0}
@@ -110,15 +167,20 @@ tbody tr.tot td{border-top:2px solid var(--bdp);font-weight:800;color:var(--bdp)
 <body>
 <div class="app">
 <div class="ld" id="ld">
-  <img src="data:image/jpeg;base64,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" style="height:40px" alt="SS">
+  <img src="data:image/jpeg;base64,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" style="height:40px" alt="SS">
   <div class="sp"></div><div id="lt" style="font-size:12px;color:#64748b">Loading…</div>
 </div>
 <div class="hdr">
-  <img class="h-logo" src="data:image/jpeg;base64,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" alt="SS">
+  <img class="h-logo" src="data:image/jpeg;base64,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" alt="SS">
   <div><div class="h-t">B2C <i>GM</i> Report</div><div class="h-sub" id="hSub">Analytics Dashboard</div></div>
   <div class="h-fill"></div>
   <div class="h-live"><span class="h-dot"></span><span id="hLive">—</span></div>
   <button class="h-btn" onclick="loadData()">↻ Refresh</button>
+</div>
+<div class="tabnav">
+  <button class="tbtn active" id="tabBtn-ov" onclick="showTab('ov')">Overview</button>
+  <button class="tbtn" id="tabBtn-city" onclick="showTab('city')">City Analysis</button>
+  <button class="tbtn" id="tabBtn-cogs" onclick="showTab('cogs')">COGS Analysis</button>
 </div>
 <div class="fbar">
   <span class="fl">From</span><input type="date" class="fd" id="fFrom" onchange="af()">
@@ -130,13 +192,15 @@ tbody tr.tot td{border-top:2px solid var(--bdp);font-weight:800;color:var(--bdp)
   <span class="fl">Phase</span><select class="fs" id="fPh" onchange="af()"><option value="">All</option><option>Single Phase</option><option>Three Phase</option></select>
   <div class="fdiv"></div>
   <button class="fbtn" onclick="cf()">✕ Clear</button>
+  <button class="fbtn" id="xfBtn" onclick="SELM=null;SELS=null;render();" style="display:none">✕ Cross-filter</button>
   <span class="finfo" id="fi">—</span>
 </div>
+<div id="view-ov" class="view">
 <div class="krow">
   <div class="kc c1"><div class="kl">Projects</div><div class="kv" id="k1" style="color:var(--bdp)">—</div><div class="kd" id="k1d">—</div></div>
   <div class="kc c2"><div class="kl">Project Size</div><div class="kv" id="k2" style="color:var(--pu)">—</div><div class="kd" id="k2d">—</div></div>
   <div class="kc c3"><div class="kl">Revenue Ex-GST</div><div class="kv" id="k3" style="color:var(--am)">—</div><div class="kd" id="k3d">—</div></div>
-  <div class="kc c4"><div class="kl">IC Total (COGS)</div><div class="kv" id="k4" style="color:var(--or)">—</div><div class="kd" id="k3d">—</div></div>
+  <div class="kc c4"><div class="kl">IC Total (COGS)</div><div class="kv" id="k4" style="color:var(--or)">—</div><div class="kd" id="k4d">—</div></div>
   <div class="kc c5"><div class="kl">Gross Profit</div><div class="kv" id="k5" style="color:var(--gn2)">—</div><div class="kd">Revenue − IC Total</div></div>
   <div class="kc c6"><div class="kl">GM Book %</div><div class="kv" id="k6" style="color:var(--gn)">—</div><div class="kd" id="k6d">—</div></div>
   <div class="kc c7"><div class="kl">COGS O&M & QHSE</div><div class="kv" id="k7" style="color:var(--pk)">—</div><div class="kd" id="k7d">—</div></div>
@@ -147,25 +211,113 @@ tbody tr.tot td{border-top:2px solid var(--bdp);font-weight:800;color:var(--bdp)
 <div class="main">
   <div class="tbls">
     <div class="tblw">
-      <div class="tbh"><div class="tbt">Monthly Performance</div><div class="tbb" id="mBdg">—</div></div>
-      <div class="tbs"><table><thead><tr>
-        <th>Month</th><th>Projects</th><th>Revenue (₹Cr)</th><th>COGS (₹Cr)</th><th>GM ₹ (₹Cr)</th><th>GM %</th><th>AoS</th><th>AoV (₹L)</th><th>Rev/Wp</th>
-      </tr></thead><tbody id="tM"></tbody></table></div>
-    </div>
-    <div class="tblw">
       <div class="tbh"><div class="tbt">State Performance Summary</div><div class="tbb" id="sBdg">—</div></div>
       <div class="tbs"><table><thead><tr>
-        <th>#</th><th>State</th><th>Installs</th><th>Revenue (Ex-GST)</th><th>COGS (IC Total)</th><th>Gross Margin ₹</th><th>GM %</th><th>Avg AOV</th><th>Avg AOS</th><th>Rev Share</th>
+        <th>#</th><th>State</th><th>Installs</th><th>Revenue</th><th>COGS</th><th>GM ₹</th><th>GM%</th><th>AOV</th><th>AOS</th>
       </tr></thead><tbody id="tB"></tbody></table></div>
+    </div>
+    <div class="tblw">
+      <div class="tbh"><div class="tbt">Monthly Performance</div><div class="tbb" id="mBdg">—</div></div>
+      <div class="tbs"><table><thead><tr>
+        <th>Month</th><th>Projects</th><th>Rev (₹Cr)</th><th>COGS (₹Cr)</th><th>GM ₹ (₹Cr)</th><th>GM%</th><th>AOS (kW)</th><th>AOV (₹L)</th><th>₹/Wp</th>
+      </tr></thead><tbody id="tM"></tbody></table></div>
     </div>
   </div>
 </div>
+</div>
+
+<!-- CITY ANALYSIS VIEW -->
+<div id="view-city" class="view" style="display:none">
+<div class="krow">
+  <div class="kc c1"><div class="kl">Total Cities</div><div class="kv" id="c1" style="color:var(--bdp)">—</div><div class="kd" id="c1d">—</div></div>
+  <div class="kc c3"><div class="kl">Top City (Rev)</div><div class="kv" id="c2" style="color:var(--am);font-size:13px">—</div><div class="kd" id="c2d">—</div></div>
+  <div class="kc c6"><div class="kl">Best GM% City</div><div class="kv" id="c3" style="color:var(--gn);font-size:13px">—</div><div class="kd" id="c3d">—</div></div>
+  <div class="kc c7"><div class="kl">Worst GM% City</div><div class="kv" id="c4" style="color:var(--rd);font-size:13px">—</div><div class="kd" id="c4d">—</div></div>
+  <div class="kc c2"><div class="kl">Top 5 Rev Share</div><div class="kv" id="c5" style="color:var(--pu)">—</div><div class="kd" id="c5d">concentration</div></div>
+  <div class="kc c8"><div class="kl">Avg GM% (Fleet)</div><div class="kv" id="c6" style="color:var(--tl)">—</div><div class="kd">across all cities</div></div>
+</div>
+<div class="main">
+  <div class="cityrow">
+    <div class="tblw" style="flex:1.5">
+      <div class="tbh">
+        <div class="tbt">City Ranking</div>
+        <div style="display:flex;gap:4px;align-items:center">
+          <button class="sortbtn active" id="sb-rev" onclick="citySort('rev')">Revenue</button>
+          <button class="sortbtn" id="sb-gm" onclick="citySort('gm')">GM%</button>
+          <button class="sortbtn" id="sb-n" onclick="citySort('n')">Installs</button>
+          <button class="sortbtn" id="sb-aov" onclick="citySort('aov')">AOV</button>
+          <div class="tbb" id="cBdg" style="margin-left:6px">—</div>
+        </div>
+      </div>
+      <div class="tbs"><table><thead><tr>
+        <th>#</th><th>City</th><th>State</th><th>Installs</th><th>Revenue</th><th>COGS</th><th>GM ₹</th><th>GM %</th><th>AOV</th><th>AOS</th><th>Rev/Wp</th>
+      </tr></thead><tbody id="tC"></tbody></table></div>
+    </div>
+    <div class="cd" style="flex:1;display:flex;flex-direction:column;gap:8px;overflow-y:auto;max-height:420px">
+      <div>
+        <div class="viz-title">Top 10 Cities by Revenue</div>
+        <div id="vizRev"></div>
+      </div>
+      <div>
+        <div class="viz-title">Top 10 Cities by GM%</div>
+        <div id="vizGM"></div>
+      </div>
+    </div>
+  </div>
+  <div class="memo">
+    <div class="memo-head">🔎 RCA & Analytics Notes <span class="cb" id="memoBdg">auto-generated</span></div>
+    <div id="memoBody" class="memo-body"></div>
+  </div>
+</div>
+</div>
+
+<!-- COGS ANALYSIS VIEW -->
+<div id="view-cogs" class="view" style="display:none">
+<div class="krow">
+  <div class="kc c4"><div class="kl">Total COGS</div><div class="kv" id="g1" style="color:var(--or)">—</div><div class="kd" id="g1d">—</div></div>
+  <div class="kc c6"><div class="kl">COGS % of Revenue</div><div class="kv" id="g2" style="color:var(--gn)">—</div><div class="kd" id="g2d">—</div></div>
+  <div class="kc c5"><div class="kl">Cost / Wp (Fleet)</div><div class="kv" id="g3" style="color:var(--gn2)">—</div><div class="kd">₹ per Wp installed</div></div>
+  <div class="kc c1"><div class="kl">Module Share</div><div class="kv" id="g4" style="color:var(--bdp)">—</div><div class="kd" id="g4d">of COGS</div></div>
+  <div class="kc c7"><div class="kl">Metering Share</div><div class="kv" id="g5" style="color:var(--pk)">—</div><div class="kd" id="g5d">of COGS</div></div>
+  <div class="kc c2"><div class="kl">Top Cost Driver</div><div class="kv" id="g6" style="color:var(--pu);font-size:13px">—</div><div class="kd" id="g6d">—</div></div>
+</div>
+<div class="main">
+  <!-- Row 1: Category breakdown + visuals side by side -->
+  <div class="cogs-top">
+    <div class="tblw">
+      <div class="tbh"><div class="tbt">Category-wise COGS Breakdown</div><div class="tbb" id="gBdg">—</div></div>
+      <div class="tbs"><table class="fixed-tbl"><colgroup><col style="width:28%"><col style="width:18%"><col style="width:18%"><col style="width:18%"><col style="width:18%"></colgroup><thead><tr>
+        <th>Category</th><th>Total Cost</th><th>% of COGS</th><th>Cost / Wp</th><th>Avg / Project</th>
+      </tr></thead><tbody id="tG"></tbody></table></div>
+    </div>
+    <div class="cogs-viz">
+      <div><div class="viz-title">Category Mix (% of COGS)</div><div class="segbar" id="segMix"></div><div id="segLegend" style="margin-top:6px"></div></div>
+      <div><div class="viz-title">Cost per Wp by Category (₹)</div><div id="vizCostWp"></div></div>
+    </div>
+  </div>
+  <!-- Row 2: Month-wise comparison table -->
+  <div class="tblw">
+    <div class="tbh">
+      <div class="tbt">COGS Comparison — Month View</div>
+      <div style="font-size:8px;color:var(--dm)">Amount (₹) · Mix % of total COGS · Per Wp (₹/Wp installed)</div>
+      <div class="tbb" id="gCompBdg">—</div>
+    </div>
+    <div class="tbs" style="overflow-x:auto"><table id="gCompTbl"><thead id="gCompHead"></thead><tbody id="gCompBody"></tbody></table></div>
+  </div>
+  <!-- Row 3: RCA -->
+  <div class="memo">
+    <div class="memo-head">🔎 COGS RCA & Analytics Notes <span class="cb">auto-generated</span></div>
+    <div id="memoBodyG" class="memo-body"></div>
+  </div>
+</div>
+</div>
+
 <div class="sbar"><span id="sT">—</span><b>SolarSquare · B2C GM · GitHub</b><span id="sF">No filters</span></div>
 </div>
 <script>
 const PGZ='https://raw.githubusercontent.com/sanketmhatre-png/Demo-Dash/main/projects.json.gz';
 const MTA='https://raw.githubusercontent.com/sanketmhatre-png/Demo-Dash/main/data_meta.json';
-let A=[],F=[];
+let A=[],F=[],SELM=null,SELS=null,CITYSORT='rev';
 const MC='2026-04-01',MT={'540 Wp Mono Bifacial DCR-PREMIER':12037.98,'550 Wp Mono Bifacial Non DCR-NAVITAS':7383.75,'545 Wp Mono Bifacial Non DCR-PREMIER':8107.27,'600 Wp Mono Bifacial Topcon N-Type DCR-PREMIER':13920};
 const MC2='2026-05-01',MT2={'540 Wp Mono Bifacial DCR-PREMIER':12093,'550 Wp Mono Bifacial Non DCR-NAVITAS':7768,'550 Wp Mono Bifacial DCR-RAYZON':11509,'545 Wp Mono Bifacial Non DCR-WAAREE':9007,'545 Wp Mono Bifacial Non DCR-PREMIER':8085};
 const MC3='2026-06-01',MT3={'610 Wp Mono Bifacial Topcon N-Type DCR-PREMIER':13268,'540 Wp Mono Bifacial DCR-PREMIER':11819,'550 Wp Mono Bifacial DCR-RAYZON':11523};
@@ -189,7 +341,8 @@ async function loadData(){
     const p=JSON.parse(txt);let proj=p._meta?p.projects:Array.isArray(p)?p:[];
     A=proj.map(p=>{const dt=pD(p.dt);let mod=p.mod,cogs=p.cogs;const mt=(p.mt||'').trim(),mq=p.mq||0;
       if(mt&&mq>0){const rate=gR(mt,dt);if(rate!==null){cogs=cogs-p.mod+rate*mq;mod=rate*mq;}}
-      return{id:p.id,city:p.c,state:p.s,offer:p.o,phase:p.ph,kw:p.kw,rev:p.rev,cogs,gm:p.rev-cogs,date:dt,hr:p.rev>0,mod,onm:p.onm||0,qhs:p.qhs||0,mt,mq};
+      return{id:p.id,city:p.c,state:p.s,offer:p.o,phase:p.ph,kw:p.kw,rev:p.rev,cogs,gm:p.rev-cogs,date:dt,hr:p.rev>0,mod,onm:p.onm||0,qhs:p.qhs||0,mt,mq,
+        inv:p.inv||0,prf:p.prf||0,cab:p.cab||0,ick:p.ick||0,con:p.con||0,ear:p.ear||0,jbx:p.jbx||0,tsh:p.tsh||0,saf:p.saf||0,ica:p.ica||0,wel:p.wel||0,ssn:p.ssn||0,ebo:p.ebo||0,dlg:p.dlg||0,mtr:p.mtr||0,wkt:p.wkt||0,lad:p.lad||0};
     });
     pF();F=[...A];render();document.getElementById('sT').textContent='● '+A.length.toLocaleString()+' projects · synced '+new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
   }catch(e){lt.textContent='Error: '+e.message;return;}
@@ -204,16 +357,32 @@ function af(){
   const f={fy:document.getElementById('fFY').value,st:document.getElementById('fSt').value,of:document.getElementById('fOf').value,ph:document.getElementById('fPh').value,fr:document.getElementById('fFrom').value,to:document.getElementById('fTo').value};
   const df=f.fr?new Date(f.fr):null,dt=f.to?(()=>{const d=new Date(f.to);d.setHours(23,59,59);return d;})():null;
   F=A.filter(r=>{if(f.st&&r.state!==f.st)return false;if(f.of&&r.offer!==f.of)return false;if(f.ph&&r.phase!==f.ph)return false;if((f.fy||f.fr||f.to)&&!r.date)return false;if(r.date){if(f.fy&&fy(r.date)!==f.fy)return false;if(df&&r.date<df)return false;if(dt&&r.date>dt)return false;}return true;});
+  SELM=null;SELS=null;
   document.getElementById('fi').textContent=F.length.toLocaleString()+' / '+A.length.toLocaleString()+' installs';
   document.getElementById('sF').textContent=[f.fy,f.st,f.of,f.ph].filter(Boolean).join(' · ')||'No filters';
   render();
 }
-function cf(){['fFY','fSt','fOf','fPh','fFrom','fTo'].forEach(i=>{const e=document.getElementById(i);if(e)e.value='';});F=[...A];document.getElementById('fi').textContent=A.length.toLocaleString()+' installs';document.getElementById('sF').textContent='No filters';render();}
+function cf(){['fFY','fSt','fOf','fPh','fFrom','fTo'].forEach(i=>{const e=document.getElementById(i);if(e)e.value='';});F=[...A];SELM=null;SELS=null;document.getElementById('fi').textContent=A.length.toLocaleString()+' installs';document.getElementById('sF').textContent='No filters';render();}
+function pickMonth(k){SELM=(SELM===k)?null:k;render();}
+function pickState(s){SELS=(SELS===s)?null:s;render();}
+function fdState(){return SELS?F.filter(r=>r.state===SELS):F;}
+function fdMonth(){if(!SELM)return F;const[y,mo]=SELM.split('-').map(Number);return F.filter(r=>r.date&&r.date.getFullYear()===y&&r.date.getMonth()===mo);}
+function fdBoth(){let arr=F;if(SELS)arr=arr.filter(r=>r.state===SELS);if(SELM){const[y,mo]=SELM.split('-').map(Number);arr=arr.filter(r=>r.date&&r.date.getFullYear()===y&&r.date.getMonth()===mo);}return arr;}
 
-function render(){rK();rM();rT();}
+function render(){
+  const xf=document.getElementById('xfBtn');
+  if(xf){
+    const parts=[];if(SELS)parts.push(SELS);if(SELM){const[y,mo]=SELM.split('-').map(Number);parts.push(new Date(y,mo,1).toLocaleString('en',{month:'short',year:'numeric'}));}
+    if(parts.length){xf.style.display='inline-block';xf.textContent='✕ '+parts.join(' + ');}
+    else xf.style.display='none';
+  }
+  rK();rM();rT();
+  if(document.getElementById('view-city').style.display!=='none')rCity();
+  if(document.getElementById('view-cogs').style.display!=='none')rCogs();
+}
 
 function rK(){
-  const r=F,rv=r.filter(x=>x.hr),n=r.length,nr=rv.length;
+  const r=fdBoth(),rv=r.filter(x=>x.hr),n=r.length,nr=rv.length;
   const tR=rv.reduce((s,x)=>s+x.rev,0),tC=rv.reduce((s,x)=>s+x.cogs,0),tK=r.reduce((s,x)=>s+x.kw,0);
   const tO=r.reduce((s,x)=>s+(x.onm||0)+(x.qhs||0),0),gm=tR-tC,gp=tR?gm/tR*100:0;
   const s=(i,v)=>{const e=document.getElementById(i);if(e)e.textContent=v;};
@@ -231,25 +400,256 @@ function rK(){
 }
 
 function rM(){
-  const m={};F.forEach(r=>{if(!r.date)return;const k=r.date.toLocaleString('en',{month:'short',year:'numeric'});const y=r.date.getFullYear(),mo=r.date.getMonth();if(!m[k])m[k]={k,rev:0,cogs:0,n:0,kw:0,nr:0,y,mo};m[k].n++;m[k].kw+=r.kw;if(r.hr){m[k].rev+=r.rev;m[k].cogs+=r.cogs;m[k].nr++;}});
+  const src=fdState();
+  const m={};src.forEach(r=>{if(!r.date)return;const y=r.date.getFullYear(),mo=r.date.getMonth();const key=y+'-'+mo;const lbl=r.date.toLocaleString('en',{month:'short'})+'\n'+r.date.getFullYear();if(!m[key])m[key]={key,lbl,rev:0,cogs:0,n:0,kw:0,nr:0,y,mo};m[key].n++;m[key].kw+=r.kw;if(r.hr){m[key].rev+=r.rev;m[key].cogs+=r.cogs;m[key].nr++;}});
   const a=Object.values(m).sort((a,b)=>b.y!==a.y?b.y-a.y:b.mo-a.mo);
-  document.getElementById('mBdg').textContent=a.length+' months';
-  const tot={k:'TOTAL',n:0,kw:0,rev:0,cogs:0,nr:0};a.forEach(d=>{tot.n+=d.n;tot.kw+=d.kw;tot.rev+=d.rev;tot.cogs+=d.cogs;tot.nr+=d.nr;});
+  document.getElementById('mBdg').textContent=a.length+' months · click to filter';
+  const tot={n:0,kw:0,rev:0,cogs:0,nr:0};a.forEach(d=>{tot.n+=d.n;tot.kw+=d.kw;tot.rev+=d.rev;tot.cogs+=d.cogs;tot.nr+=d.nr;});
   const rw=(d,t)=>{const gm=d.rev-d.cogs,gp=d.rev?gm/d.rev*100:0,as=d.n?d.kw/d.n:0,av=d.nr?d.rev/d.nr:0,rp=d.kw>0?d.rev/(d.kw*1000):0;
-    return'<tr class="'+(t?'tot':'')+'"><td>'+(t?'<strong>TOTAL</strong>':d.k)+'</td><td>'+d.n.toLocaleString()+'</td><td>'+(d.rev/1e7).toFixed(2)+'</td><td>'+(d.cogs/1e7).toFixed(2)+'</td><td style="color:var(--gn)">'+(gm/1e7).toFixed(2)+'</td><td class="'+gc(gp)+'">'+gp.toFixed(2)+'%</td><td>'+as.toFixed(2)+'</td><td>'+(av/1e5).toFixed(2)+'</td><td>'+rp.toFixed(2)+'</td></tr>';};
+    const cls=(t?'tot':'rowsel')+(!t&&SELM===d.key?' sel':'');
+    const click=t?'':' onclick="pickMonth(\''+d.key+'\')"';
+    return'<tr class="'+cls+'"'+click+'><td>'+(t?'<b>TOTAL</b>':d.lbl)+'</td><td>'+d.n.toLocaleString()+'</td><td>'+(d.rev/1e7).toFixed(2)+'</td><td>'+(d.cogs/1e7).toFixed(2)+'</td><td style="color:var(--gn)">'+(gm/1e7).toFixed(2)+'</td><td class="'+gc(gp)+'">'+gp.toFixed(1)+'%</td><td>'+as.toFixed(2)+'</td><td>'+(av/1e5).toFixed(2)+'</td><td>'+rp.toFixed(1)+'</td></tr>';};
   document.getElementById('tM').innerHTML=a.map(d=>rw(d)).join('')+rw(tot,true);
 }
 
 function rT(){
-  const m={};F.forEach(r=>{const k=r.state||'Unknown';if(!m[k])m[k]={s:k,n:0,kw:0,rev:0,cogs:0,nr:0,onm:0};m[k].n++;m[k].kw+=r.kw;if(r.hr){m[k].rev+=r.rev;m[k].cogs+=r.cogs;m[k].nr++;}m[k].onm+=(r.onm||0)+(r.qhs||0);});
-  const a=Object.values(m).sort((a,b)=>b.rev-a.rev),tR=a.reduce((s,d)=>s+d.rev,0)||1;
-  const tot={s:'TOTAL',n:0,kw:0,rev:0,cogs:0,nr:0,onm:0};a.forEach(d=>{tot.n+=d.n;tot.kw+=d.kw;tot.rev+=d.rev;tot.cogs+=d.cogs;tot.nr+=d.nr;tot.onm+=d.onm;});
-  document.getElementById('sBdg').textContent=a.length+' states · click row to expand cities';
-  const rw=(d,i,t)=>{const gm=d.rev-d.cogs,gp=d.rev?gm/d.rev*100:0,as=d.n?d.kw/d.n:0,av=d.nr?d.rev/d.nr:0,sh=d.rev/tR*100;
-    return'<tr class="'+(t?'tot':'')+'"><td>'+(t?'':i)+'</td><td>'+(t?'<strong>TOTAL</strong>':d.s)+'</td><td>'+d.n.toLocaleString()+'</td><td>₹'+(d.rev/1e7).toFixed(2)+' Cr</td><td>₹'+(d.cogs/1e7).toFixed(2)+' Cr</td><td style="color:var(--gn)">₹'+(gm/1e7).toFixed(2)+' Cr</td><td class="'+gc(gp)+'">'+gp.toFixed(2)+'%</td><td>₹'+(av/1e5).toFixed(2)+' L</td><td>'+as.toFixed(2)+' kW</td><td><div class="bar-cell"><span>'+sh.toFixed(1)+'%</span><div class="bar-bg"><div class="bar-fill" style="width:'+Math.min(sh*2,100)+'%"></div></div></div></td></tr>';};
+  const src=fdMonth();
+  const m={};src.forEach(r=>{const k=r.state||'Unknown';if(!m[k])m[k]={s:k,n:0,kw:0,rev:0,cogs:0,nr:0};m[k].n++;m[k].kw+=r.kw;if(r.hr){m[k].rev+=r.rev;m[k].cogs+=r.cogs;m[k].nr++;}});
+  const a=Object.values(m).sort((a,b)=>b.rev-a.rev);
+  const tot={n:0,kw:0,rev:0,cogs:0,nr:0};a.forEach(d=>{tot.n+=d.n;tot.kw+=d.kw;tot.rev+=d.rev;tot.cogs+=d.cogs;tot.nr+=d.nr;});
+  document.getElementById('sBdg').textContent=a.length+' states · click to filter';
+  const rw=(d,i,t)=>{const gm=d.rev-d.cogs,gp=d.rev?gm/d.rev*100:0,as=d.n?d.kw/d.n:0,av=d.nr?d.rev/d.nr:0;
+    const cls=(t?'tot':'rowsel')+(!t&&SELS===d.s?' sel':'');
+    const click=t?'':' onclick="pickState(\''+d.s.replace(/'/g,"\\'")+'\')"';
+    return'<tr class="'+cls+'"'+click+'><td>'+(t?'':i)+'</td><td>'+(t?'<b>TOTAL</b>':d.s)+'</td><td>'+d.n.toLocaleString()+'</td><td>₹'+(d.rev/1e7).toFixed(2)+' Cr</td><td>₹'+(d.cogs/1e7).toFixed(2)+' Cr</td><td style="color:var(--gn)">₹'+(gm/1e7).toFixed(2)+' Cr</td><td class="'+gc(gp)+'">'+gp.toFixed(1)+'%</td><td>₹'+(av/1e5).toFixed(2)+' L</td><td>'+as.toFixed(2)+' kW</td></tr>';};
   document.getElementById('tB').innerHTML=a.map((d,i)=>rw(d,i+1)).join('')+rw(tot,0,true);
 }
+function showTab(t){
+  document.getElementById('view-ov').style.display=t==='ov'?'flex':'none';
+  document.getElementById('view-city').style.display=t==='city'?'flex':'none';
+  document.getElementById('view-cogs').style.display=t==='cogs'?'flex':'none';
+  document.getElementById('tabBtn-ov').classList.toggle('active',t==='ov');
+  document.getElementById('tabBtn-city').classList.toggle('active',t==='city');
+  document.getElementById('tabBtn-cogs').classList.toggle('active',t==='cogs');
+  if(t==='city')rCity();
+  if(t==='cogs')rCogs();
+}
+function citySort(k){CITYSORT=k;['rev','gm','n','aov'].forEach(x=>document.getElementById('sb-'+x).classList.toggle('active',x===k));rCity();}
+
+function rCity(){
+  const m={};F.forEach(r=>{const k=r.city||'Unknown';if(!m[k])m[k]={city:k,state:r.state||'—',n:0,kw:0,rev:0,cogs:0,nr:0};m[k].n++;m[k].kw+=r.kw;if(r.hr){m[k].rev+=r.rev;m[k].cogs+=r.cogs;m[k].nr++;}});
+  let arr=Object.values(m).map(d=>{const gm=d.rev-d.cogs;return Object.assign(d,{gm,gp:d.rev?gm/d.rev*100:0,aov:d.nr?d.rev/d.nr:0,aos:d.n?d.kw/d.n:0,rwp:d.kw>0?d.rev/(d.kw*1000):0});});
+  const sortFns={rev:(a,b)=>b.rev-a.rev,gm:(a,b)=>b.gp-a.gp,n:(a,b)=>b.n-a.n,aov:(a,b)=>b.aov-a.aov};
+  arr.sort(sortFns[CITYSORT]||sortFns.rev);
+  const totalRev=arr.reduce((s,d)=>s+d.rev,0)||1;
+  const totalGm=arr.reduce((s,d)=>s+d.gm,0);
+  const overallGP=totalRev?totalGm/totalRev*100:0;
+
+  document.getElementById('cBdg').textContent=arr.length+' cities';
+  // Table
+  const rw=d=>{return'<tr><td></td><td>'+d.city+'</td><td style="color:var(--dm);font-weight:500">'+d.state+'</td><td>'+d.n.toLocaleString()+'</td><td>₹'+(d.rev/1e7).toFixed(2)+' Cr</td><td>₹'+(d.cogs/1e7).toFixed(2)+' Cr</td><td style="color:var(--gn)">₹'+(d.gm/1e7).toFixed(2)+' Cr</td><td class="'+gc(d.gp)+'">'+d.gp.toFixed(2)+'%</td><td>₹'+(d.aov/1e5).toFixed(2)+' L</td><td>'+d.aos.toFixed(2)+' kW</td><td>₹'+d.rwp.toFixed(2)+'</td></tr>';};
+  document.getElementById('tC').innerHTML=arr.map((d,i)=>rw(d).replace('<td></td>','<td>'+(i+1)+'</td>')).join('');
+
+  // KPI cards
+  const byRev=[...arr].sort((a,b)=>b.rev-a.rev),byGM=[...arr].sort((a,b)=>b.gp-a.gp);
+  const top=byRev[0],bestGM=byGM[0],worstGM=byGM[byGM.length-1];
+  const top5Share=byRev.slice(0,5).reduce((s,d)=>s+d.rev,0)/totalRev*100;
+  document.getElementById('c1').textContent=arr.length;document.getElementById('c1d').textContent=arr.reduce((s,d)=>s+d.n,0).toLocaleString()+' total installs';
+  if(top){document.getElementById('c2').textContent=top.city;document.getElementById('c2d').textContent='₹'+(top.rev/1e7).toFixed(2)+' Cr · '+top.gp.toFixed(1)+'% GM';}
+  if(bestGM){document.getElementById('c3').textContent=bestGM.city;document.getElementById('c3d').textContent=bestGM.gp.toFixed(2)+'% GM · '+bestGM.n+' installs';}
+  if(worstGM){document.getElementById('c4').textContent=worstGM.city;document.getElementById('c4d').textContent=worstGM.gp.toFixed(2)+'% GM · '+worstGM.n+' installs';}
+  document.getElementById('c5').textContent=top5Share.toFixed(1)+'%';document.getElementById('c5d').textContent='of total revenue';
+  document.getElementById('c6').textContent=overallGP.toFixed(2)+'%';
+
+  // Viz bars — top 10 by revenue
+  const maxRev=byRev[0]?byRev[0].rev:1;
+  document.getElementById('vizRev').innerHTML=byRev.slice(0,10).map(d=>{
+    const w=Math.max((d.rev/maxRev*100),4);
+    const col=d.gp>=48?'var(--gn2)':d.gp>=40?'var(--am)':'var(--rd)';
+    return'<div class="vrow"><div class="vname" title="'+d.city+'">'+d.city+'</div><div class="vbar-bg"><div class="vbar-fill" style="width:'+w+'%;background:'+col+'"><span class="vbar-val'+(w<25?' out':'')+'">₹'+(d.rev/1e7).toFixed(1)+'Cr</span></div></div></div>';
+  }).join('');
+
+  // Viz bars — top 10 by GM%
+  const byGMdesc=[...arr].filter(d=>d.nr>0).sort((a,b)=>b.gp-a.gp).slice(0,10);
+  const maxGM=Math.max(...byGMdesc.map(d=>d.gp),1);
+  document.getElementById('vizGM').innerHTML=byGMdesc.map(d=>{
+    const w=Math.max((d.gp/maxGM*100),4);
+    const col=d.gp>=48?'var(--gn2)':d.gp>=40?'var(--am)':'var(--rd)';
+    return'<div class="vrow"><div class="vname" title="'+d.city+'">'+d.city+'</div><div class="vbar-bg"><div class="vbar-fill" style="width:'+w+'%;background:'+col+'"><span class="vbar-val'+(w<25?' out':'')+'">'+d.gp.toFixed(1)+'%</span></div></div></div>';
+  }).join('');
+
+  renderRCA(arr,overallGP,totalRev,top,bestGM,worstGM,top5Share);
+}
+
+function renderRCA(arr,overallGP,totalRev,top,bestGM,worstGM,top5Share){
+  const notes=[];
+  const validGM=arr.filter(d=>d.nr>=5); // only cities with meaningful sample
+  const laggards=validGM.filter(d=>d.gp<overallGP-5).sort((a,b)=>a.gp-b.gp);
+  const strong=validGM.filter(d=>d.gp>overallGP+5).sort((a,b)=>b.gp-a.gp);
+  const avgRwp=arr.reduce((s,d)=>s+d.rwp*d.kw,0)/(arr.reduce((s,d)=>s+d.kw,0)||1);
+  const lowRealisation=validGM.filter(d=>d.rwp>0&&d.rwp<avgRwp*0.92).sort((a,b)=>a.rwp-b.rwp);
+
+  // Concentration risk
+  if(top5Share>50){
+    notes.push({tag:'watch',html:'<b>Revenue concentration risk:</b> Top 5 cities contribute <b>'+top5Share.toFixed(1)+'%</b> of total revenue. A slowdown in these markets would disproportionately impact overall numbers — consider diversifying installer capacity to mid-tier cities.'});
+  }else{
+    notes.push({tag:'good',html:'<b>Healthy revenue spread:</b> Top 5 cities account for only '+top5Share.toFixed(1)+'% of revenue, indicating diversified geographic demand.'});
+  }
+
+  // Margin laggards (RCA)
+  if(laggards.length){
+    const names=laggards.slice(0,3).map(d=>d.city+' ('+d.gp.toFixed(1)+'%)').join(', ');
+    notes.push({tag:'risk',html:'<b>Margin drag identified:</b> '+laggards.length+' cities are running GM% more than 5pp below the fleet average ('+overallGP.toFixed(1)+'%). Worst offenders: '+names+'. <b>Likely root cause:</b> higher landed COGS per Wp (freight/logistics to these cities) or lower realised revenue per project — review module rate application and local pricing for these clusters.'});
+  }
+
+  // Low realisation (Rev/Wp root cause)
+  if(lowRealisation.length){
+    const names=lowRealisation.slice(0,3).map(d=>d.city+' (₹'+d.rwp.toFixed(2)+'/Wp)').join(', ');
+    notes.push({tag:'risk',html:'<b>Revenue realisation gap:</b> '+names+' are realising Rev/Wp meaningfully below the fleet average (₹'+avgRwp.toFixed(2)+'/Wp). This typically points to discounting, smaller average system sizes, or a product mix skewed toward lower-ASP offers in these cities.'});
+  }
+
+  // Outperformers
+  if(strong.length){
+    const names=strong.slice(0,3).map(d=>d.city+' ('+d.gp.toFixed(1)+'%)').join(', ');
+    notes.push({tag:'good',html:'<b>Margin outperformers:</b> '+names+' are running more than 5pp above fleet average GM%. Worth studying their cost structure (vendor rates, local BOS sourcing) as a playbook for underperforming clusters.'});
+  }
+
+  // Top city insight
+  if(top){
+    notes.push({tag:'info',html:'<b>'+top.city+'</b> is the single largest revenue contributor at ₹'+(top.rev/1e7).toFixed(2)+' Cr ('+((top.rev/totalRev)*100).toFixed(1)+'% of total) with a GM% of '+top.gp.toFixed(2)+'%, '+(top.gp>=overallGP?'above':'below')+' the fleet average.'});
+  }
+
+  // Sample size caveat
+  const smallCities=arr.filter(d=>d.nr>0&&d.nr<5).length;
+  if(smallCities>0){
+    notes.push({tag:'info',html: smallCities+' cities have fewer than 5 revenue-generating projects — their GM% figures are volatile and should be treated directionally, not as reliable benchmarks.'});
+  }
+
+  document.getElementById('memoBody').innerHTML=notes.map(n=>'<div class="memo-item"><span class="memo-tag '+n.tag+'">'+n.tag+'</span><span>'+n.html+'</span></div>').join('');
+}
+
+const COST_CATS=[
+  {key:'mod',label:'Module'},{key:'inv',label:'Inverter'},{key:'mtr',label:'Metering'},
+  {key:'prf',label:'Prefab MMS'},{key:'cab',label:'Cables'},{key:'ick',label:'I&C KIT'},
+  {key:'con',label:'Conduit Pipe'},{key:'ear',label:'Earthing & LA'},{key:'jbx',label:'Junction Box'},
+  {key:'tsh',label:'Tin Shed MMS'},{key:'saf',label:'Safety'},{key:'ica',label:'I&C Accessories'},
+  {key:'wel',label:'Welded MMS'},{key:'ssn',label:'SS NBW'},{key:'ebo',label:'Electrical BoS'},
+  {key:'dlg',label:'Data Logger'},{key:'wkt',label:'Welcome Kit & Board'},{key:'lad',label:'Ladder'}
+];
+const CAT_COLORS=['#1a4fd4','#3b82f6','#7c3aed','#db2777','#ea580c','#d97706','#059669','#0891b2','#60a5fa','#a78bfa','#f472b6','#fb923c','#fbbf24','#34d399','#22d3ee','#93c5fd','#c4b5fd','#fda4af'];
+
+function rCogs(){
+  const rv=F.filter(r=>r.hr);
+  const totRev=rv.reduce((s,r)=>s+r.rev,0),totCogs=rv.reduce((s,r)=>s+r.cogs,0),totKW=F.reduce((s,r)=>s+r.kw,0);
+  const nr=rv.length;
+  const catTotals=COST_CATS.map(c=>({...c,total:rv.reduce((s,r)=>s+(r[c.key]||0),0)}));
+  catTotals.forEach(c=>{c.share=totCogs?c.total/totCogs*100:0;c.perWp=totKW>0?c.total/(totKW*1000):0;});
+  catTotals.sort((a,b)=>b.total-a.total);
+
+  // KPIs
+  const cogsPct=totRev?totCogs/totRev*100:0,rwp=totKW>0?totCogs/(totKW*1000):0;
+  const modCat=catTotals.find(c=>c.key==='mod'),mtrCat=catTotals.find(c=>c.key==='mtr');
+  const s=(i,v)=>{const e=document.getElementById(i);if(e)e.textContent=v;};
+  s('g1','₹'+(totCogs/1e7).toFixed(2)+' Cr');s('g1d','across '+nr.toLocaleString()+' projects');
+  s('g2',cogsPct.toFixed(2)+'%');s('g2d',cogsPct<=52?'Healthy':'Elevated');
+  s('g3','₹'+rwp.toFixed(2));
+  s('g4',modCat?modCat.share.toFixed(1)+'%':'—');s('g4d',modCat?'₹'+(modCat.total/1e7).toFixed(2)+' Cr':'—');
+  s('g5',mtrCat?mtrCat.share.toFixed(1)+'%':'—');s('g5d',mtrCat?'₹'+(mtrCat.total/1e7).toFixed(2)+' Cr':'—');
+  if(catTotals[0]){s('g6',catTotals[0].label);s('g6d',catTotals[0].share.toFixed(1)+'% of total COGS');}
+
+  // Breakdown table
+  document.getElementById('gBdg').textContent=catTotals.length+' categories';
+  document.getElementById('tG').innerHTML=catTotals.map(c=>{
+    return'<tr><td>'+c.label+'</td><td>₹'+(c.total/1e7).toFixed(2)+' Cr</td><td class="'+(c.share>=25?'gb':c.share>=10?'go':'gg')+'">'+c.share.toFixed(2)+'%</td><td>₹'+c.perWp.toFixed(2)+'</td><td>₹'+(nr?c.total/nr:0).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,',')+'</td></tr>';
+  }).join('')+'<tr class="tot"><td><strong>TOTAL</strong></td><td>₹'+(totCogs/1e7).toFixed(2)+' Cr</td><td>100%</td><td>₹'+rwp.toFixed(2)+'</td><td>₹'+(nr?(totCogs/nr).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,','):'0')+'</td></tr>';
+
+  // Segmented mix bar
+  document.getElementById('segMix').innerHTML=catTotals.map((c,i)=>c.share>0.1?'<div class="seg" style="width:'+c.share+'%;background:'+CAT_COLORS[i%CAT_COLORS.length]+'" title="'+c.label+': '+c.share.toFixed(1)+'%"></div>':'').join('');
+  document.getElementById('segLegend').innerHTML=catTotals.slice(0,8).map((c,i)=>
+    '<div class="seg-legend-row"><div class="seg-dot" style="background:'+CAT_COLORS[i%CAT_COLORS.length]+'"></div><div class="seg-name">'+c.label+'</div><div class="seg-pct">'+c.share.toFixed(1)+'%</div></div>'
+  ).join('')+(catTotals.length>8?'<div class="seg-legend-row" style="color:var(--mu)"><div class="seg-dot" style="background:var(--br2)"></div><div class="seg-name">+'+(catTotals.length-8)+' more</div><div class="seg-pct">'+catTotals.slice(8).reduce((s,c)=>s+c.share,0).toFixed(1)+'%</div></div>':'');
+
+  // Cost per Wp bars
+  const maxPWp=Math.max(...catTotals.map(c=>c.perWp),0.01);
+  document.getElementById('vizCostWp').innerHTML=catTotals.map((c,i)=>{
+    const w=Math.max((c.perWp/maxPWp*100),3);
+    return'<div class="vrow"><div class="vname" title="'+c.label+'">'+c.label+'</div><div class="vbar-bg"><div class="vbar-fill" style="width:'+w+'%;background:'+CAT_COLORS[i%CAT_COLORS.length]+'"><span class="vbar-val'+(w<28?' out':'')+'">₹'+c.perWp.toFixed(1)+'</span></div></div></div>';
+  }).join('');
+
+  // Get last 4 months from filtered data
+  const withDate=rv.filter(r=>r.date);
+  const mk={};
+  withDate.forEach(r=>{const y=r.date.getFullYear(),mo=r.date.getMonth();const k=y+'-'+mo;const ml=r.date.toLocaleString('en',{month:'short'}).toUpperCase()+' '+String(y).slice(2);if(!mk[k])mk[k]={y,mo,k,lbl:ml};});
+  const months=Object.values(mk).sort((a,b)=>b.y!==a.y?b.y-a.y:b.mo-a.mo).slice(0,4).reverse();
+  const N=months.length;
+
+  document.getElementById('gCompBdg').textContent=months.map(m=>m.lbl).join(' · ');
+
+  // Compute per-month data for each category
+  const mRows=months.map(m=>{
+    const mr=withDate.filter(r=>r.date.getFullYear()===m.y&&r.date.getMonth()===m.mo);
+    const totC=mr.reduce((s,r)=>s+r.cogs,0),totK=mr.reduce((s,r)=>s+r.kw,0);
+    const cats={};
+    COST_CATS.forEach(c=>{const v=mr.reduce((s,r)=>s+(r[c.key]||0),0);cats[c.key]={amt:v,mix:totC?v/totC*100:0,wp:totK>0?v/(totK*1000):0};});
+    return{...m,totC,totK,cats};
+  });
+
+  // Build grouped header
+  let h1='<tr><th rowspan="2" style="min-width:120px">CATEGORY</th>';
+  let h2='<tr>';
+  if(N){
+    h1+='<th class="grp" colspan="'+N+'">AMOUNT (₹)</th><th class="grp grp-blue" colspan="'+N+'">MIX %</th><th class="grp grp-purple" colspan="'+N+'">PER WP (₹)</th>';
+    months.forEach(m=>{h2+='<th>'+m.lbl+'</th>';});
+    months.forEach(m=>{h2+='<th>'+m.lbl+'</th>';});
+    months.forEach(m=>{h2+='<th>'+m.lbl+'</th>';});
+  }
+  h1+='</tr>';h2+='</tr>';
+  document.getElementById('gCompHead').innerHTML=h1+h2;
+
+  // Build rows
+  const fmtAmt=v=>{if(v>=1e7)return'₹'+(v/1e7).toFixed(2)+' Cr';if(v>=1e5)return'₹'+(v/1e5).toFixed(1)+'L';return'₹'+Math.round(v).toLocaleString();};
+  let html='';
+  catTotals.forEach(c=>{
+    html+='<tr><td>'+c.label+'</td>';
+    // Amount columns
+    months.forEach(m=>{const v=mRows.find(x=>x.k===m.k).cats[c.key].amt;html+='<td>'+fmtAmt(v)+'</td>';});
+    // Mix % columns
+    months.forEach(m=>{const v=mRows.find(x=>x.k===m.k).cats[c.key].mix;html+='<td>'+(v>0.005?v.toFixed(1)+'%':'—')+'</td>';});
+    // Per Wp columns
+    months.forEach(m=>{const v=mRows.find(x=>x.k===m.k).cats[c.key].wp;html+='<td>'+(v>0.005?'₹'+v.toFixed(3):'—')+'</td>';});
+    html+='</tr>';
+  });
+  // Total COGS row
+  html+='<tr class="tot"><td><strong>Total COGS</strong></td>';
+  months.forEach(m=>{const mr=mRows.find(x=>x.k===m.k);html+='<td>'+fmtAmt(mr.totC)+'</td>';});
+  months.forEach(m=>{html+='<td>100%</td>';});
+  months.forEach(m=>{const mr=mRows.find(x=>x.k===m.k);html+='<td>₹'+(mr.totK>0?mr.totC/(mr.totK*1000):0).toFixed(3)+'</td>';});
+  html+='</tr>';
+  document.getElementById('gCompBody').innerHTML=html;
+
+  // RCA
+  const notes=[];
+  const top3Share=catTotals.slice(0,3).reduce((s,c)=>s+c.share,0);
+  notes.push({tag:'info',html:'<b>'+catTotals[0].label+'</b> is the single largest cost driver at <b>'+catTotals[0].share.toFixed(1)+'%</b> of total COGS. Top 3 ('+catTotals.slice(0,3).map(c=>c.label).join(', ')+') account for <b>'+top3Share.toFixed(1)+'%</b>.'});
+  if(cogsPct>52){notes.push({tag:'risk',html:'<b>COGS ratio elevated:</b> '+cogsPct.toFixed(2)+'% of revenue. Investigate module rate, product mix, or discounting.'});}
+  else{notes.push({tag:'good',html:'<b>Healthy cost ratio:</b> COGS at '+cogsPct.toFixed(2)+'% of revenue.'});}
+  // MoM movement on top categories
+  if(N>=2){
+    const m2=mRows[N-2],m1=mRows[N-1];
+    catTotals.slice(0,5).forEach(c=>{
+      const prev=m2.cats[c.key].wp,curr=m1.cats[c.key].wp;
+      if(prev>0){
+        const delta=(curr-prev)/prev*100;
+        if(Math.abs(delta)>5){
+          notes.push({tag:delta>0?'watch':'good',html:'<b>'+c.label+' ₹/Wp '+(delta>0?'up':'down')+' '+Math.abs(delta).toFixed(1)+'%</b> ('+m2.lbl+': ₹'+prev.toFixed(3)+' → '+m1.lbl+': ₹'+curr.toFixed(3)+').'});
+        }
+      }
+    });
+  }
+  if(rv.length<20){notes.push({tag:'info',html:'Small sample ('+rv.length+' projects) — figures may be volatile.'});}
+  document.getElementById('memoBodyG').innerHTML=notes.map(n=>'<div class="memo-item"><span class="memo-tag '+n.tag+'">'+n.tag+'</span><span>'+n.html+'</span></div>').join('');
+}
+
 window.addEventListener('DOMContentLoaded',loadData);
 </script>
-</body>
-</html>
+</body></html>
