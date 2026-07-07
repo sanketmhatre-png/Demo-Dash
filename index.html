@@ -119,6 +119,34 @@ tbody tr.sel td:first-child{color:var(--bd)}
 #gCompTbl tbody tr.tot td{border-top:2px solid var(--bdp);font-weight:800;color:var(--bdp)}
 .gg{color:var(--gn);font-weight:900}.go{color:var(--am);font-weight:900}.gb{color:var(--rd);font-weight:900}
 
+/* MOM CARDS */
+.mom-section{margin-top:8px}
+.mom-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.mom-card{background:#fff;border-radius:8px;border:1px solid var(--br);padding:12px 14px;display:flex;flex-direction:column;gap:4px;position:relative;overflow:hidden}
+.mom-card::before{content:'';position:absolute;top:0;left:0;right:0;height:3px}
+.mom-card.up::before{background:var(--gn2)} .mom-card.down::before{background:var(--rd)} .mom-card.flat::before{background:var(--am)}
+.mom-metric{font-size:9px;color:var(--mu);font-family:'JetBrains Mono',monospace;font-weight:700;text-transform:uppercase;letter-spacing:.4px}
+.mom-vals{display:flex;align-items:baseline;gap:8px}
+.mom-curr{font-size:18px;font-weight:900;color:var(--bdp)}
+.mom-prev{font-size:11px;color:var(--mu);text-decoration:line-through}
+.mom-delta{display:inline-flex;align-items:center;gap:3px;font-size:13px;font-weight:900;padding:2px 8px;border-radius:6px;margin-top:2px;width:fit-content}
+.mom-delta.up{background:var(--gnb);color:var(--gn)} .mom-delta.down{background:var(--rdb);color:var(--rd)} .mom-delta.flat{background:var(--amb);color:var(--am)}
+
+/* TREND BARS */
+.trend-section{margin-top:8px}
+.trend-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.trend-card{background:#fff;border-radius:8px;border:1px solid var(--br);padding:14px 16px}
+.trend-label{font-size:10px;font-weight:800;color:var(--bdp);margin-bottom:8px;text-transform:uppercase;letter-spacing:.3px}
+.trend-bars{position:relative;height:100px;margin-bottom:4px}
+.trend-bars svg{width:100%;height:100%}
+.trend-vals{display:flex;justify-content:space-between;gap:2px}
+.trend-v{flex:1;text-align:center;font-size:9px;font-weight:800;font-family:'JetBrains Mono',monospace;color:var(--dm)}
+.trend-v.last{font-size:10px}
+.trend-lbls{display:flex;justify-content:space-between;gap:2px;margin-top:2px}
+.trend-l{flex:1;text-align:center;font-size:8px;color:var(--mu);font-family:'JetBrains Mono',monospace}
+.trend-pip{display:flex;justify-content:space-between;margin-top:2px}
+.trend-pip-bar{flex:1;height:4px;border-radius:2px;margin:0 3px}
+
 /* CITY VIEW */
 .cityrow{display:flex;gap:6px;margin-bottom:6px;align-items:stretch}
 .cogs-top{display:grid;grid-template-columns:1.3fr 1fr;gap:8px;margin-bottom:8px}
@@ -209,6 +237,24 @@ tbody tr.sel td:first-child{color:var(--bd)}
   <div class="kc c5"><div class="kl">Rev / Wp</div><div class="kv" id="k10" style="color:var(--gn2)">—</div><div class="kd">₹ per Wp</div></div>
 </div>
 <div class="main">
+  <!-- MoM CHANGE CARDS -->
+  <div class="mom-section">
+    <div class="tbh" style="border:none;padding:8px 0"><div class="tbt">📊 Month-over-Month Change</div><div class="tbb" id="momBdg">—</div></div>
+    <div class="mom-grid" id="momCards"></div>
+  </div>
+
+  <!-- MONTHLY TREND BARS -->
+  <div class="trend-section">
+    <div class="tbh" style="border:none;padding:8px 0"><div class="tbt">📈 Last 6 Months Trend</div></div>
+    <div class="trend-grid">
+      <div class="trend-card"><div class="trend-label">Revenue (₹Cr)</div><div class="trend-bars" id="trendRev"></div><div class="trend-vals" id="trendRevV"></div><div class="trend-pip" id="trendRevP"></div><div class="trend-lbls" id="trendRevL"></div></div>
+      <div class="trend-card"><div class="trend-label">COGS (₹Cr)</div><div class="trend-bars" id="trendCogs"></div><div class="trend-vals" id="trendCogsV"></div><div class="trend-pip" id="trendCogsP"></div><div class="trend-lbls" id="trendCogsL"></div></div>
+      <div class="trend-card"><div class="trend-label">GM %</div><div class="trend-bars" id="trendGM"></div><div class="trend-vals" id="trendGMV"></div><div class="trend-pip" id="trendGMP"></div><div class="trend-lbls" id="trendGML"></div></div>
+      <div class="trend-card"><div class="trend-label">Projects</div><div class="trend-bars" id="trendN"></div><div class="trend-vals" id="trendNV"></div><div class="trend-pip" id="trendNP"></div><div class="trend-lbls" id="trendNL"></div></div>
+    </div>
+  </div>
+
+  <!-- TABLES -->
   <div class="tbls">
     <div class="tblw">
       <div class="tbh"><div class="tbt">State Performance Summary</div><div class="tbb" id="sBdg">—</div></div>
@@ -223,10 +269,14 @@ tbody tr.sel td:first-child{color:var(--bd)}
       </tr></thead><tbody id="tM"></tbody></table></div>
     </div>
   </div>
-</div>
-</div>
 
-<!-- CITY ANALYSIS VIEW -->
+  <!-- RCA MEMOS -->
+  <div class="memo">
+    <div class="memo-head">🔎 Overview RCA & Analytics <span class="cb">auto-generated</span></div>
+    <div id="memoOV" class="memo-body"></div>
+  </div>
+</div>
+</div>
 <div id="view-city" class="view" style="display:none">
 <div class="krow">
   <div class="kc c1"><div class="kl">Total Cities</div><div class="kv" id="c1" style="color:var(--bdp)">—</div><div class="kd" id="c1d">—</div></div>
@@ -376,7 +426,7 @@ function render(){
     if(parts.length){xf.style.display='inline-block';xf.textContent='✕ '+parts.join(' + ');}
     else xf.style.display='none';
   }
-  rK();rM();rT();
+  rK();rM();rT();rOVA();
   if(document.getElementById('view-city').style.display!=='none')rCity();
   if(document.getElementById('view-cogs').style.display!=='none')rCogs();
 }
@@ -424,6 +474,124 @@ function rT(){
     return'<tr class="'+cls+'"'+click+'><td>'+(t?'':i)+'</td><td>'+(t?'<b>TOTAL</b>':d.s)+'</td><td>'+d.n.toLocaleString()+'</td><td>₹'+(d.rev/1e7).toFixed(2)+' Cr</td><td>₹'+(d.cogs/1e7).toFixed(2)+' Cr</td><td style="color:var(--gn)">₹'+(gm/1e7).toFixed(2)+' Cr</td><td class="'+gc(gp)+'">'+gp.toFixed(1)+'%</td><td>₹'+(av/1e5).toFixed(2)+' L</td><td>'+as.toFixed(2)+' kW</td></tr>';};
   document.getElementById('tB').innerHTML=a.map((d,i)=>rw(d,i+1)).join('')+rw(tot,0,true);
 }
+
+function rOVA(){
+  const src=F.filter(r=>r.date);
+  const mk={};
+  src.forEach(r=>{const y=r.date.getFullYear(),mo=r.date.getMonth();const k=y+'-'+mo;if(!mk[k])mk[k]={y,mo,k,lbl:r.date.toLocaleString('en',{month:'short',year:'2-digit'}).replace(' ',"'")};});
+  const months=Object.values(mk).sort((a,b)=>b.y!==a.y?b.y-a.y:b.mo-a.mo);
+  const last6=months.slice(0,6).reverse();
+
+  function mStats(rows){
+    const rv=rows.filter(r=>r.hr),n=rows.length,nr=rv.length;
+    const rev=rv.reduce((s,r)=>s+r.rev,0),cogs=rv.reduce((s,r)=>s+r.cogs,0),kw=rows.reduce((s,r)=>s+r.kw,0);
+    return{n,nr,rev,cogs,gm:rev-cogs,gp:rev?(rev-cogs)/rev*100:0,kw,aos:n?kw/n:0,aov:nr?rev/nr:0,rwp:kw>0?rev/(kw*1000):0};
+  }
+  const mData=last6.map(m=>{const rows=src.filter(r=>r.date.getFullYear()===m.y&&r.date.getMonth()===m.mo);return{...m,...mStats(rows)};});
+
+  // ── MOM CARDS ──
+  if(months.length>=2){
+    const cur=mStats(src.filter(r=>r.date.getFullYear()===months[0].y&&r.date.getMonth()===months[0].mo));
+    const prev=mStats(src.filter(r=>r.date.getFullYear()===months[1].y&&r.date.getMonth()===months[1].mo));
+    document.getElementById('momBdg').textContent=months[1].lbl+' → '+months[0].lbl;
+
+    const metrics=[
+      {label:'Revenue',curr:(cur.rev/1e7).toFixed(2)+' Cr',prev:(prev.rev/1e7).toFixed(2)+' Cr',delta:prev.rev?((cur.rev-prev.rev)/prev.rev*100):0,higher:true},
+      {label:'COGS',curr:(cur.cogs/1e7).toFixed(2)+' Cr',prev:(prev.cogs/1e7).toFixed(2)+' Cr',delta:prev.cogs?((cur.cogs-prev.cogs)/prev.cogs*100):0,higher:false},
+      {label:'Gross Profit',curr:(cur.gm/1e7).toFixed(2)+' Cr',prev:(prev.gm/1e7).toFixed(2)+' Cr',delta:prev.gm?((cur.gm-prev.gm)/prev.gm*100):0,higher:true},
+      {label:'GM %',curr:cur.gp.toFixed(2)+'%',prev:prev.gp.toFixed(2)+'%',delta:cur.gp-prev.gp,higher:true,isPP:true},
+      {label:'Projects',curr:cur.n.toLocaleString(),prev:prev.n.toLocaleString(),delta:prev.n?((cur.n-prev.n)/prev.n*100):0,higher:true},
+      {label:'AOV',curr:'₹'+(cur.aov/1e5).toFixed(2)+' L',prev:'₹'+(prev.aov/1e5).toFixed(2)+' L',delta:prev.aov?((cur.aov-prev.aov)/prev.aov*100):0,higher:true},
+      {label:'AOS',curr:cur.aos.toFixed(2)+' kW',prev:prev.aos.toFixed(2)+' kW',delta:prev.aos?((cur.aos-prev.aos)/prev.aos*100):0,higher:null},
+      {label:'Rev / Wp',curr:'₹'+cur.rwp.toFixed(2),prev:'₹'+prev.rwp.toFixed(2),delta:prev.rwp?((cur.rwp-prev.rwp)/prev.rwp*100):0,higher:true}
+    ];
+    document.getElementById('momCards').innerHTML=metrics.map(m=>{
+      const dir=Math.abs(m.delta)<0.5?'flat':m.delta>0?(m.higher===false?'down':'up'):(m.higher===false?'up':'down');
+      const realDir=m.higher===null?'flat':dir;
+      const arrow=m.delta>0.5?'▲':m.delta<-0.5?'▼':'—';
+      const unit=m.isPP?'pp':'%';
+      return'<div class="mom-card '+realDir+'"><div class="mom-metric">'+m.label+'</div><div class="mom-vals"><span class="mom-curr">'+m.curr+'</span><span class="mom-prev">'+m.prev+'</span></div><div class="mom-delta '+realDir+'">'+arrow+' '+Math.abs(m.delta).toFixed(1)+unit+'</div></div>';
+    }).join('');
+  }else{
+    document.getElementById('momCards').innerHTML='<div style="color:var(--mu);font-size:11px;padding:12px">Need at least 2 months of data for MoM comparison</div>';
+  }
+
+  // ── TREND BARS ──
+  if(mData.length>=2){
+    const renderTrend=(base,extract,color,fmt)=>{
+      const vals=mData.map(d=>extract(d));
+      const maxV=Math.max(...vals,0.01),minV=Math.min(...vals);
+      const range=maxV-minV||1;
+      const n=vals.length;
+      const W=300,H=90,padX=10,padY=10;
+      const pts=vals.map((v,i)=>{
+        const x=padX+i*(W-2*padX)/(n-1||1);
+        const y=padY+(1-(v-minV)/range)*(H-2*padY);
+        return{x,y,v};
+      });
+      // SVG line + area + dots
+      const line=pts.map((p,i)=>(i?'L':'M')+p.x.toFixed(1)+','+p.y.toFixed(1)).join(' ');
+      const area=line+' L'+pts[pts.length-1].x.toFixed(1)+','+(H-2)+' L'+pts[0].x.toFixed(1)+','+(H-2)+' Z';
+      const dots=pts.map((p,i)=>{
+        const isLast=i===n-1;
+        return'<circle cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="'+(isLast?5:3)+'" fill="'+(isLast?color:'#fff')+'" stroke="'+color+'" stroke-width="'+(isLast?2.5:1.5)+'"/>';
+      }).join('');
+      document.getElementById(base).innerHTML='<svg viewBox="0 0 '+W+' '+H+'" preserveAspectRatio="none"><defs><linearGradient id="g_'+base+'" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="'+color+'" stop-opacity=".18"/><stop offset="100%" stop-color="'+color+'" stop-opacity=".02"/></linearGradient></defs><path d="'+area+'" fill="url(#g_'+base+')"/><path d="'+line+'" fill="none" stroke="'+color+'" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>'+dots+'</svg>';
+      // Values
+      document.getElementById(base+'V').innerHTML=mData.map((d,i)=>'<div class="trend-v'+(i===n-1?' last" style="color:'+color:'')+'">'+fmt(vals[i])+'</div>').join('');
+      // Pip bars
+      document.getElementById(base+'P').innerHTML=mData.map((d,i)=>'<div class="trend-pip-bar" style="background:'+(i===n-1?color:'rgba(26,79,212,.12)')+'"></div>').join('');
+      // Labels
+      document.getElementById(base+'L').innerHTML=mData.map(d=>'<div class="trend-l">'+d.lbl+'</div>').join('');
+    };
+    renderTrend('trendRev',d=>d.rev/1e7,'#d97706',v=>v.toFixed(1));
+    renderTrend('trendCogs',d=>d.cogs/1e7,'#ea580c',v=>v.toFixed(1));
+    renderTrend('trendGM',d=>d.gp,'#059669',v=>v.toFixed(1)+'%');
+    renderTrend('trendN',d=>d.n,'#1a4fd4',v=>v.toLocaleString());
+  }
+
+  // ── RCA MEMOS ──
+  const notes=[];
+  if(months.length>=2){
+    const cur=mStats(src.filter(r=>r.date.getFullYear()===months[0].y&&r.date.getMonth()===months[0].mo));
+    const prev=mStats(src.filter(r=>r.date.getFullYear()===months[1].y&&r.date.getMonth()===months[1].mo));
+    const revD=prev.rev?((cur.rev-prev.rev)/prev.rev*100):0;
+    const gmD=cur.gp-prev.gp;
+    const cogsD=prev.cogs?((cur.cogs-prev.cogs)/prev.cogs*100):0;
+
+    if(Math.abs(revD)>5){
+      notes.push({tag:revD>0?'good':'risk',html:'<b>Revenue '+(revD>0?'up':'down')+' '+Math.abs(revD).toFixed(1)+'% MoM</b> (₹'+(prev.rev/1e7).toFixed(2)+' → ₹'+(cur.rev/1e7).toFixed(2)+' Cr). '+(revD>0?'Driven by higher installation volume ('+prev.n+' → '+cur.n+' projects) and/or larger system sizes.':'Investigate whether the drop is seasonal, pipeline-driven, or caused by project delays in specific cities.')});
+    }
+    if(Math.abs(gmD)>1){
+      const dir=gmD>0?'improved':'declined';
+      notes.push({tag:gmD>0?'good':'risk',html:'<b>GM% '+dir+' by '+Math.abs(gmD).toFixed(2)+'pp</b> ('+prev.gp.toFixed(2)+'% → '+cur.gp.toFixed(2)+'%). '+(gmD<0?'Root causes to investigate: module cost increase (check rate table changes), product mix shift toward lower-margin offers, or increased metering/BOS costs in expanding cities.':'This improvement could reflect better module rate negotiation, a favorable product mix shift, or operational efficiencies in high-volume clusters.')});
+    }
+    if(cogsD>revD+3){
+      notes.push({tag:'watch',html:'<b>COGS growing faster than revenue</b> — COGS up '+cogsD.toFixed(1)+'% vs revenue up '+revD.toFixed(1)+'%. This margin compression pattern typically indicates rising input costs not yet passed through to pricing, or a shift toward higher-cost installation configurations.'});
+    }
+  }
+
+  // State concentration
+  const stateData={};F.forEach(r=>{const k=r.state||'?';if(!stateData[k])stateData[k]={s:k,rev:0};if(r.hr)stateData[k].rev+=r.rev;});
+  const stArr=Object.values(stateData).sort((a,b)=>b.rev-a.rev);
+  const totRev=stArr.reduce((s,d)=>s+d.rev,0)||1;
+  if(stArr.length>=3){
+    const top3=stArr.slice(0,3);
+    const top3Share=top3.reduce((s,d)=>s+d.rev,0)/totRev*100;
+    notes.push({tag:top3Share>60?'watch':'info',html:'<b>Top 3 states ('+top3.map(d=>d.s).join(', ')+')</b> contribute '+top3Share.toFixed(1)+'% of revenue. '+(top3Share>60?'High concentration — a downturn in any one of these markets would significantly impact overall numbers.':'Healthy geographic diversification.')});
+  }
+
+  // GM band distribution
+  const rv=F.filter(r=>r.hr);
+  const above50=rv.filter(r=>r.rev?(r.rev-r.cogs)/r.rev*100>=50:false).length;
+  const below40=rv.filter(r=>r.rev?(r.rev-r.cogs)/r.rev*100<40:false).length;
+  if(rv.length>0){
+    notes.push({tag:'info',html:'<b>GM% distribution:</b> '+above50.toLocaleString()+' projects ('+((above50/rv.length)*100).toFixed(1)+'%) are above 50% GM, while '+below40.toLocaleString()+' projects ('+((below40/rv.length)*100).toFixed(1)+'%) are below 40% GM. '+(below40/rv.length>0.3?'The long tail of low-margin projects is worth auditing — these may be legacy pricing, exceptional installations, or data issues.':'The margin distribution is healthy with most projects in the profitable band.')});
+  }
+
+  document.getElementById('memoOV').innerHTML=notes.length?notes.map(n=>'<div class="memo-item"><span class="memo-tag '+n.tag+'">'+n.tag+'</span><span>'+n.html+'</span></div>').join(''):'<div style="color:var(--mu);padding:8px;font-size:11px">Apply filters or load data to generate insights.</div>';
+}
+
 function showTab(t){
   document.getElementById('view-ov').style.display=t==='ov'?'flex':'none';
   document.getElementById('view-city').style.display=t==='city'?'flex':'none';
