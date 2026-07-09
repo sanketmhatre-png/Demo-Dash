@@ -170,6 +170,47 @@ tbody tr.sel td:first-child{color:var(--bd)}
 .seg-name{flex:1;font-weight:600;color:var(--tx);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .seg-pct{font-weight:800;font-family:'JetBrains Mono',monospace;color:var(--bdp)}
 
+/* PRODUCT MIX */
+.prod-cards{display:flex;gap:10px;overflow-x:auto;padding-bottom:4px}
+.pcard{min-width:200px;flex:1;border-radius:10px;border:2px solid var(--br);background:#fff;padding:12px 14px;display:flex;flex-direction:column;gap:6px;position:relative}
+.pcard.gm-high{border-color:#059669;background:linear-gradient(180deg,#f0fdf4 0%,#fff 40%)}
+.pcard.gm-mid{border-color:#d97706;background:linear-gradient(180deg,#fffbeb 0%,#fff 40%)}
+.pcard.gm-low{border-color:#dc2626;background:linear-gradient(180deg,#fef2f2 0%,#fff 40%)}
+.pcard-name{font-size:14px;font-weight:900;color:var(--bdp)}
+.pcard-meta{font-size:9px;color:var(--dm);font-family:'JetBrains Mono',monospace}
+.pcard-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px 12px}
+.pcard-kpi-label{font-size:8px;color:var(--mu);text-transform:uppercase;font-family:'JetBrains Mono',monospace;font-weight:700;letter-spacing:.3px}
+.pcard-kpi-val{font-size:16px;font-weight:900;color:var(--bdp)}
+.pcard-kpi-val.gm-green{color:#059669} .pcard-kpi-val.gm-amber{color:#d97706} .pcard-kpi-val.gm-red{color:#dc2626}
+.pcard-tags{display:flex;flex-wrap:wrap;gap:4px;margin-top:2px}
+.pcard-tag{font-size:8px;background:var(--bg);border-radius:4px;padding:3px 7px;font-family:'JetBrains Mono',monospace;color:var(--dm);font-weight:600}
+#mxTbl{border-collapse:collapse;min-width:100%}
+#mxTbl th{background:var(--bdp);color:#fff;padding:8px 12px;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:.3px;font-family:'JetBrains Mono',monospace;text-align:center;white-space:nowrap;position:sticky;top:0;z-index:2}
+#mxTbl th:first-child{text-align:left}
+#mxTbl th:last-child{background:#162454}
+#mxTbl td{padding:6px 10px;border-bottom:1px solid var(--br);text-align:center;font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:600}
+#mxTbl td:first-child{text-align:left;font-family:'Plus Jakarta Sans',sans-serif;font-weight:800;color:var(--bdp);font-size:12px}
+#mxTbl td:last-child{font-weight:900}
+#mxTbl tbody tr:nth-child(even){background:#fafbfd}
+#mxTbl tbody tr:hover{background:var(--bbg)}
+.prod-analytics{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:8px 0}
+.pa-panel{background:#fff;border-radius:8px;border:1px solid var(--br);padding:14px 16px}
+.viz-sub{font-size:8px;color:var(--mu);margin-bottom:10px;font-family:'JetBrains Mono',monospace}
+.share-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.share-name{width:90px;font-size:10px;font-weight:700;color:var(--bdp);text-align:right;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.share-bars{flex:1;display:flex;flex-direction:column;gap:2px}
+.share-bar{height:10px;border-radius:3px;display:flex;align-items:center;justify-content:flex-end;padding-right:4px;min-width:2px}
+.share-bar span{font-size:7px;font-weight:800;color:#fff;white-space:nowrap}
+.quad-wrap{width:100%;aspect-ratio:400/280}
+.quad-wrap svg{width:100%;height:100%}
+.mix-col{flex:1;display:flex;flex-direction:column-reverse;border-radius:3px 3px 0 0;overflow:hidden}
+.mix-seg{transition:height .3s}
+.mix-lbl{text-align:center;font-size:8px;color:var(--mu);font-family:'JetBrains Mono',monospace;margin-top:4px}
+.mx-cell{display:flex;flex-direction:column;align-items:center;gap:1px}
+.mx-val{font-size:12px;font-weight:800}
+.mx-val.above{color:var(--gn)} .mx-val.below{color:var(--rd)} .mx-val.avg{color:var(--am)}
+.mx-sub{font-size:8px;color:var(--mu);font-weight:500}
+
 /* MEMO */
 .memo{background:#fff;border-radius:8px;border:1px solid var(--br);border-left:4px solid var(--bd);padding:10px 14px;flex-shrink:0;max-height:150px;overflow-y:auto}
 .memo-head{font-size:11px;font-weight:800;color:var(--bdp);margin-bottom:8px;display:flex;align-items:center;gap:8px}
@@ -207,8 +248,8 @@ tbody tr.sel td:first-child{color:var(--bd)}
 </div>
 <div class="tabnav">
   <button class="tbtn active" id="tabBtn-ov" onclick="showTab('ov')">Overview</button>
-  <button class="tbtn" id="tabBtn-city" onclick="showTab('city')">City Analysis</button>
   <button class="tbtn" id="tabBtn-cogs" onclick="showTab('cogs')">COGS Analysis</button>
+  <button class="tbtn" id="tabBtn-prod" onclick="showTab('prod')">Product Mix</button>
 </div>
 <div class="fbar">
   <span class="fl">From</span><input type="date" class="fd" id="fFrom" onchange="af()">
@@ -249,8 +290,8 @@ tbody tr.sel td:first-child{color:var(--bd)}
     <div class="trend-grid">
       <div class="trend-card"><div class="trend-label">Revenue (₹Cr)</div><div class="trend-bars" id="trendRev"></div><div class="trend-vals" id="trendRevV"></div><div class="trend-pip" id="trendRevP"></div><div class="trend-lbls" id="trendRevL"></div></div>
       <div class="trend-card"><div class="trend-label">COGS (₹Cr)</div><div class="trend-bars" id="trendCogs"></div><div class="trend-vals" id="trendCogsV"></div><div class="trend-pip" id="trendCogsP"></div><div class="trend-lbls" id="trendCogsL"></div></div>
-      <div class="trend-card"><div class="trend-label">GM %</div><div class="trend-bars" id="trendGM"></div><div class="trend-vals" id="trendGMV"></div><div class="trend-pip" id="trendGMP"></div><div class="trend-lbls" id="trendGML"></div></div>
-      <div class="trend-card"><div class="trend-label">Projects</div><div class="trend-bars" id="trendN"></div><div class="trend-vals" id="trendNV"></div><div class="trend-pip" id="trendNP"></div><div class="trend-lbls" id="trendNL"></div></div>
+      <div class="trend-card" id="gmBridgeCard"><div class="trend-label">GM% Bridge <span style="font-size:8px;font-weight:500;color:var(--mu)" id="gmBridgePeriod"></span></div><div id="gmBridgeViz" style="margin-top:4px"></div></div>
+      <div class="trend-card" id="prodMixCard"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div class="trend-label">Product Mix</div><div style="font-size:8px;color:var(--mu)">by Revenue</div></div><div id="prodMixViz" style="display:flex;gap:10px;align-items:center"></div></div>
     </div>
   </div>
 
@@ -277,50 +318,6 @@ tbody tr.sel td:first-child{color:var(--bd)}
   </div>
 </div>
 </div>
-<div id="view-city" class="view" style="display:none">
-<div class="krow">
-  <div class="kc c1"><div class="kl">Total Cities</div><div class="kv" id="c1" style="color:var(--bdp)">—</div><div class="kd" id="c1d">—</div></div>
-  <div class="kc c3"><div class="kl">Top City (Rev)</div><div class="kv" id="c2" style="color:var(--am);font-size:13px">—</div><div class="kd" id="c2d">—</div></div>
-  <div class="kc c6"><div class="kl">Best GM% City</div><div class="kv" id="c3" style="color:var(--gn);font-size:13px">—</div><div class="kd" id="c3d">—</div></div>
-  <div class="kc c7"><div class="kl">Worst GM% City</div><div class="kv" id="c4" style="color:var(--rd);font-size:13px">—</div><div class="kd" id="c4d">—</div></div>
-  <div class="kc c2"><div class="kl">Top 5 Rev Share</div><div class="kv" id="c5" style="color:var(--pu)">—</div><div class="kd" id="c5d">concentration</div></div>
-  <div class="kc c8"><div class="kl">Avg GM% (Fleet)</div><div class="kv" id="c6" style="color:var(--tl)">—</div><div class="kd">across all cities</div></div>
-</div>
-<div class="main">
-  <div class="cityrow">
-    <div class="tblw" style="flex:1.5">
-      <div class="tbh">
-        <div class="tbt">City Ranking</div>
-        <div style="display:flex;gap:4px;align-items:center">
-          <button class="sortbtn active" id="sb-rev" onclick="citySort('rev')">Revenue</button>
-          <button class="sortbtn" id="sb-gm" onclick="citySort('gm')">GM%</button>
-          <button class="sortbtn" id="sb-n" onclick="citySort('n')">Installs</button>
-          <button class="sortbtn" id="sb-aov" onclick="citySort('aov')">AOV</button>
-          <div class="tbb" id="cBdg" style="margin-left:6px">—</div>
-        </div>
-      </div>
-      <div class="tbs"><table><thead><tr>
-        <th>#</th><th>City</th><th>State</th><th>Installs</th><th>Revenue</th><th>COGS</th><th>GM ₹</th><th>GM %</th><th>AOV</th><th>AOS</th><th>Rev/Wp</th>
-      </tr></thead><tbody id="tC"></tbody></table></div>
-    </div>
-    <div class="cd" style="flex:1;display:flex;flex-direction:column;gap:8px;overflow-y:auto;max-height:420px">
-      <div>
-        <div class="viz-title">Top 10 Cities by Revenue</div>
-        <div id="vizRev"></div>
-      </div>
-      <div>
-        <div class="viz-title">Top 10 Cities by GM%</div>
-        <div id="vizGM"></div>
-      </div>
-    </div>
-  </div>
-  <div class="memo">
-    <div class="memo-head">🔎 RCA & Analytics Notes <span class="cb" id="memoBdg">auto-generated</span></div>
-    <div id="memoBody" class="memo-body"></div>
-  </div>
-</div>
-</div>
-
 <!-- COGS ANALYSIS VIEW -->
 <div id="view-cogs" class="view" style="display:none">
 <div class="krow">
@@ -362,12 +359,48 @@ tbody tr.sel td:first-child{color:var(--bd)}
 </div>
 </div>
 
+<!-- PRODUCT MIX VIEW -->
+<div id="view-prod" class="view" style="display:none">
+<div class="main">
+  <div class="tbh" style="border:none;padding:8px 0">
+    <div class="tbt">₹/Wp Breakdown by Product Tier</div>
+    <div style="font-size:9px;color:var(--dm)">Revenue / Cost / GM per Watt peak installed · helps isolate price vs cost differences across tiers</div>
+  </div>
+  <div class="prod-cards" id="prodCards"></div>
+
+  <!-- Detailed Product Performance Table -->
+  <div class="tblw" style="margin-bottom:8px">
+    <div class="tbh"><div class="tbt">Product Performance Summary</div><div class="tbb" id="ppBdg">—</div></div>
+    <div class="tbs" style="overflow-x:auto"><table id="ppTbl"><thead><tr>
+      <th>Product</th><th>Installs</th><th>Rev Share</th><th>Revenue (₹Cr)</th><th>COGS (₹Cr)</th><th>GM%</th><th>Rev/Wp</th><th>Cost/Wp</th><th>GM/Wp</th><th>AOS (kW)</th><th>AOV (₹L)</th>
+    </tr></thead><tbody id="ppBody"></tbody></table></div>
+  </div>
+
+  <div class="tbh" style="border:none;padding:12px 0 6px">
+    <div class="tbt">City × Product AOV Mix</div>
+    <div style="font-size:9px;color:var(--dm)">₹L avg order value per City × Product · <span style="color:var(--gn)">●</span> Above portfolio avg · <span style="color:var(--rd)">●</span> Below</div>
+    <div style="display:flex;gap:4px">
+      <button class="sortbtn active" id="mx-aov" onclick="mxMode('aov')">AOV Matrix</button>
+      <button class="sortbtn" id="mx-rwp" onclick="mxMode('rwp')">Rev/Wp Realization</button>
+    </div>
+  </div>
+  <div class="tblw">
+    <div class="tbs" style="overflow-x:auto"><table id="mxTbl"><thead id="mxHead"></thead><tbody id="mxBody"></tbody></table></div>
+  </div>
+
+  <div class="memo" style="margin-top:8px">
+    <div class="memo-head">🔎 Product Mix RCA & Analytics <span class="cb">auto-generated</span></div>
+    <div id="memoProd" class="memo-body"></div>
+  </div>
+</div>
+</div>
+
 <div class="sbar"><span id="sT">—</span><b>SolarSquare · B2C GM · GitHub</b><span id="sF">No filters</span></div>
 </div>
 <script>
 const PGZ='https://raw.githubusercontent.com/sanketmhatre-png/Demo-Dash/main/projects.json.gz';
 const MTA='https://raw.githubusercontent.com/sanketmhatre-png/Demo-Dash/main/data_meta.json';
-let A=[],F=[],SELM=null,SELS=null,CITYSORT='rev';
+let A=[],F=[],SELM=null,SELS=null,CITYSORT='rev',MXMODE='aov';
 const MC='2026-04-01',MT={'540 Wp Mono Bifacial DCR-PREMIER':12037.98,'550 Wp Mono Bifacial Non DCR-NAVITAS':7383.75,'545 Wp Mono Bifacial Non DCR-PREMIER':8107.27,'600 Wp Mono Bifacial Topcon N-Type DCR-PREMIER':13920};
 const MC2='2026-05-01',MT2={'540 Wp Mono Bifacial DCR-PREMIER':12093,'550 Wp Mono Bifacial Non DCR-NAVITAS':7768,'550 Wp Mono Bifacial DCR-RAYZON':11509,'545 Wp Mono Bifacial Non DCR-WAAREE':9007,'545 Wp Mono Bifacial Non DCR-PREMIER':8085};
 const MC3='2026-06-01',MT3={'610 Wp Mono Bifacial Topcon N-Type DCR-PREMIER':13268,'540 Wp Mono Bifacial DCR-PREMIER':11819,'550 Wp Mono Bifacial DCR-RAYZON':11523};
@@ -427,16 +460,16 @@ function render(){
     else xf.style.display='none';
   }
   rK();rM();rT();rOVA();
-  if(document.getElementById('view-city').style.display!=='none')rCity();
   if(document.getElementById('view-cogs').style.display!=='none')rCogs();
+  if(document.getElementById('view-prod').style.display!=='none')rProd();
 }
 
 function rK(){
-  const r=fdBoth(),rv=r.filter(x=>x.hr),n=r.length,nr=rv.length;
+  // KPIs always reflect full filtered dataset — NOT affected by cross-filter clicks
+  const r=F,rv=r.filter(x=>x.hr),n=r.length,nr=rv.length;
   const tR=rv.reduce((s,x)=>s+x.rev,0),tC=rv.reduce((s,x)=>s+x.cogs,0),tK=r.reduce((s,x)=>s+x.kw,0);
   const tO=r.reduce((s,x)=>s+(x.onm||0)+(x.qhs||0),0),gm=tR-tC,gp=tR?gm/tR*100:0;
   const s=(i,v)=>{const e=document.getElementById(i);if(e)e.textContent=v;};
-  const sh=(i,v)=>{const e=document.getElementById(i);if(e)e.innerHTML=v;};
   s('k1',n.toLocaleString());s('k1d',nr<n?nr.toLocaleString()+' w/ revenue':'all w/ revenue');
   s('k2',(tK/1000).toFixed(1)+' MW');s('k2d',Math.round(tK).toLocaleString()+' kW');
   s('k3','₹'+(tR/1e7).toFixed(2)+' Cr');s('k3d','across '+nr.toLocaleString()+' projects');
@@ -489,16 +522,32 @@ function rOVA(){
   }
   const mData=last6.map(m=>{const rows=src.filter(r=>r.date.getFullYear()===m.y&&r.date.getMonth()===m.mo);return{...m,...mStats(rows)};});
 
-  // ── MOM CARDS ──
+  // ── MTD MOM CARDS ──
+  // Find current month (latest month in data) and its max day present
   if(months.length>=2){
-    const cur=mStats(src.filter(r=>r.date.getFullYear()===months[0].y&&r.date.getMonth()===months[0].mo));
-    const prev=mStats(src.filter(r=>r.date.getFullYear()===months[1].y&&r.date.getMonth()===months[1].mo));
-    document.getElementById('momBdg').textContent=months[1].lbl+' → '+months[0].lbl;
+    const curM=months[0]; // latest month
+    const curRows=src.filter(r=>r.date.getFullYear()===curM.y&&r.date.getMonth()===curM.mo);
+    const maxDay=curRows.length?Math.max(...curRows.map(r=>r.date.getDate())):new Date().getDate();
+
+    // MTD = current month rows up to maxDay
+    const curMTD=curRows.filter(r=>r.date.getDate()<=maxDay);
+
+    // Prior month same day window
+    const prevM=months[1];
+    const prevRows=src.filter(r=>r.date.getFullYear()===prevM.y&&r.date.getMonth()===prevM.mo);
+    const prevMTD=prevRows.filter(r=>r.date.getDate()<=maxDay);
+
+    const cur=mStats(curMTD);
+    const prev=mStats(prevMTD);
+
+    const curLbl=curM.lbl+' 1–'+maxDay;
+    const prevLbl=prevM.lbl+' 1–'+maxDay;
+    document.getElementById('momBdg').textContent='MTD: '+curLbl+' vs '+prevLbl;
 
     const metrics=[
-      {label:'Revenue',curr:(cur.rev/1e7).toFixed(2)+' Cr',prev:(prev.rev/1e7).toFixed(2)+' Cr',delta:prev.rev?((cur.rev-prev.rev)/prev.rev*100):0,higher:true},
-      {label:'COGS',curr:(cur.cogs/1e7).toFixed(2)+' Cr',prev:(prev.cogs/1e7).toFixed(2)+' Cr',delta:prev.cogs?((cur.cogs-prev.cogs)/prev.cogs*100):0,higher:false},
-      {label:'Gross Profit',curr:(cur.gm/1e7).toFixed(2)+' Cr',prev:(prev.gm/1e7).toFixed(2)+' Cr',delta:prev.gm?((cur.gm-prev.gm)/prev.gm*100):0,higher:true},
+      {label:'Revenue',curr:'₹'+(cur.rev/1e7).toFixed(2)+' Cr',prev:'₹'+(prev.rev/1e7).toFixed(2)+' Cr',delta:prev.rev?((cur.rev-prev.rev)/prev.rev*100):0,higher:true},
+      {label:'COGS',curr:'₹'+(cur.cogs/1e7).toFixed(2)+' Cr',prev:'₹'+(prev.cogs/1e7).toFixed(2)+' Cr',delta:prev.cogs?((cur.cogs-prev.cogs)/prev.cogs*100):0,higher:false},
+      {label:'Gross Profit',curr:'₹'+(cur.gm/1e7).toFixed(2)+' Cr',prev:'₹'+(prev.gm/1e7).toFixed(2)+' Cr',delta:prev.gm?((cur.gm-prev.gm)/prev.gm*100):0,higher:true},
       {label:'GM %',curr:cur.gp.toFixed(2)+'%',prev:prev.gp.toFixed(2)+'%',delta:cur.gp-prev.gp,higher:true,isPP:true},
       {label:'Projects',curr:cur.n.toLocaleString(),prev:prev.n.toLocaleString(),delta:prev.n?((cur.n-prev.n)/prev.n*100):0,higher:true},
       {label:'AOV',curr:'₹'+(cur.aov/1e5).toFixed(2)+' L',prev:'₹'+(prev.aov/1e5).toFixed(2)+' L',delta:prev.aov?((cur.aov-prev.aov)/prev.aov*100):0,higher:true},
@@ -513,7 +562,7 @@ function rOVA(){
       return'<div class="mom-card '+realDir+'"><div class="mom-metric">'+m.label+'</div><div class="mom-vals"><span class="mom-curr">'+m.curr+'</span><span class="mom-prev">'+m.prev+'</span></div><div class="mom-delta '+realDir+'">'+arrow+' '+Math.abs(m.delta).toFixed(1)+unit+'</div></div>';
     }).join('');
   }else{
-    document.getElementById('momCards').innerHTML='<div style="color:var(--mu);font-size:11px;padding:12px">Need at least 2 months of data for MoM comparison</div>';
+    document.getElementById('momCards').innerHTML='<div style="color:var(--mu);font-size:11px;padding:12px">Need at least 2 months of data for MTD comparison</div>';
   }
 
   // ── TREND BARS ──
@@ -546,28 +595,33 @@ function rOVA(){
     };
     renderTrend('trendRev',d=>d.rev/1e7,'#d97706',v=>v.toFixed(1));
     renderTrend('trendCogs',d=>d.cogs/1e7,'#ea580c',v=>v.toFixed(1));
-    renderTrend('trendGM',d=>d.gp,'#059669',v=>v.toFixed(1)+'%');
-    renderTrend('trendN',d=>d.n,'#1a4fd4',v=>v.toLocaleString());
+    rGMBridge(mData);
+    rProdMix();
   }
 
   // ── RCA MEMOS ──
   const notes=[];
   if(months.length>=2){
-    const cur=mStats(src.filter(r=>r.date.getFullYear()===months[0].y&&r.date.getMonth()===months[0].mo));
-    const prev=mStats(src.filter(r=>r.date.getFullYear()===months[1].y&&r.date.getMonth()===months[1].mo));
+    const curM=months[0],prevM=months[1];
+    const curRows=src.filter(r=>r.date.getFullYear()===curM.y&&r.date.getMonth()===curM.mo);
+    const maxDay=curRows.length?Math.max(...curRows.map(r=>r.date.getDate())):1;
+    const cur=mStats(curRows.filter(r=>r.date.getDate()<=maxDay));
+    const prev=mStats(src.filter(r=>r.date.getFullYear()===prevM.y&&r.date.getMonth()===prevM.mo&&r.date.getDate()<=maxDay));
+    const curLbl=curM.lbl+' 1–'+maxDay,prevLbl=prevM.lbl+' 1–'+maxDay;
     const revD=prev.rev?((cur.rev-prev.rev)/prev.rev*100):0;
     const gmD=cur.gp-prev.gp;
     const cogsD=prev.cogs?((cur.cogs-prev.cogs)/prev.cogs*100):0;
 
     if(Math.abs(revD)>5){
-      notes.push({tag:revD>0?'good':'risk',html:'<b>Revenue '+(revD>0?'up':'down')+' '+Math.abs(revD).toFixed(1)+'% MoM</b> (₹'+(prev.rev/1e7).toFixed(2)+' → ₹'+(cur.rev/1e7).toFixed(2)+' Cr). '+(revD>0?'Driven by higher installation volume ('+prev.n+' → '+cur.n+' projects) and/or larger system sizes.':'Investigate whether the drop is seasonal, pipeline-driven, or caused by project delays in specific cities.')});
+      notes.push({tag:revD>0?'good':'risk',html:'<b>MTD Revenue '+(revD>0?'up':'down')+' '+Math.abs(revD).toFixed(1)+'%</b> ('+prevLbl+': ₹'+(prev.rev/1e7).toFixed(2)+' Cr → '+curLbl+': ₹'+(cur.rev/1e7).toFixed(2)+' Cr). '+(revD>0?'Volume up '+prev.n+' → '+cur.n+' projects. Check if driven by a specific city or product tier.':'Investigate whether seasonal, pipeline-driven, or project delays in specific clusters.')});
+    }else{
+      notes.push({tag:'info',html:'<b>MTD Revenue roughly flat</b> — '+curLbl+' (₹'+(cur.rev/1e7).toFixed(2)+' Cr, '+cur.n+' proj) vs '+prevLbl+' (₹'+(prev.rev/1e7).toFixed(2)+' Cr, '+prev.n+' proj). '+(Math.abs(revD)).toFixed(1)+'% difference, within normal run-rate variance.'});
     }
     if(Math.abs(gmD)>1){
-      const dir=gmD>0?'improved':'declined';
-      notes.push({tag:gmD>0?'good':'risk',html:'<b>GM% '+dir+' by '+Math.abs(gmD).toFixed(2)+'pp</b> ('+prev.gp.toFixed(2)+'% → '+cur.gp.toFixed(2)+'%). '+(gmD<0?'Root causes to investigate: module cost increase (check rate table changes), product mix shift toward lower-margin offers, or increased metering/BOS costs in expanding cities.':'This improvement could reflect better module rate negotiation, a favorable product mix shift, or operational efficiencies in high-volume clusters.')});
+      notes.push({tag:gmD>0?'good':'risk',html:'<b>GM% '+(gmD>0?'improved':'declined')+' '+Math.abs(gmD).toFixed(2)+'pp MTD</b> ('+prevLbl+': '+prev.gp.toFixed(2)+'% → '+curLbl+': '+cur.gp.toFixed(2)+'%). '+(gmD<0?'Root causes: module cost changes, product mix shift to lower-margin tiers, or increased BOS/metering costs.':'Reflects better cost control, favorable product mix, or module rate improvement.')});
     }
     if(cogsD>revD+3){
-      notes.push({tag:'watch',html:'<b>COGS growing faster than revenue</b> — COGS up '+cogsD.toFixed(1)+'% vs revenue up '+revD.toFixed(1)+'%. This margin compression pattern typically indicates rising input costs not yet passed through to pricing, or a shift toward higher-cost installation configurations.'});
+      notes.push({tag:'watch',html:'<b>COGS growing faster than revenue MTD</b> — COGS +'+cogsD.toFixed(1)+'% vs revenue +'+revD.toFixed(1)+'% ('+prevLbl+' → '+curLbl+'). Margin compression pattern — likely rising input costs not yet passed through to pricing.'});
     }
   }
 
@@ -592,15 +646,97 @@ function rOVA(){
   document.getElementById('memoOV').innerHTML=notes.length?notes.map(n=>'<div class="memo-item"><span class="memo-tag '+n.tag+'">'+n.tag+'</span><span>'+n.html+'</span></div>').join(''):'<div style="color:var(--mu);padding:8px;font-size:11px">Apply filters or load data to generate insights.</div>';
 }
 
+function rGMBridge(mData){
+  if(!mData||mData.length<2)return;
+  const n=mData.length;
+  const src=F.filter(r=>r.date&&r.hr);
+  const BCOLORS=['#1a4fd4','#7c3aed','#db2777','#d97706'];
+  const categories=[
+    {key:'mod',label:'Module'},
+    {key:'inv',label:'Inverter'},
+    {key:'mtr',label:'Metering'},
+    {key:'cogs_other',label:'Other BOS'}
+  ];
+
+  // Build bridges between consecutive months
+  const bridges=[];
+  for(let i=0;i<Math.min(n-1,2);i++){
+    const ma=mData[n-2-i+(i>0?1:0)];const mb=mData[n-1-i+(i>0?1:0)];
+    if(!ma||!mb)break;
+    const aRows=src.filter(r=>r.date.getFullYear()===ma.y&&r.date.getMonth()===ma.mo);
+    const bRows=src.filter(r=>r.date.getFullYear()===mb.y&&r.date.getMonth()===mb.mo);
+    const aKW=aRows.reduce((s,r)=>s+r.kw,0)*1000||1;
+    const bKW=bRows.reduce((s,r)=>s+r.kw,0)*1000||1;
+    const drivers=categories.map(c=>{
+      let aV,bV;
+      if(c.key==='cogs_other'){
+        const known=['mod','inv','mtr'];
+        aV=aRows.reduce((s,r)=>s+(r.cogs||0)-known.reduce((ss,k)=>ss+(r[k]||0),0),0)/aKW;
+        bV=bRows.reduce((s,r)=>s+(r.cogs||0)-known.reduce((ss,k)=>ss+(r[k]||0),0),0)/bKW;
+      }else{
+        aV=aRows.reduce((s,r)=>s+(r[c.key]||0),0)/aKW;
+        bV=bRows.reduce((s,r)=>s+(r[c.key]||0),0)/bKW;
+      }
+      const aRev=aRows.reduce((s,r)=>s+r.rev,0)/aKW;
+      const bRev=bRows.reduce((s,r)=>s+r.rev,0)/bKW;
+      const aGP=aRev?((aRev-aRows.reduce((s,r)=>s+(r.cogs||0),0)/aKW)/aRev*100):0;
+      const impact=(bV-aV)/bRev*100;
+      return{label:c.key==='cogs_other'?'Other BOS':c.label,impact:isNaN(impact)?0:-impact};
+    });
+    const aGP=ma.gp,bGP=mb.gp;
+    bridges.push({from:ma.lbl,to:mb.lbl,fromGP:aGP,toGP:bGP,drivers});
+  }
+  // Show most recent bridge
+  const bridge=bridges[0];
+  if(!bridge){document.getElementById('gmBridgeViz').innerHTML='<div style="color:var(--mu);font-size:10px;padding:12px">Need 2 months of data</div>';return;}
+  document.getElementById('gmBridgePeriod').textContent=bridge.from+' → '+bridge.to;
+  const total=bridge.toGP-bridge.fromGP;
+  const maxAbs=Math.max(Math.abs(bridge.fromGP),Math.abs(bridge.toGP),...bridge.drivers.map(d=>Math.abs(d.impact)),0.1);
+  const barW=80;
+  function bar(val,label,isBase,isEnd,color){
+    const w=Math.abs(val)/maxAbs*barW;
+    const isPos=val>=0;
+    const bg=isBase||isEnd?'#1a4fd4':(isPos?'#059669':'#dc2626');
+    const fmt=isBase||isEnd?val.toFixed(1)+'%':(isPos?'+':'')+val.toFixed(2)+'pp';
+    return'<div style="display:flex;align-items:center;gap:6px;margin:3px 0"><div style="width:70px;font-size:9px;color:var(--dm);text-align:right;font-family:JetBrains Mono">'+label+'</div><div style="flex:1;position:relative;height:18px"><div style="height:100%;width:'+w+'%;background:'+bg+';border-radius:3px;display:flex;align-items:center;justify-content:flex-end;padding-right:4px;min-width:2px"><span style="font-size:8px;font-weight:800;color:#fff;white-space:nowrap">'+fmt+'</span></div></div></div>';
+  }
+  let html=bar(bridge.fromGP,'',true,false,'');
+  bridge.drivers.forEach((d,i)=>{ if(Math.abs(d.impact)>0.01)html+=bar(d.impact,d.label,false,false,BCOLORS[i]); });
+  html+=bar(bridge.toGP,'',false,true,'');
+  document.getElementById('gmBridgeViz').innerHTML=html;
+}
+
+function rProdMix(){
+  const rv=F.filter(r=>r.hr);
+  const totRev=rv.reduce((s,r)=>s+r.rev,0)||1;
+  const offers={};
+  rv.forEach(r=>{const o=r.offer||'Other';if(!offers[o])offers[o]=0;offers[o]+=r.rev;});
+  const arr=Object.entries(offers).map(([o,rev])=>({o,rev,pct:rev/totRev*100})).sort((a,b)=>b.rev-a.rev);
+  const COLORS=['#1a4fd4','#f59e0b','#059669','#7c3aed','#dc2626','#0891b2','#db2777'];
+  const W=120,H=120,cx=W/2,cy=H/2,r=52,ri=30;
+  let angle=-Math.PI/2,segs='';
+  arr.forEach((d,i)=>{
+    const slice=d.pct/100*Math.PI*2;
+    const x1=cx+r*Math.cos(angle),y1=cy+r*Math.sin(angle);
+    const x2=cx+r*Math.cos(angle+slice),y2=cy+r*Math.sin(angle+slice);
+    const x3=cx+ri*Math.cos(angle+slice),y3=cy+ri*Math.sin(angle+slice);
+    const x4=cx+ri*Math.cos(angle),y4=cy+ri*Math.sin(angle);
+    const lg=slice>Math.PI?1:0;
+    segs+=`<path d="M${x1.toFixed(1)},${y1.toFixed(1)} A${r},${r} 0 ${lg},1 ${x2.toFixed(1)},${y2.toFixed(1)} L${x3.toFixed(1)},${y3.toFixed(1)} A${ri},${ri} 0 ${lg},0 ${x4.toFixed(1)},${y4.toFixed(1)} Z" fill="${COLORS[i%COLORS.length]}" stroke="#fff" stroke-width="1.5"/>`;
+    angle+=slice;
+  });
+  const svg=`<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}">${segs}<circle cx="${cx}" cy="${cy}" r="${ri-2}" fill="#fff"/></svg>`;
+  const legend=arr.slice(0,6).map((d,i)=>`<div style="display:flex;align-items:center;gap:4px;margin:2px 0"><div style="width:8px;height:8px;border-radius:2px;background:${COLORS[i%COLORS.length]};flex-shrink:0"></div><span style="font-size:9px;font-weight:700;color:var(--bdp)">${d.o}</span><span style="font-size:9px;color:var(--mu);margin-left:2px">${d.pct.toFixed(1)}%</span></div>`).join('');
+  document.getElementById('prodMixViz').innerHTML=svg+'<div style="flex:1">'+legend+'</div>';
+}
+
 function showTab(t){
-  document.getElementById('view-ov').style.display=t==='ov'?'flex':'none';
-  document.getElementById('view-city').style.display=t==='city'?'flex':'none';
-  document.getElementById('view-cogs').style.display=t==='cogs'?'flex':'none';
-  document.getElementById('tabBtn-ov').classList.toggle('active',t==='ov');
-  document.getElementById('tabBtn-city').classList.toggle('active',t==='city');
-  document.getElementById('tabBtn-cogs').classList.toggle('active',t==='cogs');
-  if(t==='city')rCity();
+  ['ov','cogs','prod'].forEach(v=>{
+    document.getElementById('view-'+v).style.display=t===v?'flex':'none';
+    document.getElementById('tabBtn-'+v).classList.toggle('active',t===v);
+  });
   if(t==='cogs')rCogs();
+  if(t==='prod')rProd();
 }
 function citySort(k){CITYSORT=k;['rev','gm','n','aov'].forEach(x=>document.getElementById('sb-'+x).classList.toggle('active',x===k));rCity();}
 
@@ -816,6 +952,106 @@ function rCogs(){
   }
   if(rv.length<20){notes.push({tag:'info',html:'Small sample ('+rv.length+' projects) — figures may be volatile.'});}
   document.getElementById('memoBodyG').innerHTML=notes.map(n=>'<div class="memo-item"><span class="memo-tag '+n.tag+'">'+n.tag+'</span><span>'+n.html+'</span></div>').join('');
+}
+
+function mxMode(m){MXMODE=m;document.getElementById('mx-aov').classList.toggle('active',m==='aov');document.getElementById('mx-rwp').classList.toggle('active',m==='rwp');rProd();}
+
+function rProd(){
+  const rv=F.filter(r=>r.hr);
+  const offers={};
+  rv.forEach(r=>{const o=r.offer||'Unknown';if(!offers[o])offers[o]={o,n:0,kw:0,rev:0,cogs:0,mod:0,inv:0,mtr:0,cab:0,prf:0};const d=offers[o];d.n++;d.kw+=r.kw;d.rev+=r.rev;d.cogs+=r.cogs;d.mod+=(r.mod||0);d.inv+=(r.inv||0);d.mtr+=(r.mtr||0);d.cab+=(r.cab||0);d.prf+=(r.prf||0);});
+  const oArr=Object.values(offers).sort((a,b)=>b.n-a.n);
+  const totalKW=rv.reduce((s,r)=>s+r.kw,0)||1;
+  const totalRev=rv.reduce((s,r)=>s+r.rev,0)||1;
+  const portfolioAOV=rv.length?totalRev/rv.length:0;
+  const portfolioRwp=totalKW>0?totalRev/(totalKW*1000):0;
+
+  // Product tier cards
+  document.getElementById('prodCards').innerHTML=oArr.map(d=>{
+    const wp=d.kw*1000||1;const rwp=d.rev/wp;const cwp=d.cogs/wp;const gmwp=rwp-cwp;const gp=d.rev?(d.rev-d.cogs)/d.rev*100:0;
+    const aos=d.n?d.kw/d.n:0;
+    const cls=gp>=50?'gm-high':gp>=40?'gm-mid':'gm-low';
+    const gmCls=gp>=50?'gm-green':gp>=40?'gm-amber':'gm-red';
+    const modWp=d.mod/wp,invWp=d.inv/wp,mmsWp=d.prf/wp,cabWp=d.cab/wp,mtrWp=d.mtr/wp;
+    return'<div class="pcard '+cls+'"><div class="pcard-name">'+d.o+'</div><div class="pcard-meta">'+d.n.toLocaleString()+' installs · '+aos.toFixed(2)+' kW avg</div><div class="pcard-grid"><div><div class="pcard-kpi-label">Rev/Wp</div><div class="pcard-kpi-val">₹'+rwp.toFixed(2)+'</div></div><div><div class="pcard-kpi-label">Cost/Wp</div><div class="pcard-kpi-val">₹'+cwp.toFixed(2)+'</div></div><div><div class="pcard-kpi-label">GM/Wp</div><div class="pcard-kpi-val '+gmCls+'">₹'+gmwp.toFixed(2)+'</div></div><div><div class="pcard-kpi-label">GM%</div><div class="pcard-kpi-val '+gmCls+'">'+gp.toFixed(1)+'%</div></div></div><div class="pcard-tags"><span class="pcard-tag">Module: ₹'+modWp.toFixed(2)+'</span><span class="pcard-tag">Inverter: ₹'+invWp.toFixed(2)+'</span><span class="pcard-tag">MMS: ₹'+mmsWp.toFixed(2)+'</span><span class="pcard-tag">Cables: ₹'+cabWp.toFixed(2)+'</span></div></div>';
+  }).join('');
+
+  const PCOLORS=['#1a4fd4','#3b82f6','#7c3aed','#db2777','#ea580c','#d97706','#059669','#0891b2'];
+  const totalN=rv.length;
+
+  // ── PRODUCT PERFORMANCE TABLE ──
+  const ppArr=oArr.map(d=>{const wp=d.kw*1000||1;return{...d,gp:d.rev?(d.rev-d.cogs)/d.rev*100:0,rwp:d.rev/wp,cwp:d.cogs/wp,gmwp:(d.rev-d.cogs)/wp,aos:d.n?d.kw/d.n:0,aov:d.n?d.rev/d.n:0,rShare:d.rev/totalRev*100};}).sort((a,b)=>b.rev-a.rev);
+  document.getElementById('ppBdg').textContent=ppArr.length+' products';
+  document.getElementById('ppBody').innerHTML=ppArr.map(d=>{
+    return'<tr><td>'+d.o+'</td><td>'+d.n.toLocaleString()+'</td><td>'+d.rShare.toFixed(1)+'%</td><td>'+(d.rev/1e7).toFixed(2)+'</td><td>'+(d.cogs/1e7).toFixed(2)+'</td><td class="'+gc(d.gp)+'">'+d.gp.toFixed(1)+'%</td><td>₹'+d.rwp.toFixed(2)+'</td><td>₹'+d.cwp.toFixed(2)+'</td><td style="color:var(--gn)">₹'+d.gmwp.toFixed(2)+'</td><td>'+d.aos.toFixed(2)+'</td><td>₹'+(d.aov/1e5).toFixed(2)+' L</td></tr>';
+  }).join('');
+
+  // City × Product Matrix
+  const offerNames=oArr.map(d=>d.o);
+  const cityData={};
+  rv.forEach(r=>{
+    const c=r.city||'Unknown',o=r.offer||'Unknown';
+    if(!cityData[c])cityData[c]={city:c,total:{n:0,rev:0,kw:0},offers:{}};
+    if(!cityData[c].offers[o])cityData[c].offers[o]={n:0,rev:0,kw:0};
+    cityData[c].offers[o].n++;cityData[c].offers[o].rev+=r.rev;cityData[c].offers[o].kw+=r.kw;
+    cityData[c].total.n++;cityData[c].total.rev+=r.rev;cityData[c].total.kw+=r.kw;
+  });
+  const cities=Object.values(cityData).sort((a,b)=>b.total.rev-a.total.rev).slice(0,20);
+
+  const isAOV=MXMODE==='aov';
+  document.getElementById('mxHead').innerHTML='<tr><th>City</th>'+offerNames.map(o=>'<th>'+o+'</th>').join('')+'<th>City Avg</th></tr>';
+  const avg=isAOV?portfolioAOV/1e5:portfolioRwp;
+
+  document.getElementById('mxBody').innerHTML=cities.map(c=>{
+    const cityN=c.total.n,cityRev=c.total.rev,cityKW=c.total.kw;
+    const cityAvg=isAOV?(cityN?cityRev/cityN/1e5:0):(cityKW>0?cityRev/(cityKW*1000):0);
+    const cityAvgCls=cityAvg>=avg?'above':'below';
+    const cells=offerNames.map(o=>{
+      const d=c.offers[o];
+      if(!d||d.n===0)return'<td><span style="color:var(--mu)">—</span></td>';
+      const val=isAOV?(d.n?d.rev/d.n/1e5:0):(d.kw>0?d.rev/(d.kw*1000):0);
+      const cls=val>=avg?'above':'below';
+      const fmtV=isAOV?'₹'+val.toFixed(2)+'L':'₹'+val.toFixed(2);
+      return'<td><div class="mx-cell"><span class="mx-val '+cls+'">'+fmtV+'</span><span class="mx-sub">'+d.n+' proj</span></div></td>';
+    }).join('');
+    const fmtAvg=isAOV?'₹'+cityAvg.toFixed(2)+'L':'₹'+cityAvg.toFixed(2);
+    return'<tr><td>'+c.city+'</td>'+cells+'<td><span class="mx-val '+cityAvgCls+'">'+fmtAvg+'</span></td></tr>';
+  }).join('');
+
+  // RCA
+  const notes=[];
+  const bestOffer=oArr.reduce((a,b)=>(!a||((b.rev?(b.rev-b.cogs)/b.rev*100:0)>(a.rev?(a.rev-a.cogs)/a.rev*100:0))?b:a),null);
+  const worstOffer=oArr.reduce((a,b)=>(!a||((b.rev?(b.rev-b.cogs)/b.rev*100:0)<(a.rev?(a.rev-a.cogs)/a.rev*100:0))?b:a),null);
+  if(bestOffer&&worstOffer&&oArr.length>=2){
+    const bGP=bestOffer.rev?(bestOffer.rev-bestOffer.cogs)/bestOffer.rev*100:0;
+    const wGP=worstOffer.rev?(worstOffer.rev-worstOffer.cogs)/worstOffer.rev*100:0;
+    const spread=bGP-wGP;
+    notes.push({tag:'info',html:'<b>GM% spread across tiers is '+spread.toFixed(1)+'pp</b> — from <b>'+bestOffer.o+'</b> ('+bGP.toFixed(1)+'%) to <b>'+worstOffer.o+'</b> ('+wGP.toFixed(1)+'%). '+(spread>15?'This wide spread suggests significant pricing power differences or cost structure gaps between product lines worth investigating.':'Tiers are fairly aligned in margin performance.')});
+  }
+  // Revenue concentration by product
+  if(oArr.length>=2){
+    const topOffer=oArr[0];
+    const share=topOffer.rev/totalRev*100;
+    notes.push({tag:share>70?'watch':'info',html:'<b>'+topOffer.o+'</b> accounts for <b>'+share.toFixed(1)+'%</b> of revenue ('+topOffer.n.toLocaleString()+' installs). '+(share>70?'Heavy dependence on a single product tier — consider strategies to grow higher-margin tiers.':'Reasonable product diversification across the portfolio.')});
+  }
+  // Rev/Wp pricing gap
+  const rwps=oArr.map(d=>({o:d.o,rwp:d.kw>0?d.rev/(d.kw*1000):0,n:d.n})).filter(d=>d.n>=5).sort((a,b)=>b.rwp-a.rwp);
+  if(rwps.length>=2){
+    const gap=rwps[0].rwp-rwps[rwps.length-1].rwp;
+    notes.push({tag:'info',html:'<b>Rev/Wp realization gap:</b> ₹'+gap.toFixed(2)+'/Wp between <b>'+rwps[0].o+'</b> (₹'+rwps[0].rwp.toFixed(2)+') and <b>'+rwps[rwps.length-1].o+'</b> (₹'+rwps[rwps.length-1].rwp.toFixed(2)+'). This reflects the pricing differential across tiers — ensure each tier\'s pricing adequately covers its specific cost structure.'});
+  }
+  // Module cost share differences
+  const modShares=oArr.filter(d=>d.n>=10).map(d=>{const wp=d.kw*1000||1;return{o:d.o,modShare:d.cogs?(d.mod/d.cogs*100):0,modWp:d.mod/wp};}).sort((a,b)=>b.modShare-a.modShare);
+  if(modShares.length>=2){
+    notes.push({tag:'info',html:'<b>Module cost share</b> varies across tiers: '+modShares.slice(0,3).map(d=>d.o+' ('+d.modShare.toFixed(0)+'%, ₹'+d.modWp.toFixed(2)+'/Wp)').join(', ')+'. Higher module share typically indicates DCR panel usage — verify that pricing reflects the cost premium.'});
+  }
+  // Revenue vs Volume mismatch
+  ppArr.forEach(d=>{
+    const vShare=d.n/totalN*100;const diff=d.rShare-vShare;
+    if(diff>5)notes.push({tag:'good',html:'<b>'+d.o+'</b> punches above its weight — contributes '+d.rShare.toFixed(1)+'% of revenue with only '+vShare.toFixed(1)+'% of installs (+'+diff.toFixed(1)+'pp). This tier drives higher AOV and should be prioritized for capacity allocation.'});
+    if(diff<-5)notes.push({tag:'watch',html:'<b>'+d.o+'</b> underperforms on revenue share — holds '+vShare.toFixed(1)+'% of installs but only '+d.rShare.toFixed(1)+'% of revenue ('+diff.toFixed(1)+'pp gap). Smaller average system sizes or lower pricing may be dragging weighted revenue contribution.'});
+  });
+  document.getElementById('memoProd').innerHTML=notes.map(n=>'<div class="memo-item"><span class="memo-tag '+n.tag+'">'+n.tag+'</span><span>'+n.html+'</span></div>').join('');
 }
 
 window.addEventListener('DOMContentLoaded',loadData);
