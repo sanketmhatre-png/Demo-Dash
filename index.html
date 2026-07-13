@@ -334,19 +334,7 @@ tbody tr.sel td:first-child{color:var(--bd)}
 </div>
 <div class="main">
   <!-- Row 1: Category breakdown + visuals side by side -->
-  <div class="cogs-top">
-    <div class="tblw">
-      <div class="tbh"><div class="tbt">Category-wise COGS Breakdown</div><div class="tbb" id="gBdg">—</div></div>
-      <div class="tbs"><table class="fixed-tbl"><colgroup><col style="width:28%"><col style="width:18%"><col style="width:18%"><col style="width:18%"><col style="width:18%"></colgroup><thead><tr>
-        <th>Category</th><th>Total Cost</th><th>% of COGS</th><th>Cost / Wp</th><th>Avg / Project</th>
-      </tr></thead><tbody id="tG"></tbody></table></div>
-    </div>
-    <div class="cogs-viz">
-      <div><div class="viz-title">Category Mix (% of COGS)</div><div class="segbar" id="segMix"></div><div id="segLegend" style="margin-top:6px"></div></div>
-      <div><div class="viz-title">Cost per Wp by Category (₹)</div><div id="vizCostWp"></div></div>
-    </div>
-  </div>
-  <!-- Row 2: Month-wise comparison table -->
+  <!-- Month-wise comparison table -->
   <div class="tblw">
     <div class="tbh">
       <div class="tbt">COGS Comparison — Month View</div>
@@ -966,25 +954,6 @@ function rCogs(){
   s('g4',modCat?modCat.share.toFixed(1)+'%':'—');s('g4d',modCat?'₹'+(modCat.total/1e7).toFixed(2)+' Cr':'—');
   s('g5',mtrCat?mtrCat.share.toFixed(1)+'%':'—');s('g5d',mtrCat?'₹'+(mtrCat.total/1e7).toFixed(2)+' Cr':'—');
   if(catTotals[0]){s('g6',catTotals[0].label);s('g6d',catTotals[0].share.toFixed(1)+'% of total COGS');}
-
-  // Breakdown table
-  document.getElementById('gBdg').textContent=catTotals.length+' categories';
-  document.getElementById('tG').innerHTML=catTotals.map(c=>{
-    return'<tr><td>'+c.label+'</td><td>₹'+(c.total/1e7).toFixed(2)+' Cr</td><td class="'+(c.share>=25?'gb':c.share>=10?'go':'gg')+'">'+c.share.toFixed(2)+'%</td><td>₹'+c.perWp.toFixed(2)+'</td><td>₹'+(nr?c.total/nr:0).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,',')+'</td></tr>';
-  }).join('')+'<tr class="tot"><td><strong>TOTAL</strong></td><td>₹'+(totCogs/1e7).toFixed(2)+' Cr</td><td>100%</td><td>₹'+rwp.toFixed(2)+'</td><td>₹'+(nr?(totCogs/nr).toFixed(0).replace(/\B(?=(\d{3})+(?!\d))/g,','):'0')+'</td></tr>';
-
-  // Segmented mix bar
-  document.getElementById('segMix').innerHTML=catTotals.map((c,i)=>c.share>0.1?'<div class="seg" style="width:'+c.share+'%;background:'+CAT_COLORS[i%CAT_COLORS.length]+'" title="'+c.label+': '+c.share.toFixed(1)+'%"></div>':'').join('');
-  document.getElementById('segLegend').innerHTML=catTotals.slice(0,8).map((c,i)=>
-    '<div class="seg-legend-row"><div class="seg-dot" style="background:'+CAT_COLORS[i%CAT_COLORS.length]+'"></div><div class="seg-name">'+c.label+'</div><div class="seg-pct">'+c.share.toFixed(1)+'%</div></div>'
-  ).join('')+(catTotals.length>8?'<div class="seg-legend-row" style="color:var(--mu)"><div class="seg-dot" style="background:var(--br2)"></div><div class="seg-name">+'+(catTotals.length-8)+' more</div><div class="seg-pct">'+catTotals.slice(8).reduce((s,c)=>s+c.share,0).toFixed(1)+'%</div></div>':'');
-
-  // Cost per Wp bars
-  const maxPWp=Math.max(...catTotals.map(c=>c.perWp),0.01);
-  document.getElementById('vizCostWp').innerHTML=catTotals.map((c,i)=>{
-    const w=Math.max((c.perWp/maxPWp*100),3);
-    return'<div class="vrow"><div class="vname" title="'+c.label+'">'+c.label+'</div><div class="vbar-bg"><div class="vbar-fill" style="width:'+w+'%;background:'+CAT_COLORS[i%CAT_COLORS.length]+'"><span class="vbar-val'+(w<28?' out':'')+'">₹'+c.perWp.toFixed(1)+'</span></div></div></div>';
-  }).join('');
 
   // Get last 4 months from filtered data
   const withDate=rv.filter(r=>r.date);
