@@ -455,6 +455,7 @@ function pickState(s){SELS=(SELS===s)?null:s;render();}
 function fdState(){return SELS?F.filter(r=>r.state===SELS):F;}
 function fdMonth(){if(!SELM)return F;const[y,mo]=SELM.split('-').map(Number);return F.filter(r=>r.date&&r.date.getFullYear()===y&&r.date.getMonth()===mo);}
 function fdBoth(){let arr=F;if(SELS)arr=arr.filter(r=>r.state===SELS);if(SELM){const[y,mo]=SELM.split('-').map(Number);arr=arr.filter(r=>r.date&&r.date.getFullYear()===y&&r.date.getMonth()===mo);}return arr;}
+function filterCtx(){const parts=[];if(SELS)parts.push(SELS);if(SELM){const[y,mo]=SELM.split('-').map(Number);parts.push(new Date(y,mo,1).toLocaleString('en',{month:'short',year:'numeric'}));}const fFY=document.getElementById('fFY').value,fOf=document.getElementById('fOf').value,fPh=document.getElementById('fPh').value;if(fFY)parts.push(fFY);if(fOf)parts.push(fOf);if(fPh)parts.push(fPh);return parts.length?parts.join(' · '):'All data';}
 
 function render(){
   const xf=document.getElementById('xfBtn');
@@ -666,50 +667,55 @@ function rOVA(){
   }
 
   // ── RCA MEMOS ──
+  const ctx=filterCtx();
+  const xfData=fdBoth();
+  const xfSrc=xfData.filter(r=>r.date);
+  const xfRv=xfData.filter(r=>r.hr);
   const notes=[];
+  if(ctx!=='All data')notes.push({tag:'info',html:'<b>📌 Showing analysis for:</b> '+ctx});
+
   if(months.length>=2){
     const curM=months[0],prevM=months[1];
-    const curRows=src.filter(r=>r.date.getFullYear()===curM.y&&r.date.getMonth()===curM.mo);
+    const curRows=xfSrc.filter(r=>r.date.getFullYear()===curM.y&&r.date.getMonth()===curM.mo);
     const maxDay=curRows.length?Math.max(...curRows.map(r=>r.date.getDate())):1;
     const cur=mStats(curRows.filter(r=>r.date.getDate()<=maxDay));
-    const prev=mStats(src.filter(r=>r.date.getFullYear()===prevM.y&&r.date.getMonth()===prevM.mo&&r.date.getDate()<=maxDay));
+    const prev=mStats(xfSrc.filter(r=>r.date.getFullYear()===prevM.y&&r.date.getMonth()===prevM.mo&&r.date.getDate()<=maxDay));
     const curLbl=curM.lbl+' 1–'+maxDay,prevLbl=prevM.lbl+' 1–'+maxDay;
     const revD=prev.rev?((cur.rev-prev.rev)/prev.rev*100):0;
     const gmD=cur.gp-prev.gp;
     const cogsD=prev.cogs?((cur.cogs-prev.cogs)/prev.cogs*100):0;
 
     if(Math.abs(revD)>5){
-      notes.push({tag:revD>0?'good':'risk',html:'<b>MTD Revenue '+(revD>0?'up':'down')+' '+Math.abs(revD).toFixed(1)+'%</b> ('+prevLbl+': ₹'+(prev.rev/1e7).toFixed(2)+' Cr → '+curLbl+': ₹'+(cur.rev/1e7).toFixed(2)+' Cr). '+(revD>0?'Volume up '+prev.n+' → '+cur.n+' projects. Check if driven by a specific city or product tier.':'Investigate whether seasonal, pipeline-driven, or project delays in specific clusters.')});
+      notes.push({tag:revD>0?'good':'risk',html:'<b>MTD Revenue '+(revD>0?'up':'down')+' '+Math.abs(revD).toFixed(1)+'%</b> ('+prevLbl+': ₹'+(prev.rev/1e7).toFixed(2)+' Cr → '+curLbl+': ₹'+(cur.rev/1e7).toFixed(2)+' Cr). '+(revD>0?'Volume up '+prev.n+' → '+cur.n+' projects.':'Investigate whether seasonal, pipeline-driven, or project delays.')});
     }else{
-      notes.push({tag:'info',html:'<b>MTD Revenue roughly flat</b> — '+curLbl+' (₹'+(cur.rev/1e7).toFixed(2)+' Cr, '+cur.n+' proj) vs '+prevLbl+' (₹'+(prev.rev/1e7).toFixed(2)+' Cr, '+prev.n+' proj). '+(Math.abs(revD)).toFixed(1)+'% difference, within normal run-rate variance.'});
+      notes.push({tag:'info',html:'<b>MTD Revenue roughly flat</b> — '+curLbl+' (₹'+(cur.rev/1e7).toFixed(2)+' Cr, '+cur.n+' proj) vs '+prevLbl+' (₹'+(prev.rev/1e7).toFixed(2)+' Cr, '+prev.n+' proj). '+Math.abs(revD).toFixed(1)+'% difference.'});
     }
     if(Math.abs(gmD)>1){
-      notes.push({tag:gmD>0?'good':'risk',html:'<b>GM% '+(gmD>0?'improved':'declined')+' '+Math.abs(gmD).toFixed(2)+'pp MTD</b> ('+prevLbl+': '+prev.gp.toFixed(2)+'% → '+curLbl+': '+cur.gp.toFixed(2)+'%). '+(gmD<0?'Root causes: module cost changes, product mix shift to lower-margin tiers, or increased BOS/metering costs.':'Reflects better cost control, favorable product mix, or module rate improvement.')});
+      notes.push({tag:gmD>0?'good':'risk',html:'<b>GM% '+(gmD>0?'improved':'declined')+' '+Math.abs(gmD).toFixed(2)+'pp MTD</b> ('+prevLbl+': '+prev.gp.toFixed(2)+'% → '+curLbl+': '+cur.gp.toFixed(2)+'%). '+(gmD<0?'Root causes: module cost changes, product mix shift, or increased BOS/metering costs.':'Reflects better cost control or favorable product mix.')});
     }
     if(cogsD>revD+3){
-      notes.push({tag:'watch',html:'<b>COGS growing faster than revenue MTD</b> — COGS +'+cogsD.toFixed(1)+'% vs revenue +'+revD.toFixed(1)+'% ('+prevLbl+' → '+curLbl+'). Margin compression pattern — likely rising input costs not yet passed through to pricing.'});
+      notes.push({tag:'watch',html:'<b>COGS growing faster than revenue MTD</b> — COGS +'+cogsD.toFixed(1)+'% vs revenue +'+revD.toFixed(1)+'%. Margin compression — likely rising input costs.'});
     }
   }
 
-  // State concentration
-  const stateData={};F.forEach(r=>{const k=r.state||'?';if(!stateData[k])stateData[k]={s:k,rev:0};if(r.hr)stateData[k].rev+=r.rev;});
-  const stArr=Object.values(stateData).sort((a,b)=>b.rev-a.rev);
-  const totRev=stArr.reduce((s,d)=>s+d.rev,0)||1;
-  if(stArr.length>=3){
-    const top3=stArr.slice(0,3);
-    const top3Share=top3.reduce((s,d)=>s+d.rev,0)/totRev*100;
-    notes.push({tag:top3Share>60?'watch':'info',html:'<b>Top 3 states ('+top3.map(d=>d.s).join(', ')+')</b> contribute '+top3Share.toFixed(1)+'% of revenue. '+(top3Share>60?'High concentration — a downturn in any one of these markets would significantly impact overall numbers.':'Healthy geographic diversification.')});
+  // State/city concentration (uses cross-filtered data)
+  const stData={};xfRv.forEach(r=>{const k=r.state||'?';if(!stData[k])stData[k]={s:k,rev:0};stData[k].rev+=r.rev;});
+  const stArr2=Object.values(stData).sort((a,b)=>b.rev-a.rev);
+  const totR2=stArr2.reduce((s,d)=>s+d.rev,0)||1;
+  if(stArr2.length>=3){
+    const top3=stArr2.slice(0,3);
+    const top3S=top3.reduce((s,d)=>s+d.rev,0)/totR2*100;
+    notes.push({tag:top3S>60?'watch':'info',html:'<b>Top 3 '+(SELM?'states':'states')+' ('+top3.map(d=>d.s).join(', ')+')</b> contribute '+top3S.toFixed(1)+'% of revenue. '+(top3S>60?'High concentration risk.':'Healthy diversification.')});
   }
 
-  // GM band distribution
-  const rv=F.filter(r=>r.hr);
-  const above50=rv.filter(r=>r.rev?(r.rev-r.cogs)/r.rev*100>=50:false).length;
-  const below40=rv.filter(r=>r.rev?(r.rev-r.cogs)/r.rev*100<40:false).length;
-  if(rv.length>0){
-    notes.push({tag:'info',html:'<b>GM% distribution:</b> '+above50.toLocaleString()+' projects ('+((above50/rv.length)*100).toFixed(1)+'%) are above 50% GM, while '+below40.toLocaleString()+' projects ('+((below40/rv.length)*100).toFixed(1)+'%) are below 40% GM. '+(below40/rv.length>0.3?'The long tail of low-margin projects is worth auditing — these may be legacy pricing, exceptional installations, or data issues.':'The margin distribution is healthy with most projects in the profitable band.')});
+  // GM band (uses cross-filtered data)
+  if(xfRv.length>0){
+    const above50=xfRv.filter(r=>r.rev?(r.rev-r.cogs)/r.rev*100>=50:false).length;
+    const below40=xfRv.filter(r=>r.rev?(r.rev-r.cogs)/r.rev*100<40:false).length;
+    notes.push({tag:'info',html:'<b>GM% distribution:</b> '+above50.toLocaleString()+' projects ('+((above50/xfRv.length)*100).toFixed(1)+'%) above 50% GM, '+below40.toLocaleString()+' ('+((below40/xfRv.length)*100).toFixed(1)+'%) below 40%. '+(below40/xfRv.length>0.3?'Long tail of low-margin projects worth auditing.':'Margin distribution is healthy.')});
   }
 
-  document.getElementById('memoOV').innerHTML=notes.length?notes.map(n=>'<div class="memo-item"><span class="memo-tag '+n.tag+'">'+n.tag+'</span><span>'+n.html+'</span></div>').join(''):'<div style="color:var(--mu);padding:8px;font-size:11px">Apply filters or load data to generate insights.</div>';
+  document.getElementById('memoOV').innerHTML=notes.length?notes.map(n=>'<div class="memo-item"><span class="memo-tag '+n.tag+'">'+n.tag+'</span><span>'+n.html+'</span></div>').join(''):'<div style="color:var(--mu);padding:8px;font-size:11px">Apply filters to generate insights.</div>';
 }
 
 function rGMBridge(mData){
@@ -942,8 +948,9 @@ const COST_CATS=[
 const CAT_COLORS=['#1a4fd4','#3b82f6','#7c3aed','#db2777','#ea580c','#d97706','#059669','#0891b2','#60a5fa','#a78bfa','#f472b6','#fb923c','#fbbf24','#34d399','#22d3ee','#93c5fd','#c4b5fd','#fda4af'];
 
 function rCogs(){
-  const rv=F.filter(r=>r.hr);
-  const totRev=rv.reduce((s,r)=>s+r.rev,0),totCogs=rv.reduce((s,r)=>s+r.cogs,0),totKW=F.reduce((s,r)=>s+r.kw,0);
+  const xf=fdBoth();
+  const rv=xf.filter(r=>r.hr);
+  const totRev=rv.reduce((s,r)=>s+r.rev,0),totCogs=rv.reduce((s,r)=>s+r.cogs,0),totKW=xf.reduce((s,r)=>s+r.kw,0);
   const nr=rv.length;
   const catTotals=COST_CATS.map(c=>({...c,total:rv.reduce((s,r)=>s+(r[c.key]||0),0)}));
   catTotals.forEach(c=>{c.share=totCogs?c.total/totCogs*100:0;c.perWp=totKW>0?c.total/(totKW*1000):0;});
@@ -1031,7 +1038,9 @@ function rCogs(){
   document.getElementById('gCompBody').innerHTML=html;
 
   // RCA
+  const ctx2=filterCtx();
   const notes=[];
+  if(ctx2!=='All data')notes.push({tag:'info',html:'<b>📌 Showing analysis for:</b> '+ctx2});
   const top3Share=catTotals.slice(0,3).reduce((s,c)=>s+c.share,0);
   notes.push({tag:'info',html:'<b>'+catTotals[0].label+'</b> is the single largest cost driver at <b>'+catTotals[0].share.toFixed(1)+'%</b> of total COGS. Top 3 ('+catTotals.slice(0,3).map(c=>c.label).join(', ')+') account for <b>'+top3Share.toFixed(1)+'%</b>.'});
   if(cogsPct>52){notes.push({tag:'risk',html:'<b>COGS ratio elevated:</b> '+cogsPct.toFixed(2)+'% of revenue. Investigate module rate, product mix, or discounting.'});}
@@ -1056,7 +1065,8 @@ function rCogs(){
 function mxMode(m){MXMODE=m;document.getElementById('mx-aov').classList.toggle('active',m==='aov');document.getElementById('mx-rwp').classList.toggle('active',m==='rwp');rProd();}
 
 function rProd(){
-  const rv=F.filter(r=>r.hr);
+  const xf=fdBoth();
+  const rv=xf.filter(r=>r.hr);
   const offers={};
   rv.forEach(r=>{const o=r.offer;if(!o||o.trim()==='')return; // skip blank offer type
     if(!offers[o])offers[o]={o,n:0,kw:0,rev:0,cogs:0,mod:0,inv:0,mtr:0,cab:0,prf:0};const d=offers[o];d.n++;d.kw+=r.kw;d.rev+=r.rev;d.cogs+=r.cogs;d.mod+=(r.mod||0);d.inv+=(r.inv||0);d.mtr+=(r.mtr||0);d.cab+=(r.cab||0);d.prf+=(r.prf||0);});
@@ -1120,7 +1130,9 @@ function rProd(){
   }).join('');
 
   // RCA
+  const ctx3=filterCtx();
   const notes=[];
+  if(ctx3!=='All data')notes.push({tag:'info',html:'<b>📌 Showing analysis for:</b> '+ctx3});
   const bestOffer=oArr.reduce((a,b)=>(!a||((b.rev?(b.rev-b.cogs)/b.rev*100:0)>(a.rev?(a.rev-a.cogs)/a.rev*100:0))?b:a),null);
   const worstOffer=oArr.reduce((a,b)=>(!a||((b.rev?(b.rev-b.cogs)/b.rev*100:0)<(a.rev?(a.rev-a.cogs)/a.rev*100:0))?b:a),null);
   if(bestOffer&&worstOffer&&oArr.length>=2){
