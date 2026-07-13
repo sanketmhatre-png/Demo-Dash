@@ -619,11 +619,13 @@ function rOVA(){
       {label:'Rev / Wp',curr:'₹'+cur.rwp.toFixed(2),prev:'₹'+prev.rwp.toFixed(2),delta:prev.rwp?((cur.rwp-prev.rwp)/prev.rwp*100):0,higher:true}
     ];
     document.getElementById('momCards').innerHTML=metrics.map(m=>{
-      const dir=Math.abs(m.delta)<0.5?'flat':m.delta>0?(m.higher===false?'down':'up'):(m.higher===false?'up':'down');
-      const realDir=m.higher===null?'flat':dir;
-      const arrow=m.delta>0.5?'▲':m.delta<-0.5?'▼':'';
+      // dir: 'up'=good, 'down'=bad, 'flat'=neutral
+      const isGood=m.higher===null?null:(m.delta>0)===m.higher;
+      const realDir=Math.abs(m.delta)<0.01?'flat':isGood===null?'flat':isGood?'up':'down';
+      // arrow: ▲ if good for business, ▼ if bad
+      const arrow=Math.abs(m.delta)<0.01?'—':isGood===null?(m.delta>0?'▲':'▼'):isGood?'▲':'▼';
       const unit=m.isPP?'pp':'%';
-      const deltaHtml=realDir!=='flat'?'<div class="mom-delta '+realDir+'">'+arrow+' '+Math.abs(m.delta).toFixed(1)+unit+'</div>':'';
+      const deltaHtml='<div class="mom-delta '+realDir+'">'+arrow+' '+Math.abs(m.delta).toFixed(1)+unit+'</div>';
       return'<div class="mom-card '+realDir+'"><div class="mom-metric">'+m.label+'</div><div class="mom-vals"><span class="mom-curr">'+m.curr+'</span><span class="mom-prev">'+m.prev+'</span></div>'+deltaHtml+'</div>';
     }).join('');
   }else{
