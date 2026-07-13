@@ -133,7 +133,7 @@ tbody tr.sel td:first-child{color:var(--bd)}
 .mom-metric{font-size:9px;color:var(--mu);font-family:'JetBrains Mono',monospace;font-weight:700;text-transform:uppercase;letter-spacing:.4px}
 .mom-vals{display:flex;align-items:baseline;gap:8px}
 .mom-curr{font-size:18px;font-weight:900;color:var(--bdp)}
-.mom-prev{font-size:11px;color:var(--mu);text-decoration:line-through}
+.mom-prev{font-size:11px;color:var(--mu)}
 .mom-delta{display:inline-flex;align-items:center;gap:3px;font-size:13px;font-weight:900;padding:2px 8px;border-radius:6px;margin-top:2px;width:fit-content}
 .mom-delta.up{background:var(--gnb);color:var(--gn)} .mom-delta.down{background:var(--rdb);color:var(--rd)} .mom-delta.flat{background:var(--amb);color:var(--am)}
 
@@ -292,11 +292,10 @@ tbody tr.sel td:first-child{color:var(--bd)}
   <!-- MONTHLY TREND BARS -->
   <div class="trend-section">
     <div class="tbh" style="border:none;padding:8px 0"><div class="tbt">📈 Last 6 Months Trend</div></div>
-    <div class="trend-grid">
+    <div class="trend-grid" style="grid-template-columns:repeat(3,1fr)">
       <div class="trend-card"><div class="trend-label">Revenue (₹Cr)</div><div class="trend-bars" id="trendRev"></div><div class="trend-vals" id="trendRevV"></div><div class="trend-pip" id="trendRevP"></div><div class="trend-lbls" id="trendRevL"></div></div>
       <div class="trend-card"><div class="trend-label">COGS (₹Cr)</div><div class="trend-bars" id="trendCogs"></div><div class="trend-vals" id="trendCogsV"></div><div class="trend-pip" id="trendCogsP"></div><div class="trend-lbls" id="trendCogsL"></div></div>
-      <div class="trend-card" id="gmBridgeCard"><div class="trend-label">GM% Bridge <span style="font-size:8px;font-weight:500;color:var(--mu)" id="gmBridgePeriod"></span></div><div id="gmBridgeViz" style="margin-top:4px"></div></div>
-      <div class="trend-card" id="prodMixCard"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px"><div class="trend-label">Product Mix</div><div style="font-size:8px;color:var(--mu)">by Revenue</div></div><div id="prodMixViz" style="display:flex;gap:10px;align-items:center"></div></div>
+      <div class="trend-card"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px"><div class="trend-label">Product Mix</div><div style="font-size:8px;color:var(--mu)">by Revenue</div></div><div id="prodMixViz" style="display:flex;gap:16px;align-items:center"></div></div>
     </div>
   </div>
 
@@ -622,9 +621,10 @@ function rOVA(){
     document.getElementById('momCards').innerHTML=metrics.map(m=>{
       const dir=Math.abs(m.delta)<0.5?'flat':m.delta>0?(m.higher===false?'down':'up'):(m.higher===false?'up':'down');
       const realDir=m.higher===null?'flat':dir;
-      const arrow=m.delta>0.5?'▲':m.delta<-0.5?'▼':'—';
+      const arrow=m.delta>0.5?'▲':m.delta<-0.5?'▼':'';
       const unit=m.isPP?'pp':'%';
-      return'<div class="mom-card '+realDir+'"><div class="mom-metric">'+m.label+'</div><div class="mom-vals"><span class="mom-curr">'+m.curr+'</span><span class="mom-prev">'+m.prev+'</span></div><div class="mom-delta '+realDir+'">'+arrow+' '+Math.abs(m.delta).toFixed(1)+unit+'</div></div>';
+      const deltaHtml=realDir!=='flat'?'<div class="mom-delta '+realDir+'">'+arrow+' '+Math.abs(m.delta).toFixed(1)+unit+'</div>':'';
+      return'<div class="mom-card '+realDir+'"><div class="mom-metric">'+m.label+'</div><div class="mom-vals"><span class="mom-curr">'+m.curr+'</span><span class="mom-prev">'+m.prev+'</span></div>'+deltaHtml+'</div>';
     }).join('');
   }else{
     document.getElementById('momCards').innerHTML='<div style="color:var(--mu);font-size:11px;padding:12px">Need at least 2 months of data for MTD comparison</div>';
@@ -660,7 +660,6 @@ function rOVA(){
     };
     renderTrend('trendRev',d=>d.rev/1e7,'#d97706',v=>v.toFixed(1));
     renderTrend('trendCogs',d=>d.cogs/1e7,'#ea580c',v=>v.toFixed(1));
-    rGMBridge(mData);
     rProdMix();
   }
 
@@ -712,63 +711,96 @@ function rOVA(){
 }
 
 function rGMBridge(mData){
-  if(!mData||mData.length<2)return;
-  const n=mData.length;
+  if(!mData||mData.length<2){document.getElementById('gmBridgeSvg').innerHTML='';return;}
   const src=F.filter(r=>r.date&&r.hr);
-  const BCOLORS=['#1a4fd4','#7c3aed','#db2777','#d97706'];
-  const categories=[
-    {key:'mod',label:'Module'},
-    {key:'inv',label:'Inverter'},
-    {key:'mtr',label:'Metering'},
-    {key:'cogs_other',label:'Other BOS'}
-  ];
+  const DCOLORS=['#7c3aed','#e67e22','#e74c3c','#27ae60'];
+  const DRIVERS=[{key:'mod',label:'Module'},{key:'inv',label:'Inverter'},{key:'cogs_other',label:'Cost'},{key:'city_mix',label:'City Mix'},{key:'prod_mix',label:'Prod Mix'}];
 
-  // Build bridges between consecutive months
+  // Build last 2 bridges (3 months: M-2 → M-1 → M)
   const bridges=[];
-  for(let i=0;i<Math.min(n-1,2);i++){
-    const ma=mData[n-2-i+(i>0?1:0)];const mb=mData[n-1-i+(i>0?1:0)];
-    if(!ma||!mb)break;
-    const aRows=src.filter(r=>r.date.getFullYear()===ma.y&&r.date.getMonth()===ma.mo);
-    const bRows=src.filter(r=>r.date.getFullYear()===mb.y&&r.date.getMonth()===mb.mo);
-    const aKW=aRows.reduce((s,r)=>s+r.kw,0)*1000||1;
-    const bKW=bRows.reduce((s,r)=>s+r.kw,0)*1000||1;
-    const drivers=categories.map(c=>{
-      let aV,bV;
-      if(c.key==='cogs_other'){
-        const known=['mod','inv','mtr'];
-        aV=aRows.reduce((s,r)=>s+(r.cogs||0)-known.reduce((ss,k)=>ss+(r[k]||0),0),0)/aKW;
-        bV=bRows.reduce((s,r)=>s+(r.cogs||0)-known.reduce((ss,k)=>ss+(r[k]||0),0),0)/bKW;
-      }else{
-        aV=aRows.reduce((s,r)=>s+(r[c.key]||0),0)/aKW;
-        bV=bRows.reduce((s,r)=>s+(r[c.key]||0),0)/bKW;
-      }
-      const aRev=aRows.reduce((s,r)=>s+r.rev,0)/aKW;
-      const bRev=bRows.reduce((s,r)=>s+r.rev,0)/bKW;
-      const aGP=aRev?((aRev-aRows.reduce((s,r)=>s+(r.cogs||0),0)/aKW)/aRev*100):0;
-      const impact=(bV-aV)/bRev*100;
-      return{label:c.key==='cogs_other'?'Other BOS':c.label,impact:isNaN(impact)?0:-impact};
+  const n=mData.length;
+  const idxPairs=n>=3?[[n-3,n-2],[n-2,n-1]]:[[n-2,n-1]];
+  idxPairs.forEach(pair=>{
+    const ai=pair[0],bi=pair[1];
+    const ma=mData[ai],mb=mData[bi];
+    if(!ma||!mb)return;
+    const aR=src.filter(r=>r.date.getFullYear()===ma.y&&r.date.getMonth()===ma.mo);
+    const bR=src.filter(r=>r.date.getFullYear()===mb.y&&r.date.getMonth()===mb.mo);
+    const aKW=aR.reduce((s,r)=>s+r.kw,0)*1000||1,bKW=bR.reduce((s,r)=>s+r.kw,0)*1000||1;
+    const aRev=aR.reduce((s,r)=>s+r.rev,0)/aKW,bRev=bR.reduce((s,r)=>s+r.rev,0)/bKW;
+    const aCogs=aR.reduce((s,r)=>s+r.cogs,0)/aKW,bCogs=bR.reduce((s,r)=>s+r.cogs,0)/bKW;
+    // driver impacts (simplified: cost/wp change effect on GM%)
+    const modImp=bRev?-((bR.reduce((s,r)=>s+(r.mod||0),0)/bKW-aR.reduce((s,r)=>s+(r.mod||0),0)/aKW)/bRev*100):0;
+    const invImp=bRev?-((bR.reduce((s,r)=>s+(r.inv||0),0)/bKW-aR.reduce((s,r)=>s+(r.inv||0),0)/aKW)/bRev*100):0;
+    const priceImp=bRev?(bRev-aRev)/bRev*100:0;
+    const residual=(mb.gp-ma.gp)-modImp-invImp-priceImp;
+    bridges.push({from:ma.lbl,to:mb.lbl,fromGP:ma.gp,toGP:mb.gp,
+      drivers:[{l:'Price',v:priceImp},{l:'Module',v:modImp},{l:'Inverter',v:invImp},{l:'Other',v:residual}]
     });
-    const aGP=ma.gp,bGP=mb.gp;
-    bridges.push({from:ma.lbl,to:mb.lbl,fromGP:aGP,toGP:bGP,drivers});
-  }
-  // Show most recent bridge
-  const bridge=bridges[0];
-  if(!bridge){document.getElementById('gmBridgeViz').innerHTML='<div style="color:var(--mu);font-size:10px;padding:12px">Need 2 months of data</div>';return;}
-  document.getElementById('gmBridgePeriod').textContent=bridge.from+' → '+bridge.to;
-  const total=bridge.toGP-bridge.fromGP;
-  const maxAbs=Math.max(Math.abs(bridge.fromGP),Math.abs(bridge.toGP),...bridge.drivers.map(d=>Math.abs(d.impact)),0.1);
-  const barW=80;
-  function bar(val,label,isBase,isEnd,color){
-    const w=Math.abs(val)/maxAbs*barW;
-    const isPos=val>=0;
-    const bg=isBase||isEnd?'#1a4fd4':(isPos?'#059669':'#dc2626');
-    const fmt=isBase||isEnd?val.toFixed(1)+'%':(isPos?'+':'')+val.toFixed(2)+'pp';
-    return'<div style="display:flex;align-items:center;gap:6px;margin:3px 0"><div style="width:70px;font-size:9px;color:var(--dm);text-align:right;font-family:JetBrains Mono">'+label+'</div><div style="flex:1;position:relative;height:18px"><div style="height:100%;width:'+w+'%;background:'+bg+';border-radius:3px;display:flex;align-items:center;justify-content:flex-end;padding-right:4px;min-width:2px"><span style="font-size:8px;font-weight:800;color:#fff;white-space:nowrap">'+fmt+'</span></div></div></div>';
-  }
-  let html=bar(bridge.fromGP,'',true,false,'');
-  bridge.drivers.forEach((d,i)=>{ if(Math.abs(d.impact)>0.01)html+=bar(d.impact,d.label,false,false,BCOLORS[i]); });
-  html+=bar(bridge.toGP,'',false,true,'');
-  document.getElementById('gmBridgeViz').innerHTML=html;
+  });
+
+  if(!bridges.length)return;
+  document.getElementById('gmBridgePeriod').textContent=bridges[0].from+' → '+bridges[bridges.length-1].to;
+
+  // Build columns: base, drivers..., end, gap, base2, drivers..., end2
+  const cols=[];
+  bridges.forEach((b,bi)=>{
+    if(bi>0)cols.push({type:'gap'});
+    cols.push({type:'base',val:b.fromGP,lbl:b.from,base:b.fromGP});
+    let running=b.fromGP;
+    b.drivers.forEach((d,di)=>{
+      if(Math.abs(d.v)>0.02){cols.push({type:'delta',val:d.v,lbl:d.l,base:running,col:DCOLORS[di%DCOLORS.length]});running+=d.v;}
+    });
+    cols.push({type:'end',val:b.toGP,lbl:b.to,base:b.toGP});
+  });
+
+  // SVG layout
+  const W=280,H=150,padL=8,padR=8,padT=28,padB=32;
+  const chartH=H-padT-padB,chartW=W-padL-padR;
+  const allGP=[...cols.filter(c=>c.type!=='gap').map(c=>c.type==='delta'?c.base+c.val:c.val),...cols.filter(c=>c.type!=='gap').map(c=>c.base||0)];
+  const minGP=Math.min(...allGP)-0.5,maxGP=Math.max(...allGP)+0.5,gpRange=maxGP-minGP||1;
+  const toY=v=>padT+(1-(v-minGP)/gpRange)*chartH;
+  const nonGap=cols.filter(c=>c.type!=='gap');
+  const gapW=8,barW=Math.floor((chartW-gapW*bridges.length)/(nonGap.length+bridges.length*0.2));
+  // assign x positions
+  let xc=padL;
+  cols.forEach(c=>{if(c.type==='gap'){c.x=xc;xc+=gapW;}else{c.x=xc;xc+=barW+3;}});
+
+  // Draw grid lines
+  let svg=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:${H}px">`;
+  [0,1,2,3].forEach(i=>{const gv=minGP+i*(gpRange/3);const gy=toY(gv);
+    svg+=`<line x1="${padL}" y1="${gy.toFixed(1)}" x2="${W-padR}" y2="${gy.toFixed(1)}" stroke="#e2e8f0" stroke-width="1"/>`;
+    svg+=`<text x="${padL}" y="${(gy-3).toFixed(1)}" font-size="8" fill="#94a3b8" font-family="JetBrains Mono">${gv.toFixed(1)}%</text>`;
+  });
+
+  // Draw bars
+  cols.forEach(c=>{
+    if(c.type==='gap')return;
+    const isBase=c.type==='base',isEnd=c.type==='end',isDelta=c.type==='delta';
+    const val=c.val,base=c.base;
+    const y1=toY(Math.max(base,base+val)),y2=toY(Math.min(base,base+val));
+    const bh=Math.max(Math.abs(y2-y1),2);
+    const fill=isBase||isEnd?'#ea580c':(val>=0?'#27ae60':'#e74c3c');
+    const textY=y1-5;
+    const fmt=isBase||isEnd?val.toFixed(1)+'%':(val>=0?'+':'')+val.toFixed(2)+'pp';
+    svg+=`<rect x="${c.x}" y="${y1.toFixed(1)}" width="${barW}" height="${bh.toFixed(1)}" fill="${fill}" rx="2"/>`;
+    svg+=`<text x="${(c.x+barW/2).toFixed(1)}" y="${(y1-5).toFixed(1)}" font-size="9" font-weight="800" fill="${fill}" font-family="JetBrains Mono" text-anchor="middle">${fmt}</text>`;
+    // connector line to next delta
+    svg+=`<text x="${(c.x+barW/2).toFixed(1)}" y="${(H-padB+14).toFixed(1)}" font-size="8.5" font-weight="${isBase||isEnd?'900':'600'}" fill="${isBase||isEnd?'#ea580c':'#64748b'}" font-family="${isBase||isEnd?'Plus Jakarta Sans':'JetBrains Mono'}" text-anchor="middle">${c.lbl}</text>`;
+    if(isDelta){
+      svg+=`<line x1="${(c.x+barW/2).toFixed(1)}" y1="${toY(base).toFixed(1)}" x2="${(c.x+barW/2).toFixed(1)}" y2="${y1.toFixed(1)}" stroke="${fill}" stroke-width="1" stroke-dasharray="2,2" opacity="0.5"/>`;
+    }
+  });
+  svg+='</svg>';
+  document.getElementById('gmBridgeSvg').innerHTML=svg;
+
+  // Footer summary
+  const footerParts=bridges.map(b=>{
+    const sigDrivers=b.drivers.filter(d=>Math.abs(d.v)>0.05).sort((a,z)=>Math.abs(z.v)-Math.abs(a.v));
+    const parts=sigDrivers.slice(0,2).map(d=>'<span style="color:'+(d.v>=0?'var(--gn)':'var(--rd)')+'">'+d.l+': '+(d.v>=0?'+':'')+d.v.toFixed(2)+'pp</span>').join(' · ');
+    return'<div style="background:var(--bg);border:1px solid var(--br);border-radius:6px;padding:3px 8px;font-size:8px;font-family:JetBrains Mono"><b style="color:var(--bdp)">'+b.from+'→'+b.to+':</b> '+parts+'</div>';
+  }).join('');
+  document.getElementById('gmBridgeFooter').innerHTML=footerParts;
 }
 
 function rProdMix(){
@@ -778,7 +810,7 @@ function rProdMix(){
   rv.forEach(r=>{const o=r.offer;if(!o||o.trim()==='')return;if(!offers[o])offers[o]=0;offers[o]+=r.rev;});
   const arr=Object.entries(offers).map(([o,rev])=>({o,rev,pct:rev/totRev*100})).sort((a,b)=>b.rev-a.rev);
   const COLORS=['#1a4fd4','#f59e0b','#059669','#7c3aed','#dc2626','#0891b2','#db2777'];
-  const W=120,H=120,cx=W/2,cy=H/2,r=52,ri=30;
+  const W=160,H=160,cx=W/2,cy=H/2,r=72,ri=42;
   let angle=-Math.PI/2,segs='';
   arr.forEach((d,i)=>{
     const slice=d.pct/100*Math.PI*2;
@@ -787,12 +819,12 @@ function rProdMix(){
     const x3=cx+ri*Math.cos(angle+slice),y3=cy+ri*Math.sin(angle+slice);
     const x4=cx+ri*Math.cos(angle),y4=cy+ri*Math.sin(angle);
     const lg=slice>Math.PI?1:0;
-    segs+=`<path d="M${x1.toFixed(1)},${y1.toFixed(1)} A${r},${r} 0 ${lg},1 ${x2.toFixed(1)},${y2.toFixed(1)} L${x3.toFixed(1)},${y3.toFixed(1)} A${ri},${ri} 0 ${lg},0 ${x4.toFixed(1)},${y4.toFixed(1)} Z" fill="${COLORS[i%COLORS.length]}" stroke="#fff" stroke-width="1.5"/>`;
+    segs+=`<path d="M${x1.toFixed(1)},${y1.toFixed(1)} A${r},${r} 0 ${lg},1 ${x2.toFixed(1)},${y2.toFixed(1)} L${x3.toFixed(1)},${y3.toFixed(1)} A${ri},${ri} 0 ${lg},0 ${x4.toFixed(1)},${y4.toFixed(1)} Z" fill="${COLORS[i%COLORS.length]}" stroke="#fff" stroke-width="2"/>`;
     angle+=slice;
   });
-  const svg=`<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}">${segs}<circle cx="${cx}" cy="${cy}" r="${ri-2}" fill="#fff"/></svg>`;
-  const legend=arr.slice(0,6).map((d,i)=>`<div style="display:flex;align-items:center;gap:4px;margin:2px 0"><div style="width:8px;height:8px;border-radius:2px;background:${COLORS[i%COLORS.length]};flex-shrink:0"></div><span style="font-size:9px;font-weight:700;color:var(--bdp)">${d.o}</span><span style="font-size:9px;color:var(--mu);margin-left:2px">${d.pct.toFixed(1)}%</span></div>`).join('');
-  document.getElementById('prodMixViz').innerHTML=svg+'<div style="flex:1">'+legend+'</div>';
+  const svg=`<svg viewBox="0 0 ${W} ${H}" width="${W}" height="${H}" style="flex-shrink:0">${segs}<circle cx="${cx}" cy="${cy}" r="${ri-3}" fill="#fff"/></svg>`;
+  const legend=arr.slice(0,6).map((d,i)=>`<div style="display:flex;align-items:center;gap:6px;margin:4px 0"><div style="width:10px;height:10px;border-radius:2px;background:${COLORS[i%COLORS.length]};flex-shrink:0"></div><span style="font-size:11px;font-weight:800;color:var(--bdp)">${d.o}</span><span style="font-size:11px;color:var(--mu);margin-left:auto">${d.pct.toFixed(1)}%</span></div>`).join('');
+  document.getElementById('prodMixViz').innerHTML=svg+'<div style="flex:1;min-width:100px">'+legend+'</div>';
 }
 
 function showTab(t){
