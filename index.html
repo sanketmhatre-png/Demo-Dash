@@ -102,6 +102,11 @@ tbody tr.tot td{border-top:2px solid var(--bdp);font-weight:900;color:var(--bdp)
 tbody tr.rowsel{cursor:pointer}
 tbody tr.rowsel:not(.tot):hover{background:var(--bpl)}
 tbody tr.sel{background:var(--bpl)!important;box-shadow:inset 3px 0 0 var(--bd)}
+tbody tr.city-row{background:#f7f9fc}
+tbody tr.city-row td{padding:4px 12px;font-size:11px;border-bottom:1px solid #eef0f4}
+tbody tr.city-row:hover{background:var(--bpl)}
+.expand-btn{display:inline-flex;align-items:center;justify-content:center;width:16px;height:16px;border-radius:3px;background:var(--bd);color:#fff;font-size:10px;font-weight:900;cursor:pointer;flex-shrink:0;line-height:1;margin-right:2px;vertical-align:middle}
+.expand-btn:hover{background:var(--bdp)}
 tbody tr.sel td:first-child{color:var(--bd)}
 .fixed-tbl{table-layout:fixed}
 .fixed-tbl td:first-child,.fixed-tbl th:first-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -424,7 +429,7 @@ async function loadData(){
     const p=JSON.parse(txt);let proj=p._meta?p.projects:Array.isArray(p)?p:[];
     A=proj.map(p=>{const dt=pD(p.dt);let mod=p.mod,cogs=p.cogs;const mt=(p.mt||'').trim(),mq=p.mq||0;
       if(mt&&mq>0){const rate=gR(mt,dt);if(rate!==null){cogs=cogs-p.mod+rate*mq;mod=rate*mq;}}
-      return{id:p.id,city:p.c,state:p.s,offer:p.o,phase:p.ph,kw:p.kw,rev:p.rev,cogs,gm:p.rev-cogs,date:dt,hr:p.rev>0,mod,onm:p.onm||0,qhs:p.qhs||0,mt,mq,
+      return{id:p.id,city:p.c,state:p.s,offer:p.o?p.o.trim():'',phase:p.ph,kw:p.kw,rev:p.rev,cogs,gm:p.rev-cogs,date:dt,hr:p.rev>0,mod,onm:p.onm||0,qhs:p.qhs||0,mt,mq,
         inv:p.inv||0,prf:p.prf||0,cab:p.cab||0,ick:p.ick||0,con:p.con||0,ear:p.ear||0,jbx:p.jbx||0,tsh:p.tsh||0,saf:p.saf||0,ica:p.ica||0,wel:p.wel||0,ssn:p.ssn||0,ebo:p.ebo||0,dlg:p.dlg||0,mtr:p.mtr||0,wkt:p.wkt||0,lad:p.lad||0};
     });
     pF();F=[...A];render();document.getElementById('sT').textContent='● '+A.length.toLocaleString()+' projects · synced '+new Date().toLocaleTimeString('en-IN',{hour:'2-digit',minute:'2-digit'});
@@ -495,17 +500,77 @@ function rM(){
   document.getElementById('tM').innerHTML=a.map(d=>rw(d)).join('')+rw(tot,true);
 }
 
+let EXPANDED_STATES=new Set();
+function toggleState(s){EXPANDED_STATES.has(s)?EXPANDED_STATES.delete(s):EXPANDED_STATES.add(s);rT();}
+
 function rT(){
   const src=fdMonth();
-  const m={};src.forEach(r=>{const k=r.state||'Unknown';if(!m[k])m[k]={s:k,n:0,kw:0,rev:0,cogs:0,nr:0};m[k].n++;m[k].kw+=r.kw;if(r.hr){m[k].rev+=r.rev;m[k].cogs+=r.cogs;m[k].nr++;}});
+  // Build state aggregation
+  const m={};
+  src.forEach(r=>{
+    const k=r.state||'Unknown';
+    if(!m[k])m[k]={s:k,n:0,kw:0,rev:0,cogs:0,nr:0,cities:{}};
+    m[k].n++;m[k].kw+=r.kw;
+    if(r.hr){m[k].rev+=r.rev;m[k].cogs+=r.cogs;m[k].nr++;}
+    // city rollup
+    const c=r.city||'Unknown';
+    if(!m[k].cities[c])m[k].cities[c]={c,n:0,kw:0,rev:0,cogs:0,nr:0};
+    m[k].cities[c].n++;m[k].cities[c].kw+=r.kw;
+    if(r.hr){m[k].cities[c].rev+=r.rev;m[k].cities[c].cogs+=r.cogs;m[k].cities[c].nr++;}
+  });
   const a=Object.values(m).sort((a,b)=>b.rev-a.rev);
   const tot={n:0,kw:0,rev:0,cogs:0,nr:0};a.forEach(d=>{tot.n+=d.n;tot.kw+=d.kw;tot.rev+=d.rev;tot.cogs+=d.cogs;tot.nr+=d.nr;});
-  document.getElementById('sBdg').textContent=a.length+' states · click to filter';
-  const rw=(d,i,t)=>{const gm=d.rev-d.cogs,gp=d.rev?gm/d.rev*100:0,as=d.n?d.kw/d.n:0,av=d.nr?d.rev/d.nr:0;
-    const cls=(t?'tot':'rowsel')+(!t&&SELS===d.s?' sel':'');
-    const click=t?'':' onclick="pickState(\''+d.s.replace(/'/g,"\\'")+'\')"';
-    return'<tr class="'+cls+'"'+click+'><td>'+(t?'':i)+'</td><td>'+(t?'<b>TOTAL</b>':d.s)+'</td><td>'+d.n.toLocaleString()+'</td><td>₹'+(d.rev/1e7).toFixed(2)+' Cr</td><td>₹'+(d.cogs/1e7).toFixed(2)+' Cr</td><td style="color:var(--gn)">₹'+(gm/1e7).toFixed(2)+' Cr</td><td class="'+gc(gp)+'">'+gp.toFixed(1)+'%</td><td>₹'+(av/1e5).toFixed(2)+' L</td><td>'+as.toFixed(2)+' kW</td></tr>';};
-  document.getElementById('tB').innerHTML=a.map((d,i)=>rw(d,i+1)).join('')+rw(tot,0,true);
+  document.getElementById('sBdg').textContent=a.length+' states · click + to expand cities';
+
+  let html='';
+  a.forEach((d,i)=>{
+    const gm=d.rev-d.cogs,gp=d.rev?gm/d.rev*100:0,as=d.n?d.kw/d.n:0,av=d.nr?d.rev/d.nr:0;
+    const expanded=EXPANDED_STATES.has(d.s);
+    const crossSel=SELS===d.s?' sel':'';
+    const sEsc=d.s.replace(/'/g,"\\'");
+    const icon=expanded?'−':'+';
+    html+='<tr class="rowsel'+crossSel+'" style="cursor:pointer" onclick="toggleState(\''+sEsc+'\')">'
+      +'<td>'+(i+1)+'</td>'
+      +'<td><span onclick="event.stopPropagation();pickState(\''+sEsc+'\')">'+d.s+'</span></td>'
+      +'<td>'+d.n.toLocaleString()+'</td>'
+      +'<td>₹'+(d.rev/1e7).toFixed(2)+' Cr</td>'
+      +'<td>₹'+(d.cogs/1e7).toFixed(2)+' Cr</td>'
+      +'<td style="color:var(--gn)">₹'+(gm/1e7).toFixed(2)+' Cr</td>'
+      +'<td class="'+gc(gp)+'">'+gp.toFixed(1)+'%</td>'
+      +'<td>₹'+(av/1e5).toFixed(2)+' L</td>'
+      +'<td>'+as.toFixed(2)+' kW</td>'
+      +'</tr>';
+    if(expanded){
+      const cities=Object.values(d.cities).sort((a,b)=>b.rev-a.rev);
+      cities.forEach(c=>{
+        const cgm=c.rev-c.cogs,cgp=c.rev?cgm/c.rev*100:0,cas=c.n?c.kw/c.n:0,cav=c.nr?c.rev/c.nr:0;
+        html+='<tr class="city-row">'
+          +'<td></td>'
+          +'<td style="padding-left:24px;color:var(--bd);font-weight:700;font-size:11px">'+c.c+'</td>'
+          +'<td style="color:var(--dm)">'+c.n.toLocaleString()+'</td>'
+          +'<td style="color:var(--dm)">₹'+(c.rev/1e7).toFixed(2)+' Cr</td>'
+          +'<td style="color:var(--dm)">₹'+(c.cogs/1e7).toFixed(2)+' Cr</td>'
+          +'<td style="color:var(--gn)">₹'+(cgm/1e7).toFixed(2)+' Cr</td>'
+          +'<td class="'+gc(cgp)+'">'+cgp.toFixed(1)+'%</td>'
+          +'<td style="color:var(--dm)">₹'+(cav/1e5).toFixed(2)+' L</td>'
+          +'<td style="color:var(--dm)">'+cas.toFixed(2)+' kW</td>'
+          +'</tr>';
+      });
+    }
+  });
+  // Total row
+  const tgm=tot.rev-tot.cogs,tgp=tot.rev?tgm/tot.rev*100:0,tas=tot.n?tot.kw/tot.n:0,tav=tot.nr?tot.rev/tot.nr:0;
+  html+='<tr class="tot">'
+    +'<td></td><td><b>TOTAL</b></td>'
+    +'<td>'+tot.n.toLocaleString()+'</td>'
+    +'<td>₹'+(tot.rev/1e7).toFixed(2)+' Cr</td>'
+    +'<td>₹'+(tot.cogs/1e7).toFixed(2)+' Cr</td>'
+    +'<td style="color:var(--gn)">₹'+(tgm/1e7).toFixed(2)+' Cr</td>'
+    +'<td class="'+gc(tgp)+'">'+tgp.toFixed(1)+'%</td>'
+    +'<td>₹'+(tav/1e5).toFixed(2)+' L</td>'
+    +'<td>'+tas.toFixed(2)+' kW</td>'
+    +'</tr>';
+  document.getElementById('tB').innerHTML=html;
 }
 
 function rOVA(){
@@ -710,7 +775,7 @@ function rProdMix(){
   const rv=F.filter(r=>r.hr);
   const totRev=rv.reduce((s,r)=>s+r.rev,0)||1;
   const offers={};
-  rv.forEach(r=>{const o=r.offer||'Other';if(!offers[o])offers[o]=0;offers[o]+=r.rev;});
+  rv.forEach(r=>{const o=r.offer;if(!o||o.trim()==='')return;if(!offers[o])offers[o]=0;offers[o]+=r.rev;});
   const arr=Object.entries(offers).map(([o,rev])=>({o,rev,pct:rev/totRev*100})).sort((a,b)=>b.rev-a.rev);
   const COLORS=['#1a4fd4','#f59e0b','#059669','#7c3aed','#dc2626','#0891b2','#db2777'];
   const W=120,H=120,cx=W/2,cy=H/2,r=52,ri=30;
@@ -959,7 +1024,8 @@ function mxMode(m){MXMODE=m;document.getElementById('mx-aov').classList.toggle('
 function rProd(){
   const rv=F.filter(r=>r.hr);
   const offers={};
-  rv.forEach(r=>{const o=r.offer||'Unknown';if(!offers[o])offers[o]={o,n:0,kw:0,rev:0,cogs:0,mod:0,inv:0,mtr:0,cab:0,prf:0};const d=offers[o];d.n++;d.kw+=r.kw;d.rev+=r.rev;d.cogs+=r.cogs;d.mod+=(r.mod||0);d.inv+=(r.inv||0);d.mtr+=(r.mtr||0);d.cab+=(r.cab||0);d.prf+=(r.prf||0);});
+  rv.forEach(r=>{const o=r.offer;if(!o||o.trim()==='')return; // skip blank offer type
+    if(!offers[o])offers[o]={o,n:0,kw:0,rev:0,cogs:0,mod:0,inv:0,mtr:0,cab:0,prf:0};const d=offers[o];d.n++;d.kw+=r.kw;d.rev+=r.rev;d.cogs+=r.cogs;d.mod+=(r.mod||0);d.inv+=(r.inv||0);d.mtr+=(r.mtr||0);d.cab+=(r.cab||0);d.prf+=(r.prf||0);});
   const oArr=Object.values(offers).sort((a,b)=>b.n-a.n);
   const totalKW=rv.reduce((s,r)=>s+r.kw,0)||1;
   const totalRev=rv.reduce((s,r)=>s+r.rev,0)||1;
@@ -990,7 +1056,8 @@ function rProd(){
   const offerNames=oArr.map(d=>d.o);
   const cityData={};
   rv.forEach(r=>{
-    const c=r.city||'Unknown',o=r.offer||'Unknown';
+    const c=r.city||'Unknown',o=r.offer;
+    if(!o||o.trim()==='')return;
     if(!cityData[c])cityData[c]={city:c,total:{n:0,rev:0,kw:0},offers:{}};
     if(!cityData[c].offers[o])cityData[c].offers[o]={n:0,rev:0,kw:0};
     cityData[c].offers[o].n++;cityData[c].offers[o].rev+=r.rev;cityData[c].offers[o].kw+=r.kw;
