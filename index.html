@@ -216,6 +216,19 @@ tbody tr.sel td:first-child{color:var(--bd)}
 .mx-val.above{color:var(--gn)} .mx-val.below{color:var(--rd)} .mx-val.avg{color:var(--am)}
 .mx-sub{font-size:8px;color:var(--mu);font-weight:500}
 
+/* CLUSTER TAB */
+#clTbl{border-collapse:collapse;min-width:100%}
+#clTbl th{background:var(--bdp);color:#fff;padding:6px 8px;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;font-family:'JetBrains Mono',monospace;text-align:right;white-space:nowrap;position:sticky;top:0;z-index:2}
+#clTbl th:first-child,#clTbl th:nth-child(2){text-align:left}
+#clTbl td{padding:5px 8px;border-bottom:1px solid var(--br);text-align:right;font-family:'JetBrains Mono',monospace;font-size:10px;white-space:nowrap}
+#clTbl td:first-child,#clTbl td:nth-child(2){text-align:left;font-family:'Plus Jakarta Sans',sans-serif}
+#clTbl .bkt-row td{background:#f1f5f9;font-weight:800;font-size:11px;border-top:2px solid var(--br)}
+#clTbl .off-row td:first-child{padding-left:24px;color:var(--dm);font-weight:500;font-size:10px}
+#clTbl .off-row td:nth-child(2){color:var(--dm);font-size:10px}
+#clTbl tbody tr:hover td{background:#fefce8}
+#clTbl .sep{border-left:2px solid var(--br)}
+.delta-pos{color:var(--gn);font-weight:700}.delta-neg{color:var(--rd);font-weight:700}.delta-flat{color:var(--mu)}
+
 /* MEMO */
 .memo{background:#fff;border-radius:8px;border:1px solid var(--br);border-left:4px solid var(--bd);padding:10px 14px;flex-shrink:0;max-height:150px;overflow-y:auto}
 .memo-head{font-size:11px;font-weight:800;color:var(--bdp);margin-bottom:8px;display:flex;align-items:center;gap:8px}
@@ -255,6 +268,7 @@ tbody tr.sel td:first-child{color:var(--bd)}
   <button class="tbtn active" id="tabBtn-ov" onclick="showTab('ov')">Overview</button>
   <button class="tbtn" id="tabBtn-cogs" onclick="showTab('cogs')">COGS Analysis</button>
   <button class="tbtn" id="tabBtn-prod" onclick="showTab('prod')">Product Mix</button>
+  <button class="tbtn" id="tabBtn-cluster" onclick="showTab('cluster')">Cluster Deep-Dive</button>
 </div>
 <div class="fbar">
   <span class="fl">From</span><input type="date" class="fd" id="fFrom" onchange="af()">
@@ -387,6 +401,52 @@ tbody tr.sel td:first-child{color:var(--bd)}
 </div>
 </div>
 
+<!-- CLUSTER DEEP-DIVE VIEW -->
+<div id="view-cluster" class="view" style="display:none">
+<div class="main">
+  <div class="krow" style="padding:0;margin-bottom:8px">
+    <div class="kc c1"><div class="kl">Installs</div><div class="kv" id="cl1" style="color:var(--bdp)">—</div></div>
+    <div class="kc c3"><div class="kl">Total Revenue</div><div class="kv" id="cl2" style="color:var(--am)">—</div></div>
+    <div class="kc c2"><div class="kl">Total kW</div><div class="kv" id="cl3" style="color:var(--pu)">—</div></div>
+    <div class="kc c5"><div class="kl">Rev / Wp</div><div class="kv" id="cl4" style="color:var(--gn2)">—</div></div>
+    <div class="kc c4"><div class="kl">COGS / Wp</div><div class="kv" id="cl5" style="color:var(--or)">—</div></div>
+    <div class="kc c6"><div class="kl">GM / Wp</div><div class="kv" id="cl6" style="color:var(--gn)">—</div></div>
+    <div class="kc c7"><div class="kl">GM %</div><div class="kv" id="cl7" style="color:var(--pk)">—</div></div>
+  </div>
+
+  <div style="background:#fff;border:1px solid var(--br);border-radius:8px;padding:10px 14px;margin-bottom:8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
+    <span class="fl">Clusters</span>
+    <select id="clSel" class="fs" multiple style="height:30px;min-width:200px"><option value="all" selected>All clusters</option></select>
+    <span class="fl">kW Bucket</span>
+    <select id="bktSel" class="fs" onchange="rCluster()"><option value="all">All kW</option><option>0-3 kW</option><option>3-4 kW</option><option>4-5 kW</option><option>5-6 kW</option><option>&gt;6 kW</option></select>
+    <div class="fdiv"></div>
+    <span class="fl">Current Month</span>
+    <select id="clCurM" class="fs" onchange="rCluster()"></select>
+    <span class="fl">vs</span>
+    <select id="clPrevM" class="fs" onchange="rCluster()"></select>
+    <div class="fdiv"></div>
+    <button class="fbtn" onclick="document.getElementById('clSel').selectedIndex=0;document.getElementById('bktSel').value='all';rCluster()">Reset</button>
+    <div class="tbb" id="clBdg" style="margin-left:auto">—</div>
+  </div>
+
+  <div class="tblw" style="margin-bottom:8px">
+    <div class="tbh"><div class="tbt">kW Bucket → Offering Breakdown</div><div class="tbb" id="clTblBdg">—</div></div>
+    <div class="tbs" style="overflow-x:auto"><table id="clTbl">
+      <thead>
+        <tr><th colspan="2" style="text-align:left"></th><th colspan="5" style="text-align:center;background:#f8fafc;color:var(--dm)">Volume & Unit Economics</th><th colspan="4" style="text-align:center;background:#f0fdf4;color:var(--gn);border-left:2px solid var(--br)">Margin Bridge (pp)</th><th colspan="5" style="text-align:center;background:var(--bbg);color:var(--bd);border-left:2px solid var(--br)">Cost Variance by Component (pp)</th></tr>
+        <tr><th style="text-align:left">kW Bucket</th><th style="text-align:left">Product</th><th>Installs</th><th>Mix%</th><th>Rev/Wp</th><th>COGS/Wp</th><th>GM%</th><th style="border-left:2px solid var(--br)">ΔGM%</th><th>Price</th><th>Cost</th><th>Mix</th><th style="border-left:2px solid var(--br)">Module</th><th>Inverter</th><th>Structure</th><th>Cables</th><th>Other</th></tr>
+      </thead>
+      <tbody id="clBody"></tbody>
+    </table></div>
+  </div>
+
+  <div class="memo">
+    <div class="memo-head">🔎 Cluster Deep-Dive Insights <span class="cb">auto-generated</span></div>
+    <div id="memoCluster" class="memo-body"></div>
+  </div>
+</div>
+</div>
+
 <div class="sbar"><span id="sT">—</span><b>SolarSquare · B2C GM · GitHub</b><span id="sF">No filters</span></div>
 </div>
 <script>
@@ -427,6 +487,8 @@ function pF(){
   const ss=[...new Set(A.map(r=>r.state).filter(Boolean))].sort(),os=[...new Set(A.map(r=>r.offer).filter(Boolean))].sort();
   document.getElementById('fSt').innerHTML='<option value="">All</option>'+ss.map(s=>'<option>'+s+'</option>').join('');
   document.getElementById('fOf').innerHTML='<option value="">All</option>'+os.map(o=>'<option>'+o+'</option>').join('');
+  const cities=[...new Set(A.map(r=>r.city).filter(Boolean))].sort();
+  document.getElementById('clSel').innerHTML='<option value="all" selected>All clusters</option>'+cities.map(c=>'<option>'+c+'</option>').join('');
 }
 function af(){
   const f={fy:document.getElementById('fFY').value,st:document.getElementById('fSt').value,of:document.getElementById('fOf').value,ph:document.getElementById('fPh').value,fr:document.getElementById('fFrom').value,to:document.getElementById('fTo').value};
@@ -443,7 +505,7 @@ function pickState(s){SELS=(SELS===s)?null:s;render();}
 function fdState(){return SELS?F.filter(r=>r.state===SELS):F;}
 function fdMonth(){if(!SELM)return F;const[y,mo]=SELM.split('-').map(Number);return F.filter(r=>r.date&&r.date.getFullYear()===y&&r.date.getMonth()===mo);}
 function fdBoth(){let arr=F;if(SELS)arr=arr.filter(r=>r.state===SELS);if(SELM){const[y,mo]=SELM.split('-').map(Number);arr=arr.filter(r=>r.date&&r.date.getFullYear()===y&&r.date.getMonth()===mo);}return arr;}
-function filterCtx(){const parts=[];if(SELS)parts.push(SELS);if(SELM){const[y,mo]=SELM.split('-').map(Number);parts.push(new Date(y,mo,1).toLocaleString('en',{month:'short',year:'numeric'}));}const fFY=document.getElementById('fFY').value,fOf=document.getElementById('fOf').value,fPh=document.getElementById('fPh').value;if(fFY)parts.push(fFY);if(fOf)parts.push(fOf);if(fPh)parts.push(fPh);return parts.length?parts.join(' · '):'All data';}
+function filterCtx(){const parts=[];if(SELS)parts.push(SELS);if(SELM){const[y,mo]=SELM.split('-').map(Number);parts.push(new Date(y,mo,1).toLocaleString('en',{month:'short',year:'numeric'}));}const fFY=document.getElementById('fFY').value,fSt=document.getElementById('fSt').value,fOf=document.getElementById('fOf').value,fPh=document.getElementById('fPh').value,fFrom=document.getElementById('fFrom').value,fTo=document.getElementById('fTo').value;if(fFY)parts.push(fFY);if(fSt&&!SELS)parts.push(fSt);if(fOf)parts.push(fOf);if(fPh)parts.push(fPh);if(fFrom)parts.push('From '+fFrom);if(fTo)parts.push('To '+fTo);return parts.length?parts.join(' · '):'All data';}
 
 function render(){
   const xf=document.getElementById('xfBtn');
@@ -455,6 +517,7 @@ function render(){
   rK();rM();rT();rOVA();
   if(document.getElementById('view-cogs').style.display!=='none')rCogs();
   if(document.getElementById('view-prod').style.display!=='none')rProd();
+  if(document.getElementById('view-cluster').style.display!=='none')rCluster();
 }
 
 function rK(){
@@ -824,12 +887,14 @@ function rProdMix(){
 }
 
 function showTab(t){
-  ['ov','cogs','prod'].forEach(v=>{
+  ['ov','cogs','prod','cluster'].forEach(v=>{
     document.getElementById('view-'+v).style.display=t===v?'flex':'none';
     document.getElementById('tabBtn-'+v).classList.toggle('active',t===v);
   });
+  if(t==='ov'){rK();rM();rT();rOVA();}
   if(t==='cogs')rCogs();
   if(t==='prod')rProd();
+  if(t==='cluster')rCluster();
 }
 function citySort(k){CITYSORT=k;['rev','gm','n','aov'].forEach(x=>document.getElementById('sb-'+x).classList.toggle('active',x===k));rCity();}
 
@@ -1134,6 +1199,142 @@ function rProd(){
     if(diff<-5)notes.push({tag:'watch',html:'<b>'+d.o+'</b> underperforms on revenue share — holds '+vShare.toFixed(1)+'% of installs but only '+d.rShare.toFixed(1)+'% of revenue ('+diff.toFixed(1)+'pp gap). Smaller average system sizes or lower pricing may be dragging weighted revenue contribution.'});
   });
   document.getElementById('memoProd').innerHTML=notes.map(n=>'<div class="memo-item"><span class="memo-tag '+n.tag+'">'+n.tag+'</span><span>'+n.html+'</span></div>').join('');
+}
+
+function getBkt(kw){if(kw<=3)return'0-3 kW';if(kw<=4)return'3-4 kW';if(kw<=5)return'4-5 kW';if(kw<=6)return'5-6 kW';return'>6 kW';}
+const BKT_ORDER=['0-3 kW','3-4 kW','4-5 kW','5-6 kW','>6 kW'];
+
+function rCluster(){
+  const base=F.filter(r=>r.hr&&r.date);
+  // Cluster filter
+  const clSel=document.getElementById('clSel');
+  const selClusters=[...clSel.selectedOptions].map(o=>o.value);
+  const allClusters=selClusters.includes('all')||selClusters.length===0;
+  let rows=allClusters?base:base.filter(r=>selClusters.includes(r.city));
+  // kW bucket filter
+  const bktVal=document.getElementById('bktSel').value;
+  if(bktVal!=='all')rows=rows.filter(r=>getBkt(r.kw)===bktVal);
+
+  // Build available months
+  const mk={};rows.forEach(r=>{const y=r.date.getFullYear(),mo=r.date.getMonth();const k=y+'-'+mo;if(!mk[k])mk[k]={y,mo,k,lbl:new Date(y,mo,1).toLocaleString('en',{month:'short',year:'2-digit'}).replace(' ',"'")};});
+  const allMonths=Object.values(mk).sort((a,b)=>b.y!==a.y?b.y-a.y:b.mo-a.mo);
+
+  // Populate month dropdowns (preserve selection if still valid)
+  const curDD=document.getElementById('clCurM'),prevDD=document.getElementById('clPrevM');
+  const curVal=curDD.value,prevVal=prevDD.value;
+  const mOpts=allMonths.map(m=>'<option value="'+m.k+'">'+m.lbl+'</option>').join('');
+  curDD.innerHTML=mOpts;prevDD.innerHTML=mOpts;
+  // Default: current=latest, previous=second latest
+  if(curVal&&allMonths.find(m=>m.k===curVal))curDD.value=curVal;
+  else if(allMonths.length)curDD.value=allMonths[0].k;
+  if(prevVal&&allMonths.find(m=>m.k===prevVal))prevDD.value=prevVal;
+  else if(allMonths.length>1)prevDD.value=allMonths[1].k;
+  else if(allMonths.length)prevDD.value=allMonths[0].k;
+
+  // Get selected months
+  const curMK=curDD.value,prevMK=prevDD.value;
+  const curM=allMonths.find(m=>m.k===curMK),prevM=allMonths.find(m=>m.k===prevMK);
+  const curLbl=curM?curM.lbl:'—',prevLbl=prevM?prevM.lbl:'—';
+  const curRows=curM?rows.filter(r=>r.date.getFullYear()===curM.y&&r.date.getMonth()===curM.mo):[];
+  const prevRows=prevM?rows.filter(r=>r.date.getFullYear()===prevM.y&&r.date.getMonth()===prevM.mo):[];
+
+  document.getElementById('clBdg').textContent=curLbl+' vs '+prevLbl+' · '+rows.length+' projects';
+  document.getElementById('clTblBdg').textContent=curLbl+' vs '+prevLbl;
+
+  // KPIs (current month)
+  const s=(i,v)=>{const e=document.getElementById(i);if(e)e.textContent=v;};
+  const ckw=curRows.reduce((s,r)=>s+r.kw,0),crev=curRows.reduce((s,r)=>s+r.rev,0),ccogs=curRows.reduce((s,r)=>s+r.cogs,0);
+  const cwp=ckw*1000||1;
+  s('cl1',curRows.length.toLocaleString());
+  s('cl2','₹'+(crev/1e7).toFixed(2)+' Cr');s('cl3',(ckw/1000).toFixed(1)+' MW');
+  s('cl4','₹'+(crev/cwp).toFixed(2));s('cl5','₹'+(ccogs/cwp).toFixed(2));
+  s('cl6','₹'+((crev-ccogs)/cwp).toFixed(2));s('cl7',(crev?(crev-ccogs)/crev*100:0).toFixed(2)+'%');
+
+  // Build bucket × offering data for both months
+  const offers=[...new Set(rows.map(r=>r.offer).filter(Boolean))].sort();
+  function agg(arr){
+    const n=arr.length,kw=arr.reduce((s,r)=>s+r.kw,0),rev=arr.reduce((s,r)=>s+r.rev,0),cogs=arr.reduce((s,r)=>s+r.cogs,0);
+    const mod=arr.reduce((s,r)=>s+(r.mod||0),0),inv=arr.reduce((s,r)=>s+(r.inv||0),0);
+    const str=arr.reduce((s,r)=>s+(r.prf||0),0),cab=arr.reduce((s,r)=>s+(r.cab||0),0);
+    const oth=cogs-mod-inv-str-cab;const wp=kw*1000||1;
+    return{n,kw,rev,cogs,mod,inv,str,cab,oth,rwp:rev/wp,cwp:cogs/wp,gp:rev?(rev-cogs)/rev*100:0,modWp:mod/wp,invWp:inv/wp,strWp:str/wp,cabWp:cab/wp,othWp:oth/wp};
+  }
+  function bridge(cur,prev){
+    if(!prev||!prev.n||!cur.n)return{dgm:0,price:0,cost:0,mix:0,dmod:0,dinv:0,dstr:0,dcab:0,doth:0};
+    const dgm=cur.gp-prev.gp;
+    const priceImp=prev.rwp?((cur.rwp-prev.rwp)/cur.rwp*100):0;
+    const costImp=prev.cwp?(-(cur.cwp-prev.cwp)/cur.rwp*100):0;
+    const mixImp=dgm-priceImp-costImp;
+    const dmod=prev.modWp?-((cur.modWp-prev.modWp)/cur.rwp*100):0;
+    const dinv=prev.invWp?-((cur.invWp-prev.invWp)/cur.rwp*100):0;
+    const dstr=prev.strWp?-((cur.strWp-prev.strWp)/cur.rwp*100):0;
+    const dcab=prev.cabWp?-((cur.cabWp-prev.cabWp)/cur.rwp*100):0;
+    const doth=costImp-dmod-dinv-dstr-dcab;
+    return{dgm,price:priceImp,cost:costImp,mix:mixImp,dmod,dinv,dstr,dcab,doth};
+  }
+  const fmtD=v=>v>0.05?'+'+v.toFixed(1):v<-0.05?v.toFixed(1):'—';
+  const dcls=v=>v>0.05?'delta-pos':v<-0.05?'delta-neg':'delta-flat';
+  const totalCurN=curRows.length||1;
+
+  // Build table HTML
+  let html='';
+  BKT_ORDER.forEach(bkt=>{
+    const bCur=curRows.filter(r=>getBkt(r.kw)===bkt);
+    const bPrev=prevRows.filter(r=>getBkt(r.kw)===bkt);
+    if(bCur.length===0&&bPrev.length===0)return;
+    const ba=agg(bCur),bp=agg(bPrev),bb=bridge(ba,bp);
+    // Bucket header row
+    html+='<tr class="bkt-row"><td>'+bkt+'</td><td>ALL</td><td>'+ba.n+'</td><td>'+((ba.n/totalCurN)*100).toFixed(1)+'%</td><td>₹'+ba.rwp.toFixed(2)+'</td><td>₹'+ba.cwp.toFixed(2)+'</td><td class="'+gc(ba.gp)+'">'+ba.gp.toFixed(1)+'%</td>';
+    html+='<td class="sep '+dcls(bb.dgm)+'">'+fmtD(bb.dgm)+'</td><td class="'+dcls(bb.price)+'">'+fmtD(bb.price)+'</td><td class="'+dcls(bb.cost)+'">'+fmtD(bb.cost)+'</td><td class="'+dcls(bb.mix)+'">'+fmtD(bb.mix)+'</td>';
+    html+='<td class="sep '+dcls(bb.dmod)+'">'+fmtD(bb.dmod)+'</td><td class="'+dcls(bb.dinv)+'">'+fmtD(bb.dinv)+'</td><td class="'+dcls(bb.dstr)+'">'+fmtD(bb.dstr)+'</td><td class="'+dcls(bb.dcab)+'">'+fmtD(bb.dcab)+'</td><td class="'+dcls(bb.doth)+'">'+fmtD(bb.doth)+'</td></tr>';
+    // Per-offering rows
+    offers.forEach(o=>{
+      const oCur=bCur.filter(r=>r.offer===o);
+      const oPrev=bPrev.filter(r=>r.offer===o);
+      if(oCur.length===0&&oPrev.length===0)return;
+      const oa=agg(oCur),op=agg(oPrev),ob=bridge(oa,op);
+      html+='<tr class="off-row"><td></td><td>'+o+'</td><td>'+oa.n+'</td><td>'+((oa.n/totalCurN)*100).toFixed(1)+'%</td><td>₹'+oa.rwp.toFixed(2)+'</td><td>₹'+oa.cwp.toFixed(2)+'</td><td class="'+gc(oa.gp)+'">'+oa.gp.toFixed(1)+'%</td>';
+      html+='<td class="sep '+dcls(ob.dgm)+'">'+fmtD(ob.dgm)+'</td><td class="'+dcls(ob.price)+'">'+fmtD(ob.price)+'</td><td class="'+dcls(ob.cost)+'">'+fmtD(ob.cost)+'</td><td class="'+dcls(ob.mix)+'">'+fmtD(ob.mix)+'</td>';
+      html+='<td class="sep '+dcls(ob.dmod)+'">'+fmtD(ob.dmod)+'</td><td class="'+dcls(ob.dinv)+'">'+fmtD(ob.dinv)+'</td><td class="'+dcls(ob.dstr)+'">'+fmtD(ob.dstr)+'</td><td class="'+dcls(ob.dcab)+'">'+fmtD(ob.dcab)+'</td><td class="'+dcls(ob.doth)+'">'+fmtD(ob.doth)+'</td></tr>';
+    });
+  });
+  document.getElementById('clBody').innerHTML=html;
+
+  // Insights
+  const notes=[];
+  const ctx4=filterCtx();
+  if(ctx4!=='All data')notes.push({tag:'info',html:'<b>📌 Showing:</b> '+ctx4});
+  // Find biggest GM movers by bucket
+  BKT_ORDER.forEach(bkt=>{
+    const bCur=curRows.filter(r=>getBkt(r.kw)===bkt),bPrev=prevRows.filter(r=>getBkt(r.kw)===bkt);
+    if(bCur.length<3)return;
+    const ba=agg(bCur),bp=agg(bPrev),bb=bridge(ba,bp);
+    if(Math.abs(bb.dgm)>1){
+      const drivers=[];
+      if(Math.abs(bb.price)>0.3)drivers.push('Price '+(bb.price>0?'+':'')+bb.price.toFixed(1)+'pp');
+      if(Math.abs(bb.cost)>0.3)drivers.push('Cost '+(bb.cost>0?'+':'')+bb.cost.toFixed(1)+'pp');
+      if(Math.abs(bb.mix)>0.3)drivers.push('Mix '+(bb.mix>0?'+':'')+bb.mix.toFixed(1)+'pp');
+      notes.push({tag:bb.dgm>0?'good':'risk',html:'<b>'+bkt+' bucket GM% '+(bb.dgm>0?'improved':'declined')+' '+Math.abs(bb.dgm).toFixed(1)+'pp</b> ('+prevLbl+' → '+curLbl+'). Drivers: '+(drivers.length?drivers.join(', '):'mixed small movements')+'.'});
+    }
+  });
+  // Module cost movement
+  const curAll=agg(curRows),prevAll=agg(prevRows);
+  if(prevAll.n&&curAll.n){
+    const modDelta=curAll.modWp-prevAll.modWp;
+    if(Math.abs(modDelta)>0.1){
+      notes.push({tag:modDelta>0?'watch':'good',html:'<b>Module cost/Wp '+(modDelta>0?'increased':'decreased')+' ₹'+Math.abs(modDelta).toFixed(2)+'</b> (₹'+prevAll.modWp.toFixed(2)+' → ₹'+curAll.modWp.toFixed(2)+'). '+(modDelta>0?'Check if driven by rate table change or DCR mix shift.':'Reflects better procurement or non-DCR mix increase.')});
+    }
+  }
+  // Volume shift between buckets
+  if(prevRows.length>10&&curRows.length>10){
+    BKT_ORDER.forEach(bkt=>{
+      const ps=prevRows.filter(r=>getBkt(r.kw)===bkt).length/prevRows.length*100;
+      const cs=curRows.filter(r=>getBkt(r.kw)===bkt).length/curRows.length*100;
+      const shift=cs-ps;
+      if(Math.abs(shift)>3)notes.push({tag:'info',html:'<b>'+bkt+' mix '+(shift>0?'growing':'shrinking')+'</b> — share moved from '+ps.toFixed(1)+'% to '+cs.toFixed(1)+'% ('+(shift>0?'+':'')+shift.toFixed(1)+'pp). '+(shift>0&&bkt==='>6 kW'?'Larger systems typically carry different margin profiles — check if pricing scales accordingly.':'')});
+    });
+  }
+  document.getElementById('memoCluster').innerHTML=notes.length?notes.map(n=>'<div class="memo-item"><span class="memo-tag '+n.tag+'">'+n.tag+'</span><span>'+n.html+'</span></div>').join(''):'<div style="color:var(--mu);padding:8px;font-size:11px">Select clusters or adjust filters to generate insights.</div>';
 }
 
 window.addEventListener('DOMContentLoaded',loadData);
