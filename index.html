@@ -82,12 +82,13 @@ html,body{min-height:100%;font-family:'Plus Jakarta Sans',sans-serif;background:
 .op{font-weight:800;font-family:'JetBrains Mono',monospace;font-size:10px;white-space:nowrap}
 
 /* TABLE */
-.tblw{background:#fff;border-radius:8px;border:1px solid var(--br);display:flex;flex-direction:column;overflow:hidden;max-height:420px}
+.tblw{background:#fff;border-radius:8px;border:1px solid var(--br);display:flex;flex-direction:column;overflow:hidden}
+.tbs{overflow:auto;max-height:400px}
 .tbh{display:flex;align-items:center;justify-content:space-between;padding:8px 14px;border-bottom:1px solid var(--br);flex-shrink:0;gap:6px}
 .tbt{font-size:13px;font-weight:800;color:var(--bdp);display:flex;align-items:center;gap:6px;white-space:nowrap}
 .tbt::before{content:'';width:3px;height:14px;background:var(--bd);border-radius:2px}
 .tbb{font-size:9px;padding:3px 8px;border-radius:8px;background:var(--bpl);color:var(--bd);font-family:'JetBrains Mono',monospace;font-weight:700;white-space:nowrap}
-.tbs{flex:1;overflow:auto;min-height:0}
+.tbs{flex:1;min-height:0}
 .tbs::-webkit-scrollbar{width:4px;height:4px}
 .tbs::-webkit-scrollbar-thumb{background:var(--br2);border-radius:6px}
 table{width:100%;border-collapse:collapse}
@@ -216,17 +217,26 @@ tbody tr.sel td:first-child{color:var(--bd)}
 .mx-val.above{color:var(--gn)} .mx-val.below{color:var(--rd)} .mx-val.avg{color:var(--am)}
 .mx-sub{font-size:8px;color:var(--mu);font-weight:500}
 
+/* CLUSTER DROPDOWN */
+.cl-dropdown{position:relative;display:inline-block}
+.cl-dropdown-btn{min-width:200px;height:26px;border:1px solid var(--br);border-radius:4px;background:#fff;font-size:10px;font-family:inherit;color:var(--tx);padding:0 10px;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:8px}
+.cl-dropdown-btn:focus{border-color:var(--bl);outline:none}
+.cl-dropdown-menu{position:absolute;top:100%;left:0;z-index:200;background:#fff;border:1px solid var(--br);border-radius:6px;box-shadow:0 4px 16px rgba(0,0,0,.12);min-width:250px;margin-top:2px}
+.cl-item{display:flex;align-items:center;gap:8px;padding:6px 12px;cursor:pointer;font-size:11px;font-weight:600;color:var(--bdp)}
+.cl-item:hover{background:var(--bbg)}
+.cl-item input[type=checkbox]{accent-color:var(--bd);width:14px;height:14px;cursor:pointer;flex-shrink:0}
+
 /* CLUSTER TAB */
 #clTbl{border-collapse:collapse;min-width:100%}
-#clTbl th{background:var(--bdp);color:#fff;padding:6px 8px;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;font-family:'JetBrains Mono',monospace;text-align:right;white-space:nowrap;position:sticky;top:0;z-index:2}
+#clTbl th{background:var(--bdp);color:#fff;padding:6px 10px;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;font-family:'JetBrains Mono',monospace;text-align:right;white-space:nowrap;position:sticky;top:0;z-index:2}
 #clTbl th:first-child,#clTbl th:nth-child(2){text-align:left}
-#clTbl td{padding:5px 8px;border-bottom:1px solid var(--br);text-align:right;font-family:'JetBrains Mono',monospace;font-size:10px;white-space:nowrap}
+#clTbl td{padding:6px 10px;border-bottom:1px solid var(--br);text-align:right;font-family:'JetBrains Mono',monospace;font-size:11px;white-space:nowrap;vertical-align:middle}
 #clTbl td:first-child,#clTbl td:nth-child(2){text-align:left;font-family:'Plus Jakarta Sans',sans-serif}
-#clTbl .bkt-row td{background:#f1f5f9;font-weight:800;font-size:11px;border-top:2px solid var(--br)}
-#clTbl .off-row td:first-child{padding-left:24px;color:var(--dm);font-weight:500;font-size:10px}
-#clTbl .off-row td:nth-child(2){color:var(--dm);font-size:10px}
+#clTbl .bkt-row td{background:#f1f5f9;font-weight:800;font-size:12px;border-top:2px solid var(--br)}
+#clTbl .off-row td:first-child{padding-left:0}
+#clTbl .off-row td:nth-child(2){padding-left:24px;color:var(--dm);font-weight:500;font-size:11px}
 #clTbl tbody tr:hover td{background:#fefce8}
-#clTbl .sep{border-left:2px solid var(--br)}
+#clTbl .sep{border-left:2px solid #e2e8f0}
 .delta-pos{color:var(--gn);font-weight:700}.delta-neg{color:var(--rd);font-weight:700}.delta-flat{color:var(--mu)}
 
 /* MEMO */
@@ -269,6 +279,7 @@ tbody tr.sel td:first-child{color:var(--bd)}
   <button class="tbtn" id="tabBtn-cogs" onclick="showTab('cogs')">COGS Analysis</button>
   <button class="tbtn" id="tabBtn-prod" onclick="showTab('prod')">Product Mix</button>
   <button class="tbtn" id="tabBtn-cluster" onclick="showTab('cluster')">Cluster Deep-Dive</button>
+  <button class="tbtn" id="tabBtn-predict" onclick="showTab('predict')">🔮 Predictive</button>
 </div>
 <div class="fbar">
   <span class="fl">From</span><input type="date" class="fd" id="fFrom" onchange="af()">
@@ -416,7 +427,22 @@ tbody tr.sel td:first-child{color:var(--bd)}
 
   <div style="background:#fff;border:1px solid var(--br);border-radius:8px;padding:10px 14px;margin-bottom:8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
     <span class="fl">Clusters</span>
-    <select id="clSel" class="fs" multiple style="height:30px;min-width:200px" onchange="rCluster()"><option value="all" selected>All clusters</option></select>
+    <div class="cl-dropdown" id="clDropWrap">
+      <button class="cl-dropdown-btn" id="clDropBtn" onclick="toggleClDrop(event)">
+        <span id="clDropLabel">All clusters</span>
+        <span style="font-size:10px">▼</span>
+      </button>
+      <div class="cl-dropdown-menu" id="clDropMenu" style="display:none">
+        <div style="display:flex;gap:8px;padding:6px 8px;border-bottom:1px solid var(--br)">
+          <button class="fbtn" onclick="clToggleAll(true)">Toggle All</button>
+          <button class="fbtn" onclick="clToggleAll(false)">Clear</button>
+        </div>
+        <div style="padding:6px 8px;border-bottom:1px solid var(--br)">
+          <input type="text" id="clSearch" placeholder="Search clusters…" oninput="clFilterList()" style="width:100%;border:1px solid var(--br);border-radius:4px;padding:4px 8px;font-size:10px;font-family:inherit;outline:none">
+        </div>
+        <div id="clList" style="max-height:200px;overflow-y:auto;padding:4px 0"></div>
+      </div>
+    </div>
     <span class="fl">kW Bucket</span>
     <select id="bktSel" class="fs" onchange="rCluster()"><option value="all">All kW</option><option>0-3 kW</option><option>3-4 kW</option><option>4-5 kW</option><option>5-6 kW</option><option>&gt;6 kW</option></select>
     <div class="fdiv"></div>
@@ -440,9 +466,84 @@ tbody tr.sel td:first-child{color:var(--bd)}
     </table></div>
   </div>
 
+  <!-- Margin Variance Bridge -->
+  <div style="background:#fff;border:1px solid var(--br);border-radius:8px;padding:14px 18px;margin-bottom:8px">
+    <div style="font-size:9px;font-weight:800;color:var(--mu);text-transform:uppercase;letter-spacing:.6px;margin-bottom:2px">Margin Variance Bridge <span style="font-weight:500" id="mvbLbl"></span></div>
+    <div style="font-size:8px;color:var(--mu);margin-bottom:12px" id="mvbSub"></div>
+    <div id="mvbSvg"></div>
+    <div style="font-size:9px;color:var(--mu);text-transform:uppercase;letter-spacing:.5px;margin:14px 0 8px;font-weight:700">COGS Variance Decomposition</div>
+    <div id="cogsDecompViz"></div>
+    <div style="margin-top:12px;background:#f8fafc;border-radius:6px;padding:8px 14px;display:flex;gap:20px;font-size:11px;font-family:'JetBrains Mono',monospace" id="mvbFooter"></div>
+  </div>
+
   <div class="memo">
-    <div class="memo-head">🔎 Cluster Deep-Dive Insights <span class="cb">auto-generated</span></div>
+    <div class="memo-head">🔎 Dynamic Insights <span style="font-size:9px;font-weight:400;color:var(--mu)">Data-driven signals from selected clusters</span></div>
     <div id="memoCluster" class="memo-body"></div>
+  </div>
+</div>
+</div>
+
+<!-- PREDICTIVE ANALYSIS VIEW -->
+<div id="view-predict" class="view" style="display:none">
+<div class="main">
+  <div style="background:linear-gradient(135deg,#0f1b3d,#1a4fd4);border-radius:10px;padding:16px 20px;margin-bottom:10px;display:flex;align-items:center;justify-content:space-between">
+    <div><div style="color:#fff;font-size:16px;font-weight:900">\U0001f52e Predictive Analytics</div><div style="color:rgba(255,255,255,.45);font-size:9px;margin-top:3px;font-family:'JetBrains Mono',monospace">LINEAR REGRESSION FORECAST \u00b7 TREND SIGNALS \u00b7 RISK FLAGS \u00b7 ACTUAL vs PREDICTED</div></div>
+    <div style="text-align:right"><div class="tbb" id="predLbl" style="font-size:9px;margin-bottom:4px">\u2014</div><div style="font-size:8px;color:rgba(255,255,255,.4);font-family:'JetBrains Mono',monospace" id="predModel">\u2014</div></div>
+  </div>
+
+  <!-- Forecast KPIs -->
+  <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:8px;margin-bottom:10px" id="predKpis"></div>
+
+  <!-- Actual vs Forecast comparison table -->
+  <div class="tblw" style="margin-bottom:10px">
+    <div class="tbh"><div class="tbt">Actual vs Forecast \u2014 Last 6 Months</div><div class="tbb" id="avfBdg">linear regression</div></div>
+    <div class="tbs"><table id="avfTbl" style="width:100%;border-collapse:collapse">
+      <thead><tr>
+        <th style="text-align:left">Month</th>
+        <th>Actual Projects</th><th>Forecast</th><th>Accuracy</th>
+        <th>Actual Rev (\u20b9Cr)</th><th>Forecast</th><th>Accuracy</th>
+        <th>Actual GM%</th><th>Forecast</th><th>Error (pp)</th>
+      </tr></thead>
+      <tbody id="avfBody"></tbody>
+    </table></div>
+  </div>
+
+  <!-- Charts row -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+    <div style="background:#fff;border:1px solid var(--br);border-radius:8px;padding:14px 16px">
+      <div class="viz-title" style="margin-bottom:4px">Revenue \u2014 Actual vs Forecast (\u20b9Cr)</div>
+      <div style="font-size:8px;color:var(--mu);margin-bottom:10px;font-family:'JetBrains Mono',monospace">\u2014 Actual &nbsp;\u2014 \u2014 Linear Regression &nbsp; \u2591 Confidence Band</div>
+      <div id="predRevChart"></div>
+    </div>
+    <div style="background:#fff;border:1px solid var(--br);border-radius:8px;padding:14px 16px">
+      <div class="viz-title" style="margin-bottom:4px">GM% \u2014 Actual vs Forecast</div>
+      <div style="font-size:8px;color:var(--mu);margin-bottom:10px;font-family:'JetBrains Mono',monospace">\u2014 Actual &nbsp;\u2014 \u2014 Linear Regression &nbsp; \u2591 Confidence Band</div>
+      <div id="predGmChart"></div>
+    </div>
+  </div>
+
+  <!-- Cost + bucket row -->
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px">
+    <div style="background:#fff;border:1px solid var(--br);border-radius:8px;padding:14px 16px">
+      <div class="viz-title" style="margin-bottom:10px">Cost/Wp Pressure by Component</div>
+      <div id="predCostBar"></div>
+    </div>
+    <div style="background:#fff;border:1px solid var(--br);border-radius:8px;padding:14px 16px">
+      <div class="viz-title" style="margin-bottom:10px">Volume Trend by kW Bucket</div>
+      <div id="predBktChart"></div>
+    </div>
+  </div>
+
+  <!-- Signals -->
+  <div style="background:#fff;border:1px solid var(--br);border-radius:8px;padding:14px 16px;margin-bottom:10px">
+    <div style="font-size:11px;font-weight:800;color:var(--bdp);margin-bottom:10px;display:flex;align-items:center;gap:8px">\u26a1 Risk & Opportunity Signals <span class="cb">regression-based momentum signals</span></div>
+    <div id="predSignals"></div>
+  </div>
+
+  <!-- Methodology -->
+  <div style="background:#f8fafc;border:1px solid var(--br);border-radius:8px;padding:10px 14px">
+    <div style="font-size:9px;color:var(--mu);font-family:'JetBrains Mono',monospace;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Methodology</div>
+    <div style="font-size:10px;color:var(--dm);line-height:1.7"><b>Linear Regression</b> (OLS) fitted on all available complete months \u2014 captures the underlying trend direction unlike simple averages. <b>Confidence bands</b> = \u00b11 std dev of regression residuals. <b>Accuracy</b> = 100% \u2212 MAPE. Current partial month (MTD) is excluded to avoid bias. Model auto-updates with each data refresh. These are <b>statistical signals, not guarantees</b> \u2014 treat alongside operational pipeline context.</div>
   </div>
 </div>
 </div>
@@ -483,13 +584,35 @@ async function loadData(){
   }catch(e){lt.textContent='Error: '+e.message;return;}
   ol.style.display='none';
 }
+let CL_ALL=[];
 function pF(){
   const ss=[...new Set(A.map(r=>r.state).filter(Boolean))].sort(),os=[...new Set(A.map(r=>r.offer).filter(Boolean))].sort();
   document.getElementById('fSt').innerHTML='<option value="">All</option>'+ss.map(s=>'<option>'+s+'</option>').join('');
   document.getElementById('fOf').innerHTML='<option value="">All</option>'+os.map(o=>'<option>'+o+'</option>').join('');
-  const cities=[...new Set(A.map(r=>r.city).filter(Boolean))].sort();
-  document.getElementById('clSel').innerHTML='<option value="all" selected>All clusters</option>'+cities.map(c=>'<option>'+c+'</option>').join('');
+  CL_ALL=[...new Set(A.map(r=>r.city).filter(Boolean))].sort();
+  clBuildList(CL_ALL,CL_ALL.slice());
 }
+function clBuildList(all,selected){
+  const list=document.getElementById('clList');if(!list)return;
+  list.innerHTML=all.map(c=>'<label class="cl-item"><input type="checkbox" value="'+c+'" '+(selected.includes(c)?'checked':'')+' onchange="clOnChange()">'+c+'</label>').join('');
+  clUpdateLabel();
+}
+function clFilterList(){
+  const q=(document.getElementById('clSearch').value||'').toLowerCase();
+  const sel=clGetSelected();
+  const filtered=CL_ALL.filter(c=>c.toLowerCase().includes(q));
+  const list=document.getElementById('clList');if(!list)return;
+  list.innerHTML=filtered.map(c=>'<label class="cl-item"><input type="checkbox" value="'+c+'" '+(sel.includes(c)?'checked':'')+' onchange="clOnChange()">'+c+'</label>').join('');
+}
+function clGetSelected(){return[...document.querySelectorAll('#clList input[type=checkbox]:checked')].map(c=>c.value);}
+function clToggleAll(check){document.querySelectorAll('#clList input[type=checkbox]').forEach(c=>c.checked=check);if(check){document.getElementById('clSearch').value='';clFilterList();}clOnChange();}
+function clOnChange(){clUpdateLabel();rCluster();}
+function clUpdateLabel(){
+  const sel=clGetSelected();const lbl=document.getElementById('clDropLabel');if(!lbl)return;
+  lbl.textContent=sel.length===0||sel.length===CL_ALL.length?'All clusters':sel.length+' cluster'+(sel.length>1?'s':'')+' selected';
+}
+function toggleClDrop(e){e.stopPropagation();const m=document.getElementById('clDropMenu');m.style.display=m.style.display==='none'?'block':'none';}
+document.addEventListener('click',function(e){const w=document.getElementById('clDropWrap');if(w&&!w.contains(e.target)){const m=document.getElementById('clDropMenu');if(m)m.style.display='none';}});
 function af(){
   const f={fy:document.getElementById('fFY').value,st:document.getElementById('fSt').value,of:document.getElementById('fOf').value,ph:document.getElementById('fPh').value,fr:document.getElementById('fFrom').value,to:document.getElementById('fTo').value};
   const df=f.fr?new Date(f.fr):null,dt=f.to?(()=>{const d=new Date(f.to);d.setHours(23,59,59);return d;})():null;
@@ -518,6 +641,7 @@ function render(){
   if(document.getElementById('view-cogs').style.display!=='none')rCogs();
   if(document.getElementById('view-prod').style.display!=='none')rProd();
   if(document.getElementById('view-cluster').style.display!=='none')rCluster();
+  if(document.getElementById('view-predict').style.display!=='none')rPredict();
 }
 
 function rK(){
@@ -887,7 +1011,7 @@ function rProdMix(){
 }
 
 function showTab(t){
-  ['ov','cogs','prod','cluster'].forEach(v=>{
+  ['ov','cogs','prod','cluster','predict'].forEach(v=>{
     document.getElementById('view-'+v).style.display=t===v?'flex':'none';
     document.getElementById('tabBtn-'+v).classList.toggle('active',t===v);
   });
@@ -895,6 +1019,7 @@ function showTab(t){
   if(t==='cogs')rCogs();
   if(t==='prod')rProd();
   if(t==='cluster')rCluster();
+  if(t==='predict')rPredict();
 }
 function citySort(k){CITYSORT=k;['rev','gm','n','aov'].forEach(x=>document.getElementById('sb-'+x).classList.toggle('active',x===k));rCity();}
 
@@ -1207,9 +1332,8 @@ const BKT_ORDER=['0-3 kW','3-4 kW','4-5 kW','5-6 kW','>6 kW'];
 function rCluster(){
   const base=F.filter(r=>r.hr&&r.date);
   // Cluster filter
-  const clSel=document.getElementById('clSel');
-  const selClusters=[...clSel.selectedOptions].map(o=>o.value);
-  const allClusters=selClusters.includes('all')||selClusters.length===0;
+  const selClusters=clGetSelected();
+  const allClusters=selClusters.length===0||selClusters.length===CL_ALL.length;
   let rows=allClusters?base:base.filter(r=>selClusters.includes(r.city));
   // kW bucket filter
   const bktVal=document.getElementById('bktSel').value;
@@ -1332,41 +1456,369 @@ function rCluster(){
   });
   document.getElementById('clBody').innerHTML=html;
 
-  // Insights
-  const notes=[];
-  const ctx4=filterCtx();
-  if(ctx4!=='All data')notes.push({tag:'info',html:'<b>📌 Showing:</b> '+ctx4});
-  // Find biggest GM movers by bucket
-  BKT_ORDER.forEach(bkt=>{
-    const bCur=curRows.filter(r=>getBkt(r.kw)===bkt),bPrev=prevRows.filter(r=>getBkt(r.kw)===bkt);
-    if(bCur.length<3)return;
-    const ba=agg(bCur),bp=agg(bPrev),bb=bridge(ba,bp);
-    if(Math.abs(bb.dgm)>1){
-      const drivers=[];
-      if(Math.abs(bb.price)>0.3)drivers.push('Price '+(bb.price>0?'+':'')+bb.price.toFixed(1)+'pp');
-      if(Math.abs(bb.cost)>0.3)drivers.push('Cost '+(bb.cost>0?'+':'')+bb.cost.toFixed(1)+'pp');
-      if(Math.abs(bb.mix)>0.3)drivers.push('Mix '+(bb.mix>0?'+':'')+bb.mix.toFixed(1)+'pp');
-      notes.push({tag:bb.dgm>0?'good':'risk',html:'<b>'+bkt+' bucket GM% '+(bb.dgm>0?'improved':'declined')+' '+Math.abs(bb.dgm).toFixed(1)+'pp</b> ('+prevLbl+' → '+curLbl+'). Drivers: '+(drivers.length?drivers.join(', '):'mixed small movements')+'.'});
-    }
-  });
-  // Module cost movement
+  // ── MARGIN VARIANCE BRIDGE VISUAL ──
   const curAll=agg(curRows),prevAll=agg(prevRows);
-  if(prevAll.n&&curAll.n){
-    const modDelta=curAll.modWp-prevAll.modWp;
-    if(Math.abs(modDelta)>0.1){
-      notes.push({tag:modDelta>0?'watch':'good',html:'<b>Module cost/Wp '+(modDelta>0?'increased':'decreased')+' ₹'+Math.abs(modDelta).toFixed(2)+'</b> (₹'+prevAll.modWp.toFixed(2)+' → ₹'+curAll.modWp.toFixed(2)+'). '+(modDelta>0?'Check if driven by rate table change or DCR mix shift.':'Reflects better procurement or non-DCR mix increase.')});
-    }
-  }
-  // Volume shift between buckets
-  if(prevRows.length>10&&curRows.length>10){
-    BKT_ORDER.forEach(bkt=>{
-      const ps=prevRows.filter(r=>getBkt(r.kw)===bkt).length/prevRows.length*100;
-      const cs=curRows.filter(r=>getBkt(r.kw)===bkt).length/curRows.length*100;
-      const shift=cs-ps;
-      if(Math.abs(shift)>3)notes.push({tag:'info',html:'<b>'+bkt+' mix '+(shift>0?'growing':'shrinking')+'</b> — share moved from '+ps.toFixed(1)+'% to '+cs.toFixed(1)+'% ('+(shift>0?'+':'')+shift.toFixed(1)+'pp). '+(shift>0&&bkt==='>6 kW'?'Larger systems typically carry different margin profiles — check if pricing scales accordingly.':'')});
+  if(document.getElementById('mvbLbl'))document.getElementById('mvbLbl').textContent=prevLbl+' → '+curLbl+': Price, Cost & Mix decomposition';
+  if(document.getElementById('mvbSub'))document.getElementById('mvbSub').textContent='VARIANCE BRIDGE — '+prevLbl.toUpperCase()+' → '+curLbl.toUpperCase();
+
+  // Compute overall bridge
+  const allBr=bridge(curAll,prevAll);
+  // Draw SVG waterfall
+  (function(){
+    const bars=[
+      {l:prevLbl+' GM',v:prevAll.gp,isBase:true},
+      {l:'Price',v:allBr.price,isBase:false},
+      {l:'Cost',v:allBr.cost,isBase:false},
+      {l:'Mix',v:allBr.mix,isBase:false},
+      {l:curLbl+' GM',v:curAll.gp,isBase:true}
+    ];
+    const W=500,H=180,padL=10,padR=10,padT=45,padB=35;
+    const chartH=H-padT-padB,chartW=W-padL-padR;
+    const barW=Math.floor(chartW/bars.length*0.55),gap=Math.floor(chartW/bars.length);
+    const allVals=[prevAll.gp,curAll.gp,...[allBr.price,allBr.cost,allBr.mix].map(v=>v)];
+    const base=Math.min(prevAll.gp,curAll.gp)-2,top=Math.max(prevAll.gp,curAll.gp)+1.5;
+    const range=top-base||1;
+    const toY=v=>padT+(1-(v-base)/range)*chartH;
+    let svg=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:600px">`;
+    // Grid
+    [0,1,2,3].forEach(i=>{const gv=base+i*(range/3);const gy=toY(gv);
+      svg+=`<line x1="${padL}" y1="${gy.toFixed(0)}" x2="${W-padR}" y2="${gy.toFixed(0)}" stroke="#f1f5f9" stroke-width="1"/>`;
+      svg+=`<text x="${padL}" y="${(gy-2).toFixed(0)}" font-size="7" fill="#cbd5e1" font-family="JetBrains Mono">${gv.toFixed(1)}%</text>`;
+    });
+    let running=prevAll.gp;
+    bars.forEach((b,i)=>{
+      const x=padL+i*gap+(gap-barW)/2;
+      const isBase=b.isBase;
+      const barBase=isBase?b.v:running;
+      const barTop=isBase?b.v:running+b.v;
+      const y1=toY(Math.max(barBase,barTop)),y2=toY(Math.min(barBase,barTop));
+      const bh=Math.max(Math.abs(y2-y1),3);
+      const fill=isBase?'#dbeafe':(b.v>=0?'#059669':'#e74c3c');
+      const textFill=isBase?'#1e293b':(b.v>=0?'#059669':'#e74c3c');
+      const fmt=isBase?b.v.toFixed(2)+'%':(b.v>=0?'+':'')+b.v.toFixed(1)+'%';
+      svg+=`<rect x="${x}" y="${y1.toFixed(0)}" width="${barW}" height="${bh.toFixed(0)}" fill="${fill}" rx="3"/>`;
+      svg+=`<text x="${(x+barW/2).toFixed(0)}" y="${(y1-6).toFixed(0)}" font-size="${isBase?10:9}" font-weight="${isBase?700:800}" fill="${textFill}" font-family="JetBrains Mono" text-anchor="middle">${fmt}</text>`;
+      svg+=`<text x="${(x+barW/2).toFixed(0)}" y="${(H-padB+14).toFixed(0)}" font-size="9" font-weight="${isBase?700:500}" fill="${isBase?'#1e293b':'#64748b'}" font-family="${isBase?'Plus Jakarta Sans':'JetBrains Mono'}" text-anchor="middle">${b.l}</text>`;
+      // Arrow connector
+      if(i<bars.length-1){
+        const nx=padL+(i+1)*gap+(gap-barW)/2;const ay=toY(isBase?b.v:running+b.v);
+        svg+=`<line x1="${x+barW}" y1="${ay.toFixed(0)}" x2="${nx}" y2="${ay.toFixed(0)}" stroke="#e2e8f0" stroke-width="1" stroke-dasharray="3,2"/>`;
+      }
+      if(!isBase)running+=b.v;
+    });
+    svg+='</svg>';
+    const el=document.getElementById('mvbSvg');if(el)el.innerHTML=svg;
+  })();
+
+  // COGS decomposition bars
+  (function(){
+    const cats=[{k:'mod',l:'Module'},{k:'inv',l:'Inverter'},{k:'str',l:'Structure'},{k:'cab',l:'Cables'},{k:'oth',l:'Other COGS'}];
+    const curRv=curAll.rwp||1;
+    const diffs=cats.map(c=>{const delta=-(curAll[c.k+'Wp']-prevAll[c.k+'Wp'])/curRv*100;return{l:c.l,delta};});
+    const maxAbs=Math.max(...diffs.map(d=>Math.abs(d.delta)),0.01);
+    const bars2=diffs.map(d=>{const w=Math.abs(d.delta)/maxAbs*85;const fill=d.delta>=0?'#059669':'#e07070';const fmt=(d.delta>=0?'+':'')+d.delta.toFixed(1)+'%';
+      return`<div style="display:flex;align-items:center;gap:10px;margin:5px 0"><div style="width:90px;font-size:11px;font-weight:700;color:var(--bdp);text-align:right">${d.l}</div><div style="flex:1;height:16px;background:#f1f5f9;border-radius:3px;overflow:visible;position:relative"><div style="height:100%;width:${w}%;background:${fill};border-radius:3px;min-width:2px"></div></div><div style="font-size:11px;font-weight:800;color:${fill};width:45px;text-align:right">${fmt}</div></div>`;
+    }).join('');
+    const el=document.getElementById('cogsDecompViz');if(el)el.innerHTML=bars2;
+  })();
+
+  // Footer
+  const netPP=curAll.gp-prevAll.gp;
+  const footEl=document.getElementById('mvbFooter');
+  if(footEl)footEl.innerHTML=`<span>${prevLbl} GM: <b>${prevAll.gp.toFixed(2)}%</b></span><span>${curLbl} GM: <b>${curAll.gp.toFixed(2)}%</b></span><span style="color:${netPP>=0?'var(--gn)':'var(--rd)'}">Net: <b>${netPP>=0?'+':''}${netPP.toFixed(2)}pp</b></span>`;
+
+  // ── DYNAMIC INSIGHTS (exact reference logic) ──
+  const f2=v=>Math.abs(v)<0.005?'0.00':Math.abs(v).toFixed(2);
+  const notes=[];
+
+  // A. Portfolio summary
+  if(curAll.n>0){
+    const dRwp=curAll.rwp-prevAll.rwp,dCwp=curAll.cwp-prevAll.cwp,dGm=curAll.gp-prevAll.gp;
+    const sev=dGm>=0?'good':(dGm>-0.5?'watch':'risk');
+    const col=dGm>=0?'#059669':'#dc2626';
+    notes.push({sev,col,
+      title:'Portfolio summary: Rev/Wp '+(dRwp>=0?'+':'')+f2(dRwp)+'/Wp, COGS/Wp '+(dCwp>=0?'+':'')+f2(dCwp)+'/Wp, GM '+(dGm>=0?'+':'')+dGm.toFixed(2)+'% MoM',
+      detail:'Selected clusters ('+curAll.n+' installs '+curLbl+', '+prevAll.n+' '+prevLbl+'). Rev/Wp: \u20b9'+f2(curAll.rwp)+' '+curLbl+' vs \u20b9'+f2(prevAll.rwp)+' '+prevLbl+'. COGS/Wp: \u20b9'+f2(curAll.cwp)+' '+curLbl+' vs \u20b9'+f2(prevAll.cwp)+' '+prevLbl+'. GM: '+curAll.gp.toFixed(2)+'% '+curLbl+' vs '+prevAll.gp.toFixed(2)+'% '+prevLbl+'.'
     });
   }
-  document.getElementById('memoCluster').innerHTML=notes.length?notes.map(n=>'<div class="memo-item"><span class="memo-tag '+n.tag+'">'+n.tag+'</span><span>'+n.html+'</span></div>').join(''):'<div style="color:var(--mu);padding:8px;font-size:11px">Select clusters or adjust filters to generate insights.</div>';
+
+  // B. Rev/Wp decomposition: mix vs rate
+  var allOff=[...new Set(rows.map(r=>r.offer).filter(Boolean))];
+  var totCurWp2=curRows.reduce(function(s,r){return s+r.kw;},0)*1000||1;
+  var totPrevWp2=prevRows.reduce(function(s,r){return s+r.kw;},0)*1000||1;
+  var revMixEff=0,revRateEff=0,offRateFlags=[];
+  allOff.forEach(function(o){
+    var jArr=curRows.filter(function(r){return r.offer===o;}),mArr=prevRows.filter(function(r){return r.offer===o;});
+    var jWp=jArr.reduce(function(s,r){return s+r.kw;},0)*1000,mWp=mArr.reduce(function(s,r){return s+r.kw;},0)*1000;
+    if(jWp<1&&mWp<1)return;
+    var jMix=jWp/totCurWp2,mMix=mWp/totPrevWp2;
+    var jRwp=jWp>0?jArr.reduce(function(s,r){return s+r.rev;},0)/jWp:0;
+    var mRwp=mWp>0?mArr.reduce(function(s,r){return s+r.rev;},0)/mWp:0;
+    revMixEff+=(jMix-mMix)*mRwp;
+    revRateEff+=jMix*(jRwp-mRwp);
+    var dRevOff=jRwp-mRwp;
+    if(Math.abs(dRevOff)>0.3&&jWp>0)offRateFlags.push({off:o,dRevOff:dRevOff,jRwp:jRwp,mRwp:mRwp});
+  });
+  var revMixDom=Math.abs(revMixEff)>=Math.abs(revRateEff);
+  var dRevTotal=curAll.rwp-prevAll.rwp;
+  var notableMoves=offRateFlags.map(function(f){return f.off+' '+(f.dRevOff>=0?'+':'')+f2(f.dRevOff)+'/Wp (\u20b9'+f2(f.mRwp)+'\u2192\u20b9'+f2(f.jRwp)+')';}).join('; ');
+  var revDecompDetail='Rev/Wp change decomposed: mix effect '+(revMixEff>=0?'+':'')+f2(revMixEff)+'/Wp, within-product rate effect '+(revRateEff>=0?'+':'')+f2(revRateEff)+'/Wp. '+(revMixDom?'Mix shift dominates \u2014 portfolio moved toward '+(revMixEff>=0?'higher-Rev':'lower-Rev')+' offerings.':'Rate effect dominates \u2014 within-product Rev/Wp shifted.')+(offRateFlags.length>0?' Notable rate moves (>0.3/Wp): '+notableMoves+'.':'');
+  notes.push({sev:Math.abs(dRevTotal)>0.5?(dRevTotal<0?'risk':'good'):'watch',col:Math.abs(dRevTotal)>0.5?(dRevTotal<0?'#dc2626':'#059669'):'#d97706',
+    title:'Rev/Wp decomposition: mix effect '+(revMixEff>=0?'+':'')+f2(revMixEff)+'/Wp, rate effect '+(revRateEff>=0?'+':'')+f2(revRateEff)+'/Wp \u2014 '+(revMixDom?'mix dominates':'rate dominates'),
+    detail:revDecompDetail
+  });
+
+  // C. COGS/Wp decomposition: kW-mix vs rate
+  var cogsMixEff=0,cogsRateEff=0,cogsHighBkts=[];
+  BKT_ORDER.forEach(function(bkt){
+    var jB=curRows.filter(function(r){return getBkt(r.kw)===bkt;}),mB=prevRows.filter(function(r){return getBkt(r.kw)===bkt;});
+    var jWp=jB.reduce(function(s,r){return s+r.kw;},0)*1000,mWp=mB.reduce(function(s,r){return s+r.kw;},0)*1000;
+    if(jWp<1&&mWp<1)return;
+    var jMix=jWp/totCurWp2,mMix=mWp/totPrevWp2;
+    var jCwp=jWp>0?jB.reduce(function(s,r){return s+r.cogs;},0)/jWp:0;
+    var mCwp=mWp>0?mB.reduce(function(s,r){return s+r.cogs;},0)/mWp:0;
+    cogsMixEff+=(jMix-mMix)*mCwp;
+    cogsRateEff+=jMix*(jCwp-mCwp);
+    var dCogsBkt=jCwp-mCwp;
+    if(dCogsBkt>0.2&&jB.length>=3){var avgKw=jWp/(jB.length*1000);cogsHighBkts.push({bkt:bkt,dCogs:dCogsBkt,jCwp:jCwp,mCwp:mCwp,avgKw:avgKw});}
+  });
+  var cogsMixDom=Math.abs(cogsMixEff)>=Math.abs(cogsRateEff);
+  var dCogsTotal=curAll.cwp-prevAll.cwp;
+  var cogsFixedNote=cogsHighBkts.length>0?' Buckets with COGS/Wp rise >0.2: '+cogsHighBkts.map(function(b){return b.bkt+' +'+f2(b.dCogs)+'/Wp (avg '+b.avgKw.toFixed(1)+'kW \u2014 fixed-cost items spread over fewer Wp at lower kW)';}).join('; ')+'.':'';
+  var cogsDecompDetail='COGS/Wp change decomposed: KW-mix effect '+(cogsMixEff>=0?'+':'')+f2(cogsMixEff)+'/Wp, within-bucket rate effect '+(cogsRateEff>=0?'+':'')+f2(cogsRateEff)+'/Wp. '+(cogsMixDom?'Mix shift dominates \u2014 kW distribution moved toward '+(cogsMixEff>=0?'higher-COGS':'lower-COGS')+' buckets.':'Rate effect dominates \u2014 within-bucket COGS/Wp shifted.')+cogsFixedNote;
+  notes.push({sev:dCogsTotal>0.3?'risk':(dCogsTotal>0?'watch':'good'),col:dCogsTotal>0.3?'#dc2626':(dCogsTotal>0?'#d97706':'#059669'),
+    title:'COGS/Wp decomposition: mix effect '+(cogsMixEff>=0?'+':'')+f2(cogsMixEff)+'/Wp, rate effect '+(cogsRateEff>=0?'+':'')+f2(cogsRateEff)+'/Wp \u2014 '+(cogsMixDom?'mix dominates':'rate dominates'),
+    detail:cogsDecompDetail
+  });
+
+  // D. Bucket x Offering cell flags
+  var cellFlags2=[],totalCurN3=curRows.length||1;
+  BKT_ORDER.forEach(function(bkt){
+    allOff.forEach(function(o){
+      var jC=curRows.filter(function(r){return getBkt(r.kw)===bkt&&r.offer===o;});
+      var mC=prevRows.filter(function(r){return getBkt(r.kw)===bkt&&r.offer===o;});
+      if(jC.length<3||mC.length<3)return;
+      var ja2=agg(jC),ma2=agg(mC),volShare=jC.length/totalCurN3*100;
+      if(volShare<2)return;
+      var dGmC=ja2.gp-ma2.gp;if(Math.abs(dGmC)<1.5)return;
+      var dRevC=ja2.rwp-ma2.rwp,dCogsC=ja2.cwp-ma2.cwp,cogsDr=Math.abs(dCogsC)>Math.abs(dRevC);
+      var avgKwC=jC.reduce(function(s,r){return s+r.kw;},0)/jC.length;
+      cellFlags2.push({bkt:bkt,off:o,dGm:dGmC,dRev:dRevC,dCogs:dCogsC,volShare:volShare,n:jC.length,cogsDr:cogsDr,avgKwC:avgKwC,junGmPct:ja2.gp,mayGmPct:ma2.gp});
+    });
+  });
+  cellFlags2.sort(function(a,b){return Math.abs(b.dGm)-Math.abs(a.dGm);});
+  cellFlags2.slice(0,4).forEach(function(cf){
+    var driverNote=cf.cogsDr?'COGS-driven (COGS/Wp '+(cf.dCogs>=0?'+':'')+f2(cf.dCogs)+'/Wp vs Rev/Wp '+(cf.dRev>=0?'+':'')+f2(cf.dRev)+'/Wp). Fixed-cost items have higher per-Wp impact at lower kW (avg '+cf.avgKwC.toFixed(1)+'kW).':'Rev-driven (Rev/Wp '+(cf.dRev>=0?'+':'')+f2(cf.dRev)+'/Wp vs COGS/Wp '+(cf.dCogs>=0?'+':'')+f2(cf.dCogs)+'/Wp). '+(cf.dRev<0?'Rev/Wp declined in this segment.':'Rev/Wp improved in this segment.');
+    notes.push({sev:cf.dGm<0?'risk':'good',col:cf.dGm<0?'#dc2626':'#059669',
+      title:cf.bkt+' \u00d7 '+cf.off+': GM '+(cf.dGm>=0?'+':'')+cf.dGm.toFixed(2)+'% ('+cf.mayGmPct.toFixed(1)+'\u2192'+cf.junGmPct.toFixed(1)+'%), '+cf.volShare.toFixed(1)+'% vol share, n='+cf.n,
+      detail:(cf.dGm<0?'Deterioration':'Improvement')+': '+driverNote
+    });
+  });
+
+  // E. Fallback bucket flags if no cell flags
+  if(cellFlags2.length===0){
+    var bigRevDrop=null,bigRDV=0,bigCogRise=null,bigCRV=0;
+    BKT_ORDER.forEach(function(bkt){
+      var jB2=curRows.filter(function(r){return getBkt(r.kw)===bkt;}),mB2=prevRows.filter(function(r){return getBkt(r.kw)===bkt;});
+      if(!jB2.length||!mB2.length)return;
+      var ja3=agg(jB2),ma3=agg(mB2);var dRev2=ja3.rwp-ma3.rwp,dCogs2=ja3.cwp-ma3.cwp,dGm2=ja3.gp-ma3.gp;
+      if(dRev2<bigRDV){bigRDV=dRev2;bigRevDrop={bkt:bkt,ja:ja3,ma:ma3,dRev:dRev2,dCogs:dCogs2,dGm:dGm2};}
+      if(dCogs2>bigCRV){bigCRV=dCogs2;bigCogRise={bkt:bkt,ja:ja3,ma:ma3,dRev:dRev2,dCogs:dCogs2,dGm:dGm2};}
+    });
+    if(bigRevDrop){
+      var mixPct2=(curRows.filter(function(r){return getBkt(r.kw)===bigRevDrop.bkt;}).length/(curRows.length||1)*100).toFixed(1);
+      notes.push({sev:bigRevDrop.dGm>=0?'watch':'risk',col:bigRevDrop.dGm>=0?'#d97706':'#dc2626',
+        title:'Rev/Wp worst drop in '+bigRevDrop.bkt+': '+(bigRevDrop.dRev>=0?'+':'')+f2(bigRevDrop.dRev)+'/Wp (\u20b9'+f2(bigRevDrop.ma.rwp)+'\u2192\u20b9'+f2(bigRevDrop.ja.rwp)+')',
+        detail:bigRevDrop.bkt+' accounts for '+mixPct2+'% of '+curLbl+' installs. Rev/Wp declined '+f2(Math.abs(bigRevDrop.dRev))+'/Wp while COGS moved '+(bigRevDrop.dCogs>=0?'+':'')+f2(bigRevDrop.dCogs)+'/Wp, net GM impact '+(bigRevDrop.dGm>=0?'+':'')+bigRevDrop.dGm.toFixed(2)+'%. '+(bigRevDrop.dGm>=0?'GM improved despite Rev/Wp drop \u2014 COGS savings absorbed the hit.':'Rev/Wp decline is the primary drag.')
+      });
+    }
+    if(bigCogRise){
+      notes.push({sev:bigCogRise.dGm>=0?'good':'watch',col:bigCogRise.dGm>=0?'#059669':'#d97706',
+        title:'COGS/Wp highest rise in '+bigCogRise.bkt+': +'+f2(bigCogRise.dCogs)+'/Wp (\u20b9'+f2(bigCogRise.ma.cwp)+'\u2192\u20b9'+f2(bigCogRise.ja.cwp)+')',
+        detail:'COGS inflation in '+bigCogRise.bkt+' rose '+f2(bigCogRise.dCogs)+'/Wp MoM. Rev/Wp compensated '+(bigCogRise.dRev>=0?'+':'')+f2(bigCogRise.dRev)+'/Wp \u2014 '+(bigCogRise.dGm>=0?'GM still improved +'+bigCogRise.dGm.toFixed(2)+'% \u2014 Rev/Wp rise more than offset COGS.':'net GM drag '+bigCogRise.dGm.toFixed(2)+'%.')+' GM: '+bigCogRise.ja.gp.toFixed(2)+'% '+curLbl+' vs '+bigCogRise.ma.gp.toFixed(2)+'% '+prevLbl+'.'
+      });
+    }
+  }
+
+  var memoEl=document.getElementById('memoCluster');
+  if(memoEl)memoEl.innerHTML=notes.length?notes.map(function(n){
+    return '<div style="display:flex;gap:12px;align-items:flex-start;padding:14px 16px;background:#fff;border:1px solid #e2e8f0;border-radius:8px;margin-bottom:8px;border-left:4px solid '+n.col+'"><span style="width:10px;height:10px;border-radius:50%;background:'+n.col+';display:inline-block;flex-shrink:0;margin-top:4px"></span><div><div style="font-size:12px;font-weight:700;color:#1e293b;margin-bottom:4px">'+n.title+'</div><div style="font-size:11px;line-height:1.6;color:#64748b">'+n.detail+'</div></div></div>';
+  }).join(''):'<div style="color:#94a3b8;padding:8px;font-size:11px">Select clusters or adjust filters to generate insights.</div>';
+}
+
+function linReg(ys){
+  // Simple OLS linear regression: y = a + b*x, x = 0..n-1
+  const n=ys.length;if(n<2)return{a:ys[0]||0,b:0,r2:0,residuals:ys.map(()=>0)};
+  const xm=(n-1)/2,ym=ys.reduce((s,v)=>s+v,0)/n;
+  const sxy=ys.reduce((s,v,i)=>s+(i-xm)*(v-ym),0);
+  const sxx=ys.reduce((s,_,i)=>s+(i-xm)**2,0);
+  const b=sxx?sxy/sxx:0,a=ym-b*xm;
+  const fitted=ys.map((_,i)=>a+b*i);
+  const residuals=ys.map((v,i)=>v-fitted[i]);
+  const sst=ys.reduce((s,v)=>s+(v-ym)**2,0);
+  const sse=residuals.reduce((s,r)=>s+r**2,0);
+  const r2=sst?1-sse/sst:0;
+  return{a,b,r2,residuals,fitted};
+}
+function forecastNext(ys){const r=linReg(ys);return r.a+r.b*ys.length;}
+function stddev(arr){const m=arr.reduce((s,v)=>s+v,0)/arr.length;return Math.sqrt(arr.reduce((s,v)=>s+(v-m)**2,0)/(arr.length||1));}
+function mape(actuals,forecasts){const pairs=actuals.map((a,i)=>({a,f:forecasts[i]})).filter(p=>Math.abs(p.a)>0.01);if(!pairs.length)return 0;return pairs.reduce((s,p)=>s+Math.abs(p.a-p.f)/Math.abs(p.a),0)/pairs.length*100;}
+
+function rPredict(){
+  const src=F.filter(r=>r.date&&r.hr);
+  const mk={};src.forEach(r=>{const y=r.date.getFullYear(),mo=r.date.getMonth();const k=y+'-'+mo;if(!mk[k])mk[k]={y,mo,k,lbl:new Date(y,mo,1).toLocaleString('en',{month:'short',year:'2-digit'}).replace(' ',"'")}; });
+  let months=Object.values(mk).sort((a,b)=>b.y!==a.y?b.y-a.y:b.mo-a.mo);
+  if(months.length){const cm=months[0];const cmR=src.filter(r=>r.date.getFullYear()===cm.y&&r.date.getMonth()===cm.mo);const maxDay=cmR.length?Math.max(...cmR.map(r=>r.date.getDate())):0;if(maxDay<25)months=months.slice(1);}
+  const hist=months.reverse();
+  if(hist.length<3){document.getElementById('predSignals').innerHTML='<div style="color:var(--mu);padding:12px;font-size:11px">Need at least 3 complete months for analysis.</div>';return;}
+
+  function mStats2(m){const rows=src.filter(r=>r.date.getFullYear()===m.y&&r.date.getMonth()===m.mo);const n=rows.length,kw=rows.reduce((s,r)=>s+r.kw,0),rev=rows.reduce((s,r)=>s+r.rev,0),cogs=rows.reduce((s,r)=>s+r.cogs,0);const wp=kw*1000||1;
+    return{n,kw,rev,cogs,gm:rev-cogs,gp:rev?(rev-cogs)/rev*100:0,rwp:rev/wp,cwp:cogs/wp,
+      modWp:rows.reduce((s,r)=>s+(r.mod||0),0)/wp,invWp:rows.reduce((s,r)=>s+(r.inv||0),0)/wp,
+      strWp:rows.reduce((s,r)=>s+(r.prf||0),0)/wp,cabWp:rows.reduce((s,r)=>s+(r.cab||0),0)/wp};}
+  const hData=hist.map(m=>({...m,...mStats2(m)}));
+  const nextM=new Date(hist[hist.length-1].y,hist[hist.length-1].mo+1,1);
+  const nextLbl=nextM.toLocaleString('en',{month:'short',year:'2-digit'}).replace(' ',"'")||'Next';
+  document.getElementById('predLbl').textContent='Forecast: '+nextLbl+' · '+hist.length+' months data';
+  document.getElementById('predModel').textContent='OLS Linear Regression · R²='+(linReg(hData.map(d=>d.rev/1e7)).r2*100).toFixed(1)+'%';
+
+  // Regression on each metric
+  const revY=hData.map(d=>d.rev/1e7),gmY=hData.map(d=>d.gp),nY=hData.map(d=>d.n),rwpY=hData.map(d=>d.rwp),cwpY=hData.map(d=>d.cwp);
+  const revReg=linReg(revY),gmReg=linReg(gmY);
+  const revF=forecastNext(revY),gmF=forecastNext(gmY),nF=Math.round(forecastNext(nY)),rwpF=forecastNext(rwpY),cwpF=forecastNext(cwpY);
+  const revCI=stddev(revReg.residuals),gmCI=stddev(gmReg.residuals);
+
+  // MAPE (in-sample accuracy on last 3 months)
+  const last3=hData.slice(-3);
+  const revFitted=last3.map((_,i)=>revReg.a+revReg.b*(hData.length-3+i));
+  const gmFitted=last3.map((_,i)=>gmReg.a+gmReg.b*(hData.length-3+i));
+  const revAcc=100-mape(last3.map(d=>d.rev/1e7),revFitted);
+  const gmAcc=100-mape(last3.map(d=>d.gp),gmFitted);
+
+  // Forecast KPI cards
+  const kpiDefs=[
+    {l:'Forecast Revenue',v:'₹'+revF.toFixed(2)+' Cr',sub:'±₹'+revCI.toFixed(2)+' Cr',acc:revAcc,col:'var(--am)',trend:revReg.b},
+    {l:'Forecast GM%',v:gmF.toFixed(2)+'%',sub:'±'+gmCI.toFixed(2)+'pp',acc:gmAcc,col:'var(--gn)',trend:gmReg.b},
+    {l:'Forecast Installs',v:nF.toLocaleString(),sub:'R²='+(linReg(nY).r2*100).toFixed(0)+'%',col:'var(--bdp)',trend:linReg(nY).b},
+    {l:'Forecast Rev/Wp',v:'₹'+rwpF.toFixed(2),sub:linReg(rwpY).b>=0?'↑ rising':'↓ falling',col:'var(--gn2)',trend:linReg(rwpY).b},
+    {l:'Forecast COGS/Wp',v:'₹'+cwpF.toFixed(2),sub:linReg(cwpY).b>0?'⚠ inflation':'✓ easing',col:'var(--or)',trend:linReg(cwpY).b},
+  ];
+  document.getElementById('predKpis').innerHTML=kpiDefs.map(k=>{
+    const up=k.trend>0,isCogs=k.l.includes('COGS');const good=isCogs?!up:up;
+    const tArrow=Math.abs(k.trend)<0.01?'→':up?'▲ ':'▼ ';const tCol=Math.abs(k.trend)<0.01?'var(--mu)':good?'var(--gn)':'var(--rd)';
+    const accHtml=k.acc?'<span style="font-size:8px;color:var(--mu);background:var(--bg);padding:1px 5px;border-radius:4px;font-family:JetBrains Mono">'+k.acc.toFixed(0)+'% acc</span>':'<span style="font-size:8px;color:var(--mu);">'+k.sub+'</span>';
+    return'<div style="background:#fff;border:1px solid var(--br);border-radius:8px;padding:12px 14px;border-top:3px solid '+k.col+'"><div style="font-size:8px;color:var(--mu);text-transform:uppercase;letter-spacing:.4px;font-family:JetBrains Mono;margin-bottom:4px">'+k.l+'</div><div style="font-size:19px;font-weight:900;color:var(--bdp)">'+k.v+'</div><div style="font-size:9px;margin-top:4px;display:flex;align-items:center;gap:6px"><span style="color:'+tCol+';font-weight:800">'+tArrow+'trend</span>'+accHtml+'</div></div>';
+  }).join('');
+
+  // Actual vs Forecast table
+  const allRevFitted=hData.map((_,i)=>revReg.a+revReg.b*i);
+  const allGmFitted=hData.map((_,i)=>gmReg.a+gmReg.b*i);
+  const allNFitted=hData.map((_,i)=>linReg(nY).a+linReg(nY).b*i);
+  const show=hData.slice(-6);const sOff=Math.max(0,hData.length-6);
+  document.getElementById('avfBdg').textContent='Revenue R²='+(revReg.r2*100).toFixed(1)+'% · GM R²='+(gmReg.r2*100).toFixed(1)+'%';
+  document.getElementById('avfBody').innerHTML=show.map((d,i)=>{
+    const ii=sOff+i;
+    const rf=allRevFitted[ii],gf=allGmFitted[ii],nf=allNFitted[ii];
+    const rErr=Math.abs(d.rev/1e7-rf)/(d.rev/1e7)*100,gErr=Math.abs(d.gp-gf),nErr=Math.abs(d.n-nf)/(d.n)*100;
+    const rAcc=100-rErr,gAcc=100-mape([d.gp],[gf]);
+    const acc2cls=a=>a>90?'color:var(--gn)':a>75?'color:var(--am)':'color:var(--rd)';
+    return'<tr><td style="font-weight:700;color:var(--bdp)">'+d.lbl+'</td>'+
+      '<td>'+d.n.toLocaleString()+'</td><td style="color:var(--dm)">'+Math.round(nf).toLocaleString()+'</td><td class="'+acc2cls(100-nErr)+'">'+Math.max(0,100-nErr).toFixed(0)+'%</td>'+
+      '<td>₹'+d.rev/1e7>=0?(d.rev/1e7).toFixed(2):'0'+'</td><td style="color:var(--dm)">₹'+rf.toFixed(2)+'</td><td class="'+acc2cls(rAcc)+'">'+Math.max(0,rAcc).toFixed(0)+'%</td>'+
+      '<td class="'+gc(d.gp)+'">'+d.gp.toFixed(2)+'%</td><td style="color:var(--dm)">'+gf.toFixed(2)+'%</td><td class="'+acc2cls(100-gErr/gf*100)+'">'+gErr.toFixed(2)+'pp</td>'+
+      '</tr>';
+  }).join('')+
+  '<tr style="background:var(--bpl);font-weight:800"><td colspan="3"><b>FORECAST: '+nextLbl+'</b></td><td style="color:var(--gn)">—</td>'+
+  '<td><b>₹'+revF.toFixed(2)+' Cr</b></td><td colspan="2" style="color:var(--mu);font-size:9px">±₹'+revCI.toFixed(2)+' Cr</td>'+
+  '<td class="'+gc(gmF)+'"><b>'+gmF.toFixed(2)+'%</b></td><td colspan="2" style="color:var(--mu);font-size:9px">±'+gmCI.toFixed(2)+'pp</td></tr>';
+
+  // SVG trend+forecast chart
+  function trendSvg2(vals,fittedAll,fVal,fLo,fHi,color,fmt){
+    const W2=360,H2=120,pL=10,pR=10,pT=28,pB=30;
+    const allV=[...vals,fVal,fLo,fHi,...fittedAll].filter(v=>v!=null&&isFinite(v));
+    const mn=Math.min(...allV)*0.97,mx=Math.max(...allV)*1.03,rng=mx-mn||1;
+    const ty=v=>pT+(1-(v-mn)/rng)*(H2-pT-pB);
+    const n2=vals.length,totX=n2+1;
+    const tx=i=>pL+i/(totX-1)*(W2-pL-pR);
+    const actPts=vals.map((v,i)=>({x:tx(i),y:ty(v)}));
+    const fitPts=fittedAll.map((v,i)=>({x:tx(i),y:ty(v)}));
+    const fPt={x:tx(n2),y:ty(fVal)};
+    let svg='<svg viewBox="0 0 '+W2+' '+H2+'" style="width:100%;height:'+H2+'px">';
+    // Confidence zone for forecast
+    svg+='<rect x="'+( fPt.x-12).toFixed(0)+'" y="'+ty(fHi).toFixed(0)+'" width="24" height="'+( ty(fLo)-ty(fHi)).toFixed(0)+'" fill="'+color+'" opacity=".12" rx="3"/>';
+    // Regression fitted line (dashed, full span)
+    svg+='<path d="'+fitPts.map((p,i)=>(i?'L':'M')+p.x.toFixed(1)+','+p.y.toFixed(1)).join(' ')+ ' L'+fPt.x.toFixed(1)+','+fPt.y.toFixed(1)+'" fill="none" stroke="'+color+'" stroke-width="1.5" stroke-dasharray="5,3" opacity=".6"/>';
+    // Actual area fill
+    svg+='<path d="'+actPts.map((p,i)=>(i?'L':'M')+p.x.toFixed(1)+','+p.y.toFixed(1)).join(' ')+ ' L'+actPts[n2-1].x.toFixed(1)+','+ty(mn).toFixed(0)+' L'+actPts[0].x.toFixed(1)+','+ty(mn).toFixed(0)+' Z" fill="'+color+'" opacity=".08"/>';
+    // Actual solid line
+    svg+='<path d="'+actPts.map((p,i)=>(i?'L':'M')+p.x.toFixed(1)+','+p.y.toFixed(1)).join(' ')+ '" fill="none" stroke="'+color+'" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>';
+    // Confidence bar at forecast
+    svg+='<line x1="'+fPt.x.toFixed(1)+'" y1="'+ty(fHi).toFixed(1)+'" x2="'+fPt.x.toFixed(1)+'" y2="'+ty(fLo).toFixed(1)+'" stroke="'+color+'" stroke-width="2" opacity=".5"/>';
+    [ty(fHi),ty(fLo)].forEach(fy=>svg+='<line x1="'+( fPt.x-6).toFixed(1)+'" y1="'+fy.toFixed(1)+'" x2="'+( fPt.x+6).toFixed(1)+'" y2="'+fy.toFixed(1)+'" stroke="'+color+'" stroke-width="1.5" opacity=".5"/>');
+    // Actual dots
+    actPts.forEach((p,i)=>svg+='<circle cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="'+( i===n2-1?4:3)+'" fill="'+( i===n2-1?color:'#fff')+'" stroke="'+color+'" stroke-width="1.5"/>');
+    // Forecast dot
+    svg+='<circle cx="'+fPt.x.toFixed(1)+'" cy="'+fPt.y.toFixed(1)+'" r="5" fill="'+color+'" stroke="#fff" stroke-width="2" opacity=".85"/>';
+    // Labels
+    vals.forEach((v,i)=>svg+='<text x="'+tx(i).toFixed(1)+'" y="'+( ty(v)-7).toFixed(0)+'" font-size="8" fill="'+color+'" font-family="JetBrains Mono" text-anchor="middle">'+fmt(v)+'</text>');
+    svg+='<text x="'+fPt.x.toFixed(1)+'" y="'+( ty(fVal)-9).toFixed(0)+'" font-size="9" fill="'+color+'" font-family="JetBrains Mono" text-anchor="middle" font-weight="900">'+fmt(fVal)+'*</text>';
+    // X labels
+    hist.forEach((m,i)=>svg+='<text x="'+tx(i).toFixed(1)+'" y="'+( H2-pB+13).toFixed(0)+'" font-size="7.5" fill="#94a3b8" font-family="JetBrains Mono" text-anchor="middle">'+m.lbl+'</text>');
+    svg+='<text x="'+fPt.x.toFixed(1)+'" y="'+( H2-pB+13).toFixed(0)+'" font-size="8" fill="'+color+'" font-family="JetBrains Mono" text-anchor="middle" font-weight="700">'+nextLbl+'*</text>';
+    svg+='</svg>';return svg;
+  }
+  document.getElementById('predRevChart').innerHTML=trendSvg2(revY,allRevFitted,revF,revF-revCI,revF+revCI,'#d97706',v=>v.toFixed(1));
+  document.getElementById('predGmChart').innerHTML=trendSvg2(gmY,allGmFitted,gmF,gmF-gmCI,gmF+gmCI,'#059669',v=>v.toFixed(1)+'%');
+
+  // Cost pressure bars
+  const costCats=[{k:'modWp',l:'Module'},{k:'invWp',l:'Inverter'},{k:'strWp',l:'Structure'},{k:'cabWp',l:'Cables'}];
+  const costTrends=costCats.map(c=>{const vy=hData.map(d=>d[c.k]||0);const reg=linReg(vy);return{label:c.l,trend:reg.b,r2:reg.r2,forecast:forecastNext(vy),vy};});
+  const maxAb=Math.max(...costTrends.map(c=>Math.abs(c.trend)),0.001);
+  document.getElementById('predCostBar').innerHTML=costTrends.map(c=>{
+    const w=Math.abs(c.trend)/maxAb*80;const col=c.trend>0.01?'#dc2626':c.trend<-0.01?'#059669':'#94a3b8';
+    const dir=c.trend>0.01?'▲ Rising pressure':c.trend<-0.01?'▼ Easing':'→ Stable';
+    return'<div style="display:flex;align-items:center;gap:10px;margin:6px 0"><div style="width:70px;font-size:11px;font-weight:700;color:var(--bdp)">'+c.label+'</div><div style="flex:1;height:16px;background:#f1f5f9;border-radius:3px;overflow:hidden"><div style="height:100%;width:'+w+'%;background:'+col+';border-radius:3px;min-width:2px"></div></div><div style="font-size:10px;font-weight:700;color:'+col+';white-space:nowrap;width:120px;text-align:right">'+dir+'</div><div style="font-size:9px;color:var(--mu);width:55px;text-align:right;font-family:JetBrains Mono">₹'+c.forecast.toFixed(2)+'/Wp</div></div>';
+  }).join('');
+
+  // kW bucket volume trend
+  const bktTrend=BKT_ORDER.map(bkt=>{
+    const shares=hData.map(d=>{const rows=src.filter(r=>r.date.getFullYear()===d.y&&r.date.getMonth()===d.mo);return rows.length?rows.filter(r=>getBkt(r.kw)===bkt).length/rows.length*100:0;});
+    const reg=linReg(shares);return{bkt,shares,trend:reg.b,forecast:forecastNext(shares)};
+  });
+  const maxSh=Math.max(...bktTrend.map(b=>b.forecast),1);
+  const BCOLS=['#1a4fd4','#3b82f6','#7c3aed','#db2777','#ea580c'];
+  document.getElementById('predBktChart').innerHTML=bktTrend.map((b,i)=>{
+    const w=b.forecast/maxSh*80;const tArrow=b.trend>0.3?'▲':b.trend<-0.3?'▼':'→';const tCol=b.trend>0.3?'var(--gn)':b.trend<-0.3?'var(--rd)':'var(--mu)';
+    return'<div style="display:flex;align-items:center;gap:10px;margin:5px 0"><div style="width:55px;font-size:10px;font-weight:700;color:var(--bdp)">'+b.bkt+'</div><div style="flex:1;height:14px;background:#f1f5f9;border-radius:3px;overflow:hidden"><div style="height:100%;width:'+w+'%;background:'+BCOLS[i]+';border-radius:3px;min-width:2px"></div></div><div style="font-size:10px;font-weight:800;width:42px;text-align:right;font-family:JetBrains Mono">'+b.forecast.toFixed(1)+'%</div><div style="font-size:11px;font-weight:800;color:'+tCol+';width:16px;text-align:right">'+tArrow+'</div></div>';
+  }).join('');
+
+  // Signals
+  const signals=[];
+  signals.push({col:gmReg.b>0.1?'#059669':gmReg.b<-0.1?'#dc2626':'#d97706',
+    title:'GM% trend (R²='+(gmReg.r2*100).toFixed(1)+'%): '+(gmReg.b>=0?'+':'')+gmReg.b.toFixed(3)+'pp/month — forecast '+gmF.toFixed(2)+'% for '+nextLbl,
+    detail:'Linear regression on '+hist.length+' months. '+(gmReg.r2>0.7?'Strong fit (R²>'+( gmReg.r2*100).toFixed(0)+'%) — trend is reliable.':gmReg.r2>0.4?'Moderate fit — trend exists but has variance.':' Weak fit — GM% is volatile, treat forecast directionally.')+' Confidence band: '+gmF.toFixed(2)+'% ±'+gmCI.toFixed(2)+'pp.'
+  });
+  signals.push({col:revReg.b>0.5?'#059669':revReg.b<-0.5?'#dc2626':'#d97706',
+    title:'Revenue trend: '+(revReg.b>=0?'+':'')+revReg.b.toFixed(2)+' Cr/month — forecast ₹'+revF.toFixed(2)+' Cr for '+nextLbl,
+    detail:'Revenue R²='+(revReg.r2*100).toFixed(1)+'%. '+(revReg.b>0.5?'Revenue is growing — strong upward trajectory. Ensure COGS doesn\'t erode margin gains.':revReg.b<-0.5?'Revenue declining MoM — investigate demand pipeline, seasonality, or competitive pressure.':'Revenue broadly stable.')+' Last 3 months: '+last3.map(d=>'₹'+(d.rev/1e7).toFixed(2)+'Cr').join(' → ')+'.'
+  });
+  signals.push({col:linReg(cwpY).b>0.05?'#dc2626':linReg(cwpY).b<-0.05?'#059669':'#d97706',
+    title:'COGS/Wp trend: '+(linReg(cwpY).b>=0?'+':'')+linReg(cwpY).b.toFixed(3)+'/Wp/month — '+( linReg(cwpY).b>0.05?'⚠ inflation signal':'✓ stable/easing'),
+    detail:'COGS/Wp last 3: '+last3.map(d=>'₹'+d.cwp.toFixed(2)).join(' → ')+'. '+(linReg(cwpY).b>0.05?'Rising cost trend will compress margin if Rev/Wp doesn\'t keep pace. Primary driver to watch: module rate revision (check vs Apr 2026 rate table).':' Cost easing provides margin tailwind. Monitor for sustainability.')+' Forecast COGS/Wp: ₹'+cwpF.toFixed(2)+'.'
+  });
+  const rwpReg=linReg(rwpY);
+  signals.push({col:'#7c3aed',
+    title:'Rev/Wp vs COGS/Wp spread: forecast ₹'+(rwpF-cwpF).toFixed(2)+'/Wp GM/Wp (’'+nextLbl+')',
+    detail:'Rev/Wp trend: '+(rwpReg.b>=0?'+':'')+rwpReg.b.toFixed(3)+'/Wp/month. COGS/Wp trend: '+(linReg(cwpY).b>=0?'+':'')+linReg(cwpY).b.toFixed(3)+'/Wp/month. '+(rwpReg.b>linReg(cwpY).b?'Rev/Wp growing faster than COGS/Wp — margin expansion signal. Maintain pricing discipline to lock in gains.':' COGS/Wp growing faster than Rev/Wp — margin compression signal. Review module rates and push for pricing adjustments.')+' Spread trajectory: '+(rwpReg.b-linReg(cwpY).b>=0?'+':'')+( rwpReg.b-linReg(cwpY).b).toFixed(3)+'/Wp/month.'
+  });
+  // Model accuracy signal
+  const avgAcc=(revAcc+gmAcc)/2;
+  signals.push({col:avgAcc>85?'#059669':avgAcc>70?'#d97706':'#dc2626',
+    title:'Model accuracy (in-sample, last 3 months): '+avgAcc.toFixed(1)+'% average',
+    detail:'Revenue forecast accuracy: '+revAcc.toFixed(1)+'%. GM% forecast accuracy: '+gmAcc.toFixed(1)+'%. '+(avgAcc>85?'High accuracy — the linear trend fits the data well, giving confidence in the forecast direction.':avgAcc>70?'Moderate accuracy — directionally useful but build in a buffer when planning.':' Low accuracy — business has significant non-linear or seasonal variance. Use forecast as a loose guide only.')
+  });
+
+  document.getElementById('predSignals').innerHTML=signals.map(s=>'<div style="display:flex;gap:12px;align-items:flex-start;padding:12px 14px;background:#fff;border:1px solid var(--br);border-radius:8px;margin-bottom:6px;border-left:4px solid '+s.col+'"><span style="width:10px;height:10px;border-radius:50%;background:'+s.col+';flex-shrink:0;margin-top:4px;display:inline-block"></span><div><div style="font-size:12px;font-weight:700;color:var(--bdp);margin-bottom:3px">'+s.title+'</div><div style="font-size:11px;line-height:1.6;color:#64748b">'+s.detail+'</div></div></div>').join('');
 }
 
 window.addEventListener('DOMContentLoaded',loadData);
