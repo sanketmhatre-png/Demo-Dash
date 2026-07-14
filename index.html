@@ -416,7 +416,7 @@ tbody tr.sel td:first-child{color:var(--bd)}
 
   <div style="background:#fff;border:1px solid var(--br);border-radius:8px;padding:10px 14px;margin-bottom:8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
     <span class="fl">Clusters</span>
-    <select id="clSel" class="fs" multiple style="height:30px;min-width:200px"><option value="all" selected>All clusters</option></select>
+    <select id="clSel" class="fs" multiple style="height:30px;min-width:200px" onchange="rCluster()"><option value="all" selected>All clusters</option></select>
     <span class="fl">kW Bucket</span>
     <select id="bktSel" class="fs" onchange="rCluster()"><option value="all">All kW</option><option>0-3 kW</option><option>3-4 kW</option><option>4-5 kW</option><option>5-6 kW</option><option>&gt;6 kW</option></select>
     <div class="fdiv"></div>
