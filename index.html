@@ -405,13 +405,13 @@ tbody tr.sel td:first-child{color:var(--bd)}
 <div id="view-cluster" class="view" style="display:none">
 <div class="main">
   <div class="krow" style="padding:0;margin-bottom:8px">
-    <div class="kc c1"><div class="kl">Installs</div><div class="kv" id="cl1" style="color:var(--bdp)">—</div></div>
-    <div class="kc c3"><div class="kl">Total Revenue</div><div class="kv" id="cl2" style="color:var(--am)">—</div></div>
-    <div class="kc c2"><div class="kl">Total kW</div><div class="kv" id="cl3" style="color:var(--pu)">—</div></div>
-    <div class="kc c5"><div class="kl">Rev / Wp</div><div class="kv" id="cl4" style="color:var(--gn2)">—</div></div>
-    <div class="kc c4"><div class="kl">COGS / Wp</div><div class="kv" id="cl5" style="color:var(--or)">—</div></div>
-    <div class="kc c6"><div class="kl">GM / Wp</div><div class="kv" id="cl6" style="color:var(--gn)">—</div></div>
-    <div class="kc c7"><div class="kl">GM %</div><div class="kv" id="cl7" style="color:var(--pk)">—</div></div>
+    <div class="kc c1"><div class="kl">Installs</div><div class="kv" id="cl1" style="color:var(--bdp)">—</div><div class="kd" id="cl1d">—</div></div>
+    <div class="kc c3"><div class="kl">Total Revenue</div><div class="kv" id="cl2" style="color:var(--am)">—</div><div class="kd" id="cl2d">—</div></div>
+    <div class="kc c2"><div class="kl">Total kW</div><div class="kv" id="cl3" style="color:var(--pu)">—</div><div class="kd" id="cl3d">—</div></div>
+    <div class="kc c5"><div class="kl">Rev / Wp</div><div class="kv" id="cl4" style="color:var(--gn2)">—</div><div class="kd" id="cl4d">—</div></div>
+    <div class="kc c4"><div class="kl">COGS / Wp</div><div class="kv" id="cl5" style="color:var(--or)">—</div><div class="kd" id="cl5d">—</div></div>
+    <div class="kc c6"><div class="kl">GM / Wp</div><div class="kv" id="cl6" style="color:var(--gn)">—</div><div class="kd" id="cl6d">—</div></div>
+    <div class="kc c7"><div class="kl">GM %</div><div class="kv" id="cl7" style="color:var(--pk)">—</div><div class="kd" id="cl7d">—</div></div>
   </div>
 
   <div style="background:#fff;border:1px solid var(--br);border-radius:8px;padding:10px 14px;margin-bottom:8px;display:flex;align-items:center;gap:10px;flex-wrap:wrap">
@@ -1241,14 +1241,33 @@ function rCluster(){
   document.getElementById('clBdg').textContent=curLbl+' vs '+prevLbl+' · '+rows.length+' projects';
   document.getElementById('clTblBdg').textContent=curLbl+' vs '+prevLbl;
 
-  // KPIs (current month)
+  // KPIs (current vs previous month)
+  const sh=(i,v)=>{const e=document.getElementById(i);if(e)e.innerHTML=v;};
   const s=(i,v)=>{const e=document.getElementById(i);if(e)e.textContent=v;};
   const ckw=curRows.reduce((s,r)=>s+r.kw,0),crev=curRows.reduce((s,r)=>s+r.rev,0),ccogs=curRows.reduce((s,r)=>s+r.cogs,0);
-  const cwp=ckw*1000||1;
+  const pkw=prevRows.reduce((s,r)=>s+r.kw,0),prev2=prevRows.reduce((s,r)=>s+r.rev,0),pcogs=prevRows.reduce((s,r)=>s+r.cogs,0);
+  const cwp=ckw*1000||1,pwp=pkw*1000||1;
+  const cGP=crev?(crev-ccogs)/crev*100:0,pGP=prev2?(prev2-pcogs)/prev2*100:0;
+  function kpiDelta(cur,prev,fmt,unit,higherGood,isPP){
+    const d=isPP?cur-prev:(prev?((cur-prev)/prev*100):0);
+    const arrow=d>0.1?(higherGood?'▲':'▼'):d<-0.1?(higherGood?'▼':'▲'):'';
+    const cls=Math.abs(d)<0.1?'color:var(--mu)':(((d>0)===higherGood)?'color:var(--gn)':'color:var(--rd)');
+    return'<span style="'+cls+';font-size:9px;font-weight:700">'+arrow+' '+Math.abs(d).toFixed(1)+(isPP?'pp':'%')+'</span> · <span style="color:var(--mu);font-size:9px">'+fmt+' '+prevLbl+'</span>';
+  }
   s('cl1',curRows.length.toLocaleString());
-  s('cl2','₹'+(crev/1e7).toFixed(2)+' Cr');s('cl3',(ckw/1000).toFixed(1)+' MW');
-  s('cl4','₹'+(crev/cwp).toFixed(2));s('cl5','₹'+(ccogs/cwp).toFixed(2));
-  s('cl6','₹'+((crev-ccogs)/cwp).toFixed(2));s('cl7',(crev?(crev-ccogs)/crev*100:0).toFixed(2)+'%');
+  sh('cl1d',kpiDelta(curRows.length,prevRows.length,prevRows.length.toLocaleString(),'',true,false));
+  s('cl2','₹'+(crev/1e7).toFixed(2)+'Cr');
+  sh('cl2d',kpiDelta(crev,prev2,'₹'+(prev2/1e7).toFixed(2)+'Cr','',true,false));
+  s('cl3',(ckw).toLocaleString()+' kW');
+  sh('cl3d',kpiDelta(ckw,pkw,pkw.toLocaleString()+' kW','',true,false));
+  s('cl4','₹'+(crev/cwp).toFixed(2));
+  sh('cl4d',kpiDelta(crev/cwp,prev2/pwp,'₹'+(prev2/pwp).toFixed(2),'',true,false));
+  s('cl5','₹'+(ccogs/cwp).toFixed(2));
+  sh('cl5d',kpiDelta(ccogs/cwp,pcogs/pwp,'₹'+(pcogs/pwp).toFixed(2),'',false,false));
+  s('cl6','₹'+((crev-ccogs)/cwp).toFixed(2));
+  sh('cl6d',kpiDelta((crev-ccogs)/cwp,(prev2-pcogs)/pwp,'₹'+((prev2-pcogs)/pwp).toFixed(2),'',true,false));
+  s('cl7',cGP.toFixed(2)+'%');
+  sh('cl7d',kpiDelta(cGP,pGP,pGP.toFixed(2)+'%','',true,true));
 
   // Build bucket × offering data for both months
   const offers=[...new Set(rows.map(r=>r.offer).filter(Boolean))].sort();
@@ -1275,6 +1294,9 @@ function rCluster(){
   const fmtD=v=>v>0.05?'+'+v.toFixed(1):v<-0.05?v.toFixed(1):'—';
   const dcls=v=>v>0.05?'delta-pos':v<-0.05?'delta-neg':'delta-flat';
   const totalCurN=curRows.length||1;
+  const totalPrevN=prevRows.length||1;
+  // Dual cell: current on top, previous below in lighter style
+  const dual=(cv,pv)=>'<div>'+cv+'<div style="font-size:8px;color:var(--mu);margin-top:1px">'+pv+'</div></div>';
 
   // Build table HTML
   let html='';
@@ -1284,7 +1306,12 @@ function rCluster(){
     if(bCur.length===0&&bPrev.length===0)return;
     const ba=agg(bCur),bp=agg(bPrev),bb=bridge(ba,bp);
     // Bucket header row
-    html+='<tr class="bkt-row"><td>'+bkt+'</td><td>ALL</td><td>'+ba.n+'</td><td>'+((ba.n/totalCurN)*100).toFixed(1)+'%</td><td>₹'+ba.rwp.toFixed(2)+'</td><td>₹'+ba.cwp.toFixed(2)+'</td><td class="'+gc(ba.gp)+'">'+ba.gp.toFixed(1)+'%</td>';
+    html+='<tr class="bkt-row"><td>'+bkt+'</td><td>ALL</td>';
+    html+='<td>'+dual(ba.n,bp.n)+'</td>';
+    html+='<td>'+dual(((ba.n/totalCurN)*100).toFixed(1)+'%',((bp.n/totalPrevN)*100).toFixed(1)+'%')+'</td>';
+    html+='<td>'+dual('₹'+ba.rwp.toFixed(2),'₹'+bp.rwp.toFixed(2))+'</td>';
+    html+='<td>'+dual('₹'+ba.cwp.toFixed(2),'₹'+bp.cwp.toFixed(2))+'</td>';
+    html+='<td class="'+gc(ba.gp)+'">'+dual(ba.gp.toFixed(1)+'%',bp.gp.toFixed(1)+'%')+'</td>';
     html+='<td class="sep '+dcls(bb.dgm)+'">'+fmtD(bb.dgm)+'</td><td class="'+dcls(bb.price)+'">'+fmtD(bb.price)+'</td><td class="'+dcls(bb.cost)+'">'+fmtD(bb.cost)+'</td><td class="'+dcls(bb.mix)+'">'+fmtD(bb.mix)+'</td>';
     html+='<td class="sep '+dcls(bb.dmod)+'">'+fmtD(bb.dmod)+'</td><td class="'+dcls(bb.dinv)+'">'+fmtD(bb.dinv)+'</td><td class="'+dcls(bb.dstr)+'">'+fmtD(bb.dstr)+'</td><td class="'+dcls(bb.dcab)+'">'+fmtD(bb.dcab)+'</td><td class="'+dcls(bb.doth)+'">'+fmtD(bb.doth)+'</td></tr>';
     // Per-offering rows
@@ -1293,7 +1320,12 @@ function rCluster(){
       const oPrev=bPrev.filter(r=>r.offer===o);
       if(oCur.length===0&&oPrev.length===0)return;
       const oa=agg(oCur),op=agg(oPrev),ob=bridge(oa,op);
-      html+='<tr class="off-row"><td></td><td>'+o+'</td><td>'+oa.n+'</td><td>'+((oa.n/totalCurN)*100).toFixed(1)+'%</td><td>₹'+oa.rwp.toFixed(2)+'</td><td>₹'+oa.cwp.toFixed(2)+'</td><td class="'+gc(oa.gp)+'">'+oa.gp.toFixed(1)+'%</td>';
+      html+='<tr class="off-row"><td></td><td>'+o+'</td>';
+      html+='<td>'+dual(oa.n,op.n)+'</td>';
+      html+='<td>'+dual(((oa.n/totalCurN)*100).toFixed(1)+'%',((op.n/totalPrevN)*100).toFixed(1)+'%')+'</td>';
+      html+='<td>'+dual('₹'+oa.rwp.toFixed(2),'₹'+op.rwp.toFixed(2))+'</td>';
+      html+='<td>'+dual('₹'+oa.cwp.toFixed(2),'₹'+op.cwp.toFixed(2))+'</td>';
+      html+='<td class="'+gc(oa.gp)+'">'+dual(oa.gp.toFixed(1)+'%',op.gp.toFixed(1)+'%')+'</td>';
       html+='<td class="sep '+dcls(ob.dgm)+'">'+fmtD(ob.dgm)+'</td><td class="'+dcls(ob.price)+'">'+fmtD(ob.price)+'</td><td class="'+dcls(ob.cost)+'">'+fmtD(ob.cost)+'</td><td class="'+dcls(ob.mix)+'">'+fmtD(ob.mix)+'</td>';
       html+='<td class="sep '+dcls(ob.dmod)+'">'+fmtD(ob.dmod)+'</td><td class="'+dcls(ob.dinv)+'">'+fmtD(ob.dinv)+'</td><td class="'+dcls(ob.dstr)+'">'+fmtD(ob.dstr)+'</td><td class="'+dcls(ob.dcab)+'">'+fmtD(ob.dcab)+'</td><td class="'+dcls(ob.doth)+'">'+fmtD(ob.doth)+'</td></tr>';
     });
