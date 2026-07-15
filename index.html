@@ -227,17 +227,19 @@ tbody tr.sel td:first-child{color:var(--bd)}
 .cl-item input[type=checkbox]{accent-color:var(--bd);width:14px;height:14px;cursor:pointer;flex-shrink:0}
 
 /* CLUSTER TAB */
-#clTbl{border-collapse:collapse;min-width:100%}
-#clTbl th{background:var(--bdp);color:#fff;padding:6px 10px;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;font-family:'JetBrains Mono',monospace;text-align:right;white-space:nowrap;position:sticky;top:0;z-index:2}
-#clTbl th:first-child,#clTbl th:nth-child(2){text-align:left}
-#clTbl td{padding:6px 10px;border-bottom:1px solid var(--br);text-align:right;font-family:'JetBrains Mono',monospace;font-size:11px;white-space:nowrap;vertical-align:middle}
-#clTbl td:first-child,#clTbl td:nth-child(2){text-align:left;font-family:'Plus Jakarta Sans',sans-serif}
-#clTbl .bkt-row td{background:#f1f5f9;font-weight:800;font-size:12px;border-top:2px solid var(--br)}
-#clTbl .off-row td:first-child{padding-left:0}
-#clTbl .off-row td:nth-child(2){padding-left:24px;color:var(--dm);font-weight:500;font-size:11px}
+#clTbl{border-collapse:collapse;min-width:100%;table-layout:fixed}
+#clTbl th{background:var(--bdp);color:#fff;padding:5px 8px;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;font-family:'JetBrains Mono',monospace;text-align:center;white-space:nowrap;position:sticky;top:0;z-index:2;border-right:1px solid rgba(255,255,255,.1)}
+#clTbl th:first-child{text-align:left;width:80px}
+#clTbl th:nth-child(2){text-align:left;width:100px}
+#clTbl td{padding:5px 8px;border-bottom:1px solid var(--br);text-align:center;font-family:'JetBrains Mono',monospace;font-size:11px;white-space:nowrap;vertical-align:middle}
+#clTbl td:first-child{text-align:left;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700}
+#clTbl td:nth-child(2){text-align:left;font-family:'Plus Jakarta Sans',sans-serif}
+#clTbl .bkt-row td{background:#f1f5f9;font-weight:800;font-size:11px;border-top:2px solid var(--bdp)}
+#clTbl .off-row td:nth-child(2){padding-left:20px;color:var(--dm);font-weight:500;font-size:10px}
 #clTbl tbody tr:hover td{background:#fefce8}
-#clTbl .sep{border-left:2px solid #e2e8f0}
-.delta-pos{color:var(--gn);font-weight:700}.delta-neg{color:var(--rd);font-weight:700}.delta-flat{color:var(--mu)}
+#clTbl .sep{border-left:2px solid #cbd5e1}
+#clTbl .tot td{background:var(--bbg);border-top:2px solid var(--bdp);font-weight:800}
+.delta-pos{color:#059669;font-weight:700}.delta-neg{color:#dc2626;font-weight:700}.delta-flat{color:#94a3b8}
 
 /* MEMO */
 .memo{background:#fff;border-radius:8px;border:1px solid var(--br);border-left:4px solid var(--bd);padding:10px 14px;flex-shrink:0;max-height:150px;overflow-y:auto}
@@ -458,9 +460,26 @@ tbody tr.sel td:first-child{color:var(--bd)}
   <div class="tblw" style="margin-bottom:8px">
     <div class="tbh"><div class="tbt">kW Bucket → Offering Breakdown</div><div class="tbb" id="clTblBdg">—</div></div>
     <div class="tbs" style="overflow-x:auto"><table id="clTbl">
+      <colgroup>
+        <col style="width:80px"><col style="width:110px">
+        <col style="width:70px"><col style="width:60px"><col style="width:72px"><col style="width:72px"><col style="width:68px">
+        <col style="width:58px"><col style="width:58px"><col style="width:58px"><col style="width:52px">
+        <col style="width:62px"><col style="width:62px"><col style="width:68px"><col style="width:58px"><col style="width:52px">
+      </colgroup>
       <thead>
-        <tr><th colspan="2" style="text-align:left"></th><th colspan="5" style="text-align:center;background:#f8fafc;color:var(--dm)">Volume & Unit Economics</th><th colspan="4" style="text-align:center;background:#f0fdf4;color:var(--gn);border-left:2px solid var(--br)">Margin Bridge (pp)</th><th colspan="5" style="text-align:center;background:var(--bbg);color:var(--bd);border-left:2px solid var(--br)">Cost Variance by Component (pp)</th></tr>
-        <tr><th style="text-align:left">kW Bucket</th><th style="text-align:left">Product</th><th>Installs</th><th>Mix%</th><th>Rev/Wp</th><th>COGS/Wp</th><th>GM%</th><th style="border-left:2px solid var(--br)">ΔGM%</th><th>Price</th><th>Cost</th><th>Mix</th><th style="border-left:2px solid var(--br)">Module</th><th>Inverter</th><th>Structure</th><th>Cables</th><th>Other</th></tr>
+        <tr>
+          <th colspan="2" style="text-align:left;background:#0f1f4e;border-bottom:1px solid rgba(255,255,255,.15)"></th>
+          <th colspan="5" style="text-align:center;background:#1a3a6b;border-bottom:1px solid rgba(255,255,255,.15);letter-spacing:.5px">Volume & Unit Economics</th>
+          <th colspan="4" style="text-align:center;background:#1a4f2e;border-bottom:1px solid rgba(255,255,255,.15);letter-spacing:.5px;border-left:2px solid rgba(255,255,255,.2)">Margin Bridge (pp)</th>
+          <th colspan="5" style="text-align:center;background:#0f2d4a;border-bottom:1px solid rgba(255,255,255,.15);letter-spacing:.5px;border-left:2px solid rgba(255,255,255,.2)">Cost Variance by Component (pp)</th>
+        </tr>
+        <tr>
+          <th style="text-align:left">kW Bucket</th>
+          <th style="text-align:left">Product</th>
+          <th>Installs</th><th>Mix%</th><th>Rev/Wp</th><th>COGS/Wp</th><th>GM%</th>
+          <th style="border-left:2px solid rgba(255,255,255,.2)">ΔGM%</th><th>Price</th><th>Cost</th><th>Mix</th>
+          <th style="border-left:2px solid rgba(255,255,255,.2)">Module</th><th>Inverter</th><th>Structure</th><th>Cables</th><th>Other</th>
+        </tr>
       </thead>
       <tbody id="clBody"></tbody>
     </table></div>
@@ -1253,9 +1272,31 @@ function rProd(){
   // ── PRODUCT PERFORMANCE TABLE ──
   const ppArr=oArr.map(d=>{const wp=d.kw*1000||1;return{...d,gp:d.rev?(d.rev-d.cogs)/d.rev*100:0,rwp:d.rev/wp,cwp:d.cogs/wp,gmwp:(d.rev-d.cogs)/wp,aos:d.n?d.kw/d.n:0,aov:d.n?d.rev/d.n:0,rShare:d.rev/totalRev*100};}).sort((a,b)=>b.rev-a.rev);
   document.getElementById('ppBdg').textContent=ppArr.length+' products';
+  const ppTotalN=ppArr.reduce((s,d)=>s+d.n,0);
+  const ppTotalRev=ppArr.reduce((s,d)=>s+d.rev,0);
+  const ppTotalCogs=ppArr.reduce((s,d)=>s+d.cogs,0);
+  const ppTotalKW=ppArr.reduce((s,d)=>s+d.kw,0);
+  const ppTotalGP=ppTotalRev?(ppTotalRev-ppTotalCogs)/ppTotalRev*100:0;
+  const ppTotalRwp=ppTotalKW>0?ppTotalRev/(ppTotalKW*1000):0;
+  const ppTotalCwp=ppTotalKW>0?ppTotalCogs/(ppTotalKW*1000):0;
+  const ppTotalAov=ppTotalN?ppTotalRev/ppTotalN:0;
+  const ppTotalAos=ppTotalN?ppTotalKW/ppTotalN:0;
+  const ppTotalRow='<tr class="tot" style="border-top:2px solid var(--bdp)">'
+    +'<td><b>TOTAL</b></td>'
+    +'<td>'+ppTotalN.toLocaleString()+'</td>'
+    +'<td>100%</td>'
+    +'<td>'+(ppTotalRev/1e7).toFixed(2)+'</td>'
+    +'<td>'+(ppTotalCogs/1e7).toFixed(2)+'</td>'
+    +'<td class="'+gc(ppTotalGP)+'">'+ppTotalGP.toFixed(1)+'%</td>'
+    +'<td>₹'+ppTotalRwp.toFixed(2)+'</td>'
+    +'<td>₹'+ppTotalCwp.toFixed(2)+'</td>'
+    +'<td style="color:var(--gn)">₹'+((ppTotalRev-ppTotalCogs)/(ppTotalKW*1000||1)).toFixed(2)+'</td>'
+    +'<td>'+ppTotalAos.toFixed(2)+'</td>'
+    +'<td>₹'+(ppTotalAov/1e5).toFixed(2)+' L</td>'
+    +'</tr>';
   document.getElementById('ppBody').innerHTML=ppArr.map(d=>{
     return'<tr><td>'+d.o+'</td><td>'+d.n.toLocaleString()+'</td><td>'+d.rShare.toFixed(1)+'%</td><td>'+(d.rev/1e7).toFixed(2)+'</td><td>'+(d.cogs/1e7).toFixed(2)+'</td><td class="'+gc(d.gp)+'">'+d.gp.toFixed(1)+'%</td><td>₹'+d.rwp.toFixed(2)+'</td><td>₹'+d.cwp.toFixed(2)+'</td><td style="color:var(--gn)">₹'+d.gmwp.toFixed(2)+'</td><td>'+d.aos.toFixed(2)+'</td><td>₹'+(d.aov/1e5).toFixed(2)+' L</td></tr>';
-  }).join('');
+  }).join('')+ppTotalRow;
 
   // City × Product Matrix
   const offerNames=oArr.map(d=>d.o);
@@ -1456,6 +1497,25 @@ function rCluster(){
       html+='<td class="sep '+dcls(ob.dmod)+'">'+fmtD(ob.dmod)+'</td><td class="'+dcls(ob.dinv)+'">'+fmtD(ob.dinv)+'</td><td class="'+dcls(ob.dstr)+'">'+fmtD(ob.dstr)+'</td><td class="'+dcls(ob.dcab)+'">'+fmtD(ob.dcab)+'</td><td class="'+dcls(ob.doth)+'">'+fmtD(ob.doth)+'</td></tr>';
     });
   });
+  // Grand total row
+  const gtCur=agg(curRows),gtPrev=agg(prevRows),gtBr=bridge(gtCur,gtPrev);
+  html+='<tr class="tot" style="border-top:2px solid var(--bdp)">'
+    +'<td><b>TOTAL</b></td><td><b>ALL</b></td>'
+    +'<td>'+dual('<b>'+gtCur.n+'</b>',gtPrev.n)+'</td>'
+    +'<td>'+dual('100%','100%')+'</td>'
+    +'<td>'+dual('₹'+gtCur.rwp.toFixed(2),'₹'+gtPrev.rwp.toFixed(2))+'</td>'
+    +'<td>'+dual('₹'+gtCur.cwp.toFixed(2),'₹'+gtPrev.cwp.toFixed(2))+'</td>'
+    +'<td class="'+gc(gtCur.gp)+'">'+dual(gtCur.gp.toFixed(1)+'%',gtPrev.gp.toFixed(1)+'%')+'</td>'
+    +'<td class="sep '+dcls(gtBr.dgm)+'">'+fmtD(gtBr.dgm)+'</td>'
+    +'<td class="'+dcls(gtBr.price)+'">'+fmtD(gtBr.price)+'</td>'
+    +'<td class="'+dcls(gtBr.cost)+'">'+fmtD(gtBr.cost)+'</td>'
+    +'<td class="'+dcls(gtBr.mix)+'">'+fmtD(gtBr.mix)+'</td>'
+    +'<td class="sep '+dcls(gtBr.dmod)+'">'+fmtD(gtBr.dmod)+'</td>'
+    +'<td class="'+dcls(gtBr.dinv)+'">'+fmtD(gtBr.dinv)+'</td>'
+    +'<td class="'+dcls(gtBr.dstr)+'">'+fmtD(gtBr.dstr)+'</td>'
+    +'<td class="'+dcls(gtBr.dcab)+'">'+fmtD(gtBr.dcab)+'</td>'
+    +'<td class="'+dcls(gtBr.doth)+'">'+fmtD(gtBr.doth)+'</td>'
+    +'</tr>';
   document.getElementById('clBody').innerHTML=html;
 
   // ── MARGIN VARIANCE BRIDGE VISUAL ──
