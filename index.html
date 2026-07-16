@@ -488,13 +488,7 @@ tbody tr.sel td:first-child{color:var(--bd)}
 
   <div class="tblw" style="margin-bottom:8px">
     <div class="tbh"><div class="tbt" id="clTblTitle">kW Bucket → Offering Breakdown</div>
-      <div style="display:flex;align-items:center;gap:6px">
-        <div style="display:flex;background:var(--bg);border-radius:6px;padding:2px;gap:2px">
-          <button class="sortbtn active" id="clGrpBkt" onclick="clSetGroupMode('bkt')">kW Bucket-wise</button>
-          <button class="sortbtn" id="clGrpProd" onclick="clSetGroupMode('prod')">Product-wise</button>
-        </div>
-        <div class="tbb" id="clTblBdg">—</div>
-      </div>
+      <div class="tbb" id="clTblBdg">—</div>
     </div>
     <div class="tbs" style="overflow-x:auto"><table id="clTbl">
       <colgroup>
@@ -662,15 +656,6 @@ async function loadData(){
   ol.style.display='none';
 }
 let CL_ALL=[];
-let CL_GROUP_MODE='bkt';
-let EXPANDED_CL_PRODUCTS=new Set();
-function toggleClProduct(o){EXPANDED_CL_PRODUCTS.has(o)?EXPANDED_CL_PRODUCTS.delete(o):EXPANDED_CL_PRODUCTS.add(o);rCluster();}
-function clSetGroupMode(m){
-  CL_GROUP_MODE=m;
-  document.getElementById('clGrpBkt').classList.toggle('active',m==='bkt');
-  document.getElementById('clGrpProd').classList.toggle('active',m==='prod');
-  rCluster();
-}
 function pF(){
   const ss=[...new Set(A.map(r=>r.state).filter(Boolean))].sort(),os=[...new Set(A.map(r=>r.offer).filter(Boolean))].sort();
   document.getElementById('fSt').innerHTML='<option value="">All</option>'+ss.map(s=>'<option>'+s+'</option>').join('');
@@ -1644,51 +1629,23 @@ function rCluster(){
   }
 
   let html='';
-  const grpMode=CL_GROUP_MODE||'bkt';
-  if(grpMode==='bkt'){
-    // ── kW Bucket → Offering ──
-    document.getElementById('clTblTitle').textContent='kW Bucket → Offering Breakdown';
-    document.getElementById('clTbl').querySelector('thead tr:last-child th:first-child').textContent='kW Bucket';
-    document.getElementById('clTbl').querySelector('thead tr:last-child th:nth-child(2)').textContent='Product';
-    BKT_ORDER.forEach(bkt=>{
-      const bCur=curRows.filter(r=>getBkt(r.kw)===bkt);
-      const bPrev=prevRows.filter(r=>getBkt(r.kw)===bkt);
-      if(bCur.length===0&&bPrev.length===0)return;
-      const ba=agg(bCur),bp=agg(bPrev),bb=bridge(ba,bp);
-      html+=buildRow(bkt,'ALL','bkt-row',ba,bp,bb,0);
-      offers.forEach(o=>{
-        const oCur=bCur.filter(r=>r.offer===o);
-        const oPrev=bPrev.filter(r=>r.offer===o);
-        if(oCur.length===0&&oPrev.length===0)return;
-        const oa=agg(oCur),op=agg(oPrev),ob=bridge(oa,op);
-        html+=buildRow('',o,'off-row',oa,op,ob,0);
-      });
-    });
-  }else{
-    // ── Product → kW Bucket (collapsible) ──
-    document.getElementById('clTblTitle').textContent='Product → kW Bucket Breakdown';
-    document.getElementById('clTbl').querySelector('thead tr:last-child th:first-child').textContent='Product';
-    document.getElementById('clTbl').querySelector('thead tr:last-child th:nth-child(2)').textContent='kW Bucket';
+  document.getElementById('clTblTitle').textContent='kW Bucket → Offering Breakdown';
+  document.getElementById('clTbl').querySelector('thead tr:last-child th:first-child').textContent='kW Bucket';
+  document.getElementById('clTbl').querySelector('thead tr:last-child th:nth-child(2)').textContent='Product';
+  BKT_ORDER.forEach(bkt=>{
+    const bCur=curRows.filter(r=>getBkt(r.kw)===bkt);
+    const bPrev=prevRows.filter(r=>getBkt(r.kw)===bkt);
+    if(bCur.length===0&&bPrev.length===0)return;
+    const ba=agg(bCur),bp=agg(bPrev),bb=bridge(ba,bp);
+    html+=buildRow(bkt,'ALL','bkt-row',ba,bp,bb,0);
     offers.forEach(o=>{
-      const pCur=curRows.filter(r=>r.offer===o);
-      const pPrev=prevRows.filter(r=>r.offer===o);
-      if(pCur.length===0&&pPrev.length===0)return;
-      const pa=agg(pCur),pp=agg(pPrev),pb=bridge(pa,pp);
-      const oEsc=o.replace(/'/g,"\\'");
-      const expanded=EXPANDED_CL_PRODUCTS.has(o);
-      const icon=expanded?'−':'+';
-      html+=buildRow('<span class="expand-btn" style="margin-right:6px">'+icon+'</span>'+o,'ALL','bkt-row',pa,pp,pb,0,'toggleClProduct(\''+oEsc+'\')');
-      if(expanded){
-        BKT_ORDER.forEach(bkt=>{
-          const bCur=pCur.filter(r=>getBkt(r.kw)===bkt);
-          const bPrev=pPrev.filter(r=>getBkt(r.kw)===bkt);
-          if(bCur.length===0&&bPrev.length===0)return;
-          const ba=agg(bCur),bp=agg(bPrev),bb=bridge(ba,bp);
-          html+=buildRow('',bkt,'off-row',ba,bp,bb,0);
-        });
-      }
+      const oCur=bCur.filter(r=>r.offer===o);
+      const oPrev=bPrev.filter(r=>r.offer===o);
+      if(oCur.length===0&&oPrev.length===0)return;
+      const oa=agg(oCur),op=agg(oPrev),ob=bridge(oa,op);
+      html+=buildRow('',o,'off-row',oa,op,ob,0);
     });
-  }
+  });
   // Grand total row
   const gtCur=agg(curRows),gtPrev=agg(prevRows),gtBr=bridge(gtCur,gtPrev);
   html+='<tr class="tot" style="border-top:2px solid var(--bdp)">'
