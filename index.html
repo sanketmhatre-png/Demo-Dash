@@ -227,18 +227,18 @@ tbody tr.sel td:first-child{color:var(--bd)}
 .cl-item input[type=checkbox]{accent-color:var(--bd);width:14px;height:14px;cursor:pointer;flex-shrink:0}
 
 /* CLUSTER TAB */
-#clTbl{border-collapse:collapse;min-width:100%;table-layout:fixed}
-#clTbl th{background:var(--bdp);color:#fff;padding:5px 8px;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;font-family:'JetBrains Mono',monospace;text-align:center;white-space:nowrap;position:sticky;top:0;z-index:2;border-right:1px solid rgba(255,255,255,.1)}
-#clTbl th:first-child{text-align:left;width:80px}
-#clTbl th:nth-child(2){text-align:left;width:100px}
-#clTbl td{padding:5px 8px;border-bottom:1px solid var(--br);text-align:center;font-family:'JetBrains Mono',monospace;font-size:11px;white-space:nowrap;vertical-align:middle}
-#clTbl td:first-child{text-align:left;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700}
-#clTbl td:nth-child(2){text-align:left;font-family:'Plus Jakarta Sans',sans-serif}
-#clTbl .bkt-row td{background:#f1f5f9;font-weight:800;font-size:11px;border-top:2px solid var(--bdp)}
+#clTbl,#clStaticTbl{border-collapse:collapse;min-width:100%;table-layout:fixed}
+#clTbl th,#clStaticTbl th{background:var(--bdp);color:#fff;padding:5px 8px;font-size:8px;font-weight:700;text-transform:uppercase;letter-spacing:.3px;font-family:'JetBrains Mono',monospace;text-align:center;white-space:nowrap;position:sticky;top:0;z-index:2;border-right:1px solid rgba(255,255,255,.1)}
+#clTbl th:first-child,#clStaticTbl th:first-child{text-align:left;width:80px}
+#clTbl th:nth-child(2),#clStaticTbl th:nth-child(2){text-align:left;width:100px}
+#clTbl td,#clStaticTbl td{padding:5px 8px;border-bottom:1px solid var(--br);text-align:center;font-family:'JetBrains Mono',monospace;font-size:11px;white-space:nowrap;vertical-align:middle}
+#clTbl td:first-child,#clStaticTbl td:first-child{text-align:left;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700}
+#clTbl td:nth-child(2),#clStaticTbl td:nth-child(2){text-align:left;font-family:'Plus Jakarta Sans',sans-serif}
+#clTbl .bkt-row td,#clStaticTbl .bkt-row td{background:#f1f5f9;font-weight:800;font-size:11px;border-top:2px solid var(--bdp)}
 #clTbl .off-row td:nth-child(2){padding-left:20px;color:var(--dm);font-weight:500;font-size:10px}
-#clTbl tbody tr:hover td{background:#fefce8}
-#clTbl .sep{border-left:2px solid #cbd5e1}
-#clTbl .tot td{background:var(--bbg);border-top:2px solid var(--bdp);font-weight:800}
+#clTbl tbody tr:hover td,#clStaticTbl tbody tr:hover td{background:#fefce8}
+#clTbl .sep,#clStaticTbl .sep{border-left:2px solid #cbd5e1}
+#clTbl .tot td,#clStaticTbl .tot td{background:var(--bbg);border-top:2px solid var(--bdp);font-weight:800}
 .delta-pos{color:#059669;font-weight:700}.delta-neg{color:#dc2626;font-weight:700}.delta-flat{color:#94a3b8}
 
 /* MEMO */
@@ -505,6 +505,35 @@ tbody tr.sel td:first-child{color:var(--bd)}
     </table></div>
   </div>
 
+  <!-- Static Product Summary (no expand/collapse) -->
+  <div class="tblw" style="margin-bottom:8px">
+    <div class="tbh"><div class="tbt">Product Summary — All Products</div><div class="tbb" id="clStaticBdg">—</div></div>
+    <div class="tbs" style="overflow-x:auto"><table id="clStaticTbl">
+      <colgroup>
+        <col style="width:80px"><col style="width:110px">
+        <col style="width:70px"><col style="width:60px"><col style="width:72px"><col style="width:72px"><col style="width:68px">
+        <col style="width:58px"><col style="width:58px"><col style="width:58px"><col style="width:52px">
+        <col style="width:62px"><col style="width:62px"><col style="width:68px"><col style="width:58px"><col style="width:52px">
+      </colgroup>
+      <thead>
+        <tr>
+          <th colspan="2" style="text-align:left;background:#0f1f4e;border-bottom:1px solid rgba(255,255,255,.15)"></th>
+          <th colspan="5" style="text-align:center;background:#1a3a6b;border-bottom:1px solid rgba(255,255,255,.15);letter-spacing:.5px">Volume & Unit Economics</th>
+          <th colspan="4" style="text-align:center;background:#1a4f2e;border-bottom:1px solid rgba(255,255,255,.15);letter-spacing:.5px;border-left:2px solid rgba(255,255,255,.2)">Margin Bridge (pp)</th>
+          <th colspan="5" style="text-align:center;background:#0f2d4a;border-bottom:1px solid rgba(255,255,255,.15);letter-spacing:.5px;border-left:2px solid rgba(255,255,255,.2)">Cost Variance by Component (pp)</th>
+        </tr>
+        <tr>
+          <th style="text-align:left">Product</th>
+          <th style="text-align:left"></th>
+          <th>Installs</th><th>Mix%</th><th>Rev/Wp</th><th>COGS/Wp</th><th>GM%</th>
+          <th style="border-left:2px solid rgba(255,255,255,.2)">ΔGM%</th><th>Price</th><th>Cost</th><th>Mix</th>
+          <th style="border-left:2px solid rgba(255,255,255,.2)">Module</th><th>Inverter</th><th>Structure</th><th>Cables</th><th>Other</th>
+        </tr>
+      </thead>
+      <tbody id="clStaticBody"></tbody>
+    </table></div>
+  </div>
+
   <div class="memo">
     <div class="memo-head">🔎 Dynamic Insights <span style="font-size:9px;font-weight:400;color:var(--mu)">Data-driven signals from selected clusters</span></div>
     <div id="memoCluster" style="padding:8px 0"></div>
@@ -572,7 +601,7 @@ tbody tr.sel td:first-child{color:var(--bd)}
   <!-- Methodology -->
   <div style="background:#f8fafc;border:1px solid var(--br);border-radius:8px;padding:10px 14px">
     <div style="font-size:9px;color:var(--mu);font-family:'JetBrains Mono',monospace;font-weight:700;text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px">Methodology</div>
-    <div style="font-size:10px;color:var(--dm);line-height:1.7"><b>Ensemble Model</b> — auto-selects the best algorithm per metric from: <b>(1) OLS Linear Regression</b> (straight-line trends), <b>(2) Polynomial Regression degree-2</b> (acceleration/deceleration), <b>(3) Holt Exponential Smoothing</b> with auto-tuned α/β (weights recent months more heavily). Winner chosen by lowest MAPE on last 3 months. <b>Seasonal adjustment</b> applied when ≥6 months history available. <b>Confidence bands</b> = ±1 std dev of residuals. Partial month excluded. These are <b>statistical signals</b> — treat alongside operational pipeline context.</div>
+    <div style="font-size:10px;color:var(--dm);line-height:1.7"><b>Ensemble Model</b> — auto-selects the best of <b>OLS Linear Regression</b> or <b>Holt Exponential Smoothing</b> (α=0.5, β=0.1) per metric, scored by walk-forward (out-of-sample) MAPE. <b>Training window capped to the most recent 12 complete months</b> — prevents old-regime data (e.g. before a rate table revision or business scale-up) from anchoring the forecast to a stale baseline. <b>Seasonal adjustment</b> applied additively when ≥6 months available. <b>Confidence bands</b> = ±1 std dev of residuals. Forecast sanity-capped to ±25% of the recent 3-month average. Partial current month excluded. These are <b>statistical signals</b> — treat alongside operational pipeline context.</div>
   </div>
 </div>
 </div>
@@ -617,6 +646,8 @@ async function loadData(){
 }
 let CL_ALL=[];
 let CL_GROUP_MODE='bkt';
+let EXPANDED_CL_PRODUCTS=new Set();
+function toggleClProduct(o){EXPANDED_CL_PRODUCTS.has(o)?EXPANDED_CL_PRODUCTS.delete(o):EXPANDED_CL_PRODUCTS.add(o);rCluster();}
 function clSetGroupMode(m){
   CL_GROUP_MODE=m;
   document.getElementById('clGrpBkt').classList.toggle('active',m==='bkt');
@@ -772,6 +803,8 @@ function rM(){
 
 let EXPANDED_STATES=new Set();
 function toggleState(s){EXPANDED_STATES.has(s)?EXPANDED_STATES.delete(s):EXPANDED_STATES.add(s);rT();}
+let EXPANDED_PRODUCTS=new Set();
+function toggleProduct(o){EXPANDED_PRODUCTS.has(o)?EXPANDED_PRODUCTS.delete(o):EXPANDED_PRODUCTS.add(o);rProd();}
 
 function rT(){
   const src=fdMonth();
@@ -1372,7 +1405,22 @@ function rProd(){
     +'<td>₹'+(ppTotalAov/1e5).toFixed(2)+' L</td>'
     +'</tr>';
   document.getElementById('ppBody').innerHTML=ppArr.map(d=>{
-    return'<tr><td>'+d.o+'</td><td>'+d.n.toLocaleString()+'</td><td>'+d.rShare.toFixed(1)+'%</td><td>'+(d.rev/1e7).toFixed(2)+'</td><td>'+(d.cogs/1e7).toFixed(2)+'</td><td class="'+gc(d.gp)+'">'+d.gp.toFixed(1)+'%</td><td>₹'+d.rwp.toFixed(2)+'</td><td>₹'+d.cwp.toFixed(2)+'</td><td style="color:var(--gn)">₹'+d.gmwp.toFixed(2)+'</td><td>'+d.aos.toFixed(2)+'</td><td>₹'+(d.aov/1e5).toFixed(2)+' L</td></tr>';
+    const oEsc=d.o.replace(/'/g,"\\'");
+    const expanded=EXPANDED_PRODUCTS.has(d.o);
+    const icon=expanded?'−':'+';
+    let rowHtml='<tr style="cursor:pointer" onclick="toggleProduct(\''+oEsc+'\')"><td><span class="expand-btn" style="margin-right:6px">'+icon+'</span>'+d.o+'</td><td>'+d.n.toLocaleString()+'</td><td>'+d.rShare.toFixed(1)+'%</td><td>'+(d.rev/1e7).toFixed(2)+'</td><td>'+(d.cogs/1e7).toFixed(2)+'</td><td class="'+gc(d.gp)+'">'+d.gp.toFixed(1)+'%</td><td>₹'+d.rwp.toFixed(2)+'</td><td>₹'+d.cwp.toFixed(2)+'</td><td style="color:var(--gn)">₹'+d.gmwp.toFixed(2)+'</td><td>'+d.aos.toFixed(2)+'</td><td>₹'+(d.aov/1e5).toFixed(2)+' L</td></tr>';
+    if(expanded){
+      const prodRows=rv.filter(r=>r.offer===d.o);
+      BKT_ORDER.forEach(bkt=>{
+        const bRows=prodRows.filter(r=>getBkt(r.kw)===bkt);
+        if(!bRows.length)return;
+        const bn=bRows.length,bkw=bRows.reduce((s,r)=>s+r.kw,0),brev=bRows.reduce((s,r)=>s+r.rev,0),bcogs=bRows.reduce((s,r)=>s+r.cogs,0);
+        const bwp=bkw*1000||1,bgp=brev?(brev-bcogs)/brev*100:0,brwp=brev/bwp,bcwp=bcogs/bwp,bgmwp=brwp-bcwp;
+        const baos=bn?bkw/bn:0,baov=bn?brev/bn:0,bshare=d.rev?brev/d.rev*100:0;
+        rowHtml+='<tr class="city-row"><td style="padding-left:24px">'+bkt+'</td><td>'+bn.toLocaleString()+'</td><td>'+bshare.toFixed(1)+'%</td><td>'+(brev/1e7).toFixed(2)+'</td><td>'+(bcogs/1e7).toFixed(2)+'</td><td class="'+gc(bgp)+'">'+bgp.toFixed(1)+'%</td><td>₹'+brwp.toFixed(2)+'</td><td>₹'+bcwp.toFixed(2)+'</td><td style="color:var(--gn)">₹'+bgmwp.toFixed(2)+'</td><td>'+baos.toFixed(2)+'</td><td>₹'+(baov/1e5).toFixed(2)+' L</td></tr>';
+      });
+    }
+    return rowHtml;
   }).join('')+ppTotalRow;
 
   // City × Product Matrix
@@ -1538,8 +1586,8 @@ function rCluster(){
   const dual=(cv,pv)=>'<div>'+cv+'<div style="font-size:8px;color:var(--mu);margin-top:1px">'+pv+'</div></div>';
 
   // Build table HTML — supports two grouping modes: 'bkt' (kW Bucket→Offering) or 'prod' (Product→kW Bucket)
-  function buildRow(label,subLabel,cls,ba,bp,bb,indent){
-    let r='<tr class="'+cls+'"><td'+(indent?' style="padding-left:'+indent+'px"':'')+'>'+label+'</td><td>'+subLabel+'</td>';
+  function buildRow(label,subLabel,cls,ba,bp,bb,indent,onclickAttr){
+    let r='<tr class="'+cls+'"'+(onclickAttr?' style="cursor:pointer" onclick="'+onclickAttr+'"':'')+'><td'+(indent?' style="padding-left:'+indent+'px"':'')+'>'+label+'</td><td>'+subLabel+'</td>';
     r+='<td>'+dual(ba.n,bp.n)+'</td>';
     r+='<td>'+dual(((ba.n/totalCurN)*100).toFixed(1)+'%',((bp.n/totalPrevN)*100).toFixed(1)+'%')+'</td>';
     r+='<td>'+dual('₹'+ba.rwp.toFixed(2),'₹'+bp.rwp.toFixed(2))+'</td>';
@@ -1572,7 +1620,7 @@ function rCluster(){
       });
     });
   }else{
-    // ── Product → kW Bucket ──
+    // ── Product → kW Bucket (collapsible) ──
     document.getElementById('clTblTitle').textContent='Product → kW Bucket Breakdown';
     document.getElementById('clTbl').querySelector('thead tr:last-child th:first-child').textContent='Product';
     document.getElementById('clTbl').querySelector('thead tr:last-child th:nth-child(2)').textContent='kW Bucket';
@@ -1581,14 +1629,19 @@ function rCluster(){
       const pPrev=prevRows.filter(r=>r.offer===o);
       if(pCur.length===0&&pPrev.length===0)return;
       const pa=agg(pCur),pp=agg(pPrev),pb=bridge(pa,pp);
-      html+=buildRow(o,'ALL','bkt-row',pa,pp,pb,0);
-      BKT_ORDER.forEach(bkt=>{
-        const bCur=pCur.filter(r=>getBkt(r.kw)===bkt);
-        const bPrev=pPrev.filter(r=>getBkt(r.kw)===bkt);
-        if(bCur.length===0&&bPrev.length===0)return;
-        const ba=agg(bCur),bp=agg(bPrev),bb=bridge(ba,bp);
-        html+=buildRow('',bkt,'off-row',ba,bp,bb,0);
-      });
+      const oEsc=o.replace(/'/g,"\\'");
+      const expanded=EXPANDED_CL_PRODUCTS.has(o);
+      const icon=expanded?'−':'+';
+      html+=buildRow('<span class="expand-btn" style="margin-right:6px">'+icon+'</span>'+o,'ALL','bkt-row',pa,pp,pb,0,'toggleClProduct(\''+oEsc+'\')');
+      if(expanded){
+        BKT_ORDER.forEach(bkt=>{
+          const bCur=pCur.filter(r=>getBkt(r.kw)===bkt);
+          const bPrev=pPrev.filter(r=>getBkt(r.kw)===bkt);
+          if(bCur.length===0&&bPrev.length===0)return;
+          const ba=agg(bCur),bp=agg(bPrev),bb=bridge(ba,bp);
+          html+=buildRow('',bkt,'off-row',ba,bp,bb,0);
+        });
+      }
     });
   }
   // Grand total row
@@ -1611,6 +1664,35 @@ function rCluster(){
     +'<td class="'+dcls(gtBr.doth)+'">'+fmtD(gtBr.doth)+'</td>'
     +'</tr>';
   document.getElementById('clBody').innerHTML=html;
+
+  // ── STATIC PRODUCT SUMMARY (no expand/collapse) ──
+  let staticHtml='';
+  offers.forEach(o=>{
+    const pCur=curRows.filter(r=>r.offer===o);
+    const pPrev=prevRows.filter(r=>r.offer===o);
+    if(pCur.length===0&&pPrev.length===0)return;
+    const pa=agg(pCur),pp=agg(pPrev),pb=bridge(pa,pp);
+    staticHtml+=buildRow(o,'ALL','bkt-row',pa,pp,pb,0);
+  });
+  document.getElementById('clStaticBdg').textContent=curLbl+' vs '+prevLbl;
+  document.getElementById('clStaticBody').innerHTML=staticHtml+
+    '<tr class="tot" style="border-top:2px solid var(--bdp)">'
+    +'<td><b>TOTAL</b></td><td><b>ALL</b></td>'
+    +'<td>'+dual('<b>'+gtCur.n+'</b>',gtPrev.n)+'</td>'
+    +'<td>'+dual('100%','100%')+'</td>'
+    +'<td>'+dual('₹'+gtCur.rwp.toFixed(2),'₹'+gtPrev.rwp.toFixed(2))+'</td>'
+    +'<td>'+dual('₹'+gtCur.cwp.toFixed(2),'₹'+gtPrev.cwp.toFixed(2))+'</td>'
+    +'<td class="'+gc(gtCur.gp)+'">'+dual(gtCur.gp.toFixed(1)+'%',gtPrev.gp.toFixed(1)+'%')+'</td>'
+    +'<td class="sep '+dcls(gtBr.dgm)+'">'+fmtD(gtBr.dgm)+'</td>'
+    +'<td class="'+dcls(gtBr.price)+'">'+fmtD(gtBr.price)+'</td>'
+    +'<td class="'+dcls(gtBr.cost)+'">'+fmtD(gtBr.cost)+'</td>'
+    +'<td class="'+dcls(gtBr.mix)+'">'+fmtD(gtBr.mix)+'</td>'
+    +'<td class="sep '+dcls(gtBr.dmod)+'">'+fmtD(gtBr.dmod)+'</td>'
+    +'<td class="'+dcls(gtBr.dinv)+'">'+fmtD(gtBr.dinv)+'</td>'
+    +'<td class="'+dcls(gtBr.dstr)+'">'+fmtD(gtBr.dstr)+'</td>'
+    +'<td class="'+dcls(gtBr.dcab)+'">'+fmtD(gtBr.dcab)+'</td>'
+    +'<td class="'+dcls(gtBr.doth)+'">'+fmtD(gtBr.doth)+'</td>'
+    +'</tr>';
 
   const curAll=agg(curRows),prevAll=agg(prevRows);
 
@@ -1757,7 +1839,7 @@ function rCluster(){
 
 function linReg(ys){
   const n=ys.length;
-  if(n<2)return{a:ys[0]||0,b:0,r2:0,residuals:ys.map(()=>0),fitted:ys.map(v=>v),name:'Linear'};
+  if(n<2)return{a:ys[0]||0,b:0,r2:0,residuals:ys.map(()=>0),fitted:ys.map(v=>v),name:'Linear',nextForecast:ys[0]||0};
   const xm=(n-1)/2,ym=ys.reduce((s,v)=>s+v,0)/n;
   const sxy=ys.reduce((s,v,i)=>s+(i-xm)*(v-ym),0);
   const sxx=ys.reduce((s,_,i)=>s+(i-xm)**2,0)||1;
@@ -1766,7 +1848,7 @@ function linReg(ys){
   const res=ys.map((v,i)=>v-fitted[i]);
   const sst=ys.reduce((s,v)=>s+(v-ym)**2,0)||1;
   return{a,b,r2:Math.max(0,1-res.reduce((s,r)=>s+r**2,0)/sst),residuals:res,fitted,
-    forecast:i=>a+b*i,name:'Linear'};
+    forecast:i=>a+b*i,nextForecast:a+b*n,name:'Linear'};
 }
 
 function holtES(ys,alpha=0.5,beta=0.1){
@@ -1785,8 +1867,9 @@ function holtES(ys,alpha=0.5,beta=0.1){
   const res=ys.map((v,i)=>v-fit2[i]);
   const ym=ys.reduce((s,v)=>s+v,0)/n;
   const sst=ys.reduce((s,v)=>s+(v-ym)**2,0)||1;
+  // forecast(h): h = steps AHEAD of training end (h=1 => next immediate period)
   return{l,t,r2:Math.max(0,1-res.reduce((s,r)=>s+r**2,0)/sst),
-    residuals:res,fitted:fit2,forecast:h=>l+h*t,name:'Holt ES'};
+    residuals:res,fitted:fit2,forecast:h=>l+h*t,nextForecast:l+t,name:'Holt ES'};
 }
 
 // ── WALK-FORWARD VALIDATION (real out-of-sample accuracy) ──
@@ -1802,7 +1885,7 @@ function walkForwardMAPE(ys, modelFn){
     const trainY=ys.slice(0,test);
     const m=modelFn(trainY);
     if(!m)continue;
-    const pred=m.forecast(test); // predict index=test using train data
+    const pred=m.nextForecast; // one-step-ahead forecast from this training window
     const actual=ys[test];
     if(Math.abs(actual)>0.01)errors.push(Math.abs(actual-pred)/Math.abs(actual)*100);
   }
@@ -1853,7 +1936,7 @@ function bestModel(ys,hist){
     return a.wfMAPE-b.wfMAPE;
   });
   const winner=scored[0];
-  const rawF=winner.forecast(ys.length);
+  const rawF=winner.nextForecast;
   const seasOffset=hist?additiveSeasonalOffset(ys,hist):0;
   const cappedF=sanityCap(rawF+seasOffset,ys);
   const ci=residStd(winner.residuals);
@@ -1875,6 +1958,10 @@ function rPredict(){
     const cm=months[0],cmR=src.filter(r=>r.date.getFullYear()===cm.y&&r.date.getMonth()===cm.mo);
     if(cmR.length&&Math.max(...cmR.map(r=>r.date.getDate()))<25)months=months.slice(1);
   }
+  // Cap to most recent 12 months — prevents old-regime data (e.g. pre-rate-revision months)
+  // from dragging the forecast toward a stale baseline that no longer reflects the business
+  const HIST_CAP=12;
+  if(months.length>HIST_CAP)months=months.slice(0,HIST_CAP);
   const hist=months.reverse();
   if(hist.length<3){
     document.getElementById('predSignals').innerHTML='<div style="color:var(--mu);padding:12px;font-size:11px">Need at least 3 complete months of data for forecasting.</div>';
@@ -1958,10 +2045,10 @@ function rPredict(){
       return e1<=e2?m1:m2;
     };
     const rM=pickBest(rBest,rH,trainR),gM2=pickBest(gBest,gH,trainG),nM2=pickBest(nBest,nH,trainN);
-    // OOS prediction = forecast at index globalIdx (one beyond training)
-    const rf=sanityCap(rM.forecast(trainR.length),trainR);
-    const gf=sanityCap(gM2.forecast(trainG.length),trainG);
-    const nf=Math.round(sanityCap(nM2.forecast(trainN.length),trainN));
+    // OOS prediction = one-step-ahead forecast from training data
+    const rf=sanityCap(rM.nextForecast,trainR);
+    const gf=sanityCap(gM2.nextForecast,trainG);
+    const nf=Math.round(sanityCap(nM2.nextForecast,trainN));
     const rAcc=d.rev>0?Math.max(0,100-Math.abs(d.rev/1e7-rf)/(d.rev/1e7)*100):null;
     const gAcc=Math.max(0,100-Math.abs(d.gp-gf)/(Math.abs(d.gp)||1)*100);
     const nAcc=d.n>0?Math.max(0,100-Math.abs(d.n-nf)/d.n*100):null;
