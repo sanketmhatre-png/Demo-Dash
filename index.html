@@ -449,9 +449,26 @@ tbody tr.sel td:first-child{color:var(--bd)}
     <select id="bktSel" class="fs" onchange="rCluster()"><option value="all">All kW</option><option>0-3 kW</option><option>3-4 kW</option><option>4-5 kW</option><option>5-6 kW</option><option>&gt;6 kW</option></select>
     <div class="fdiv"></div>
     <span class="fl">Year</span>
-    <select id="clYearSel" class="fs" onchange="clPopulateMonths()" style="width:80px"></select>
-    <span class="fl">Current Month</span>
-    <select id="clCurM" class="fs" onchange="rCluster()"></select>
+    <div class="cl-dropdown" id="clYearWrap" style="min-width:100px">
+      <button class="cl-dropdown-btn" id="clYearBtn" onclick="toggleYearDrop(event)" style="min-width:100px">
+        <span id="clYearLabel">All years</span>
+        <span style="font-size:10px">▼</span>
+      </button>
+      <div class="cl-dropdown-menu" id="clYearMenu" style="display:none;min-width:110px">
+        <div id="clYearList" style="max-height:150px;overflow-y:auto;padding:4px 0"></div>
+      </div>
+    </div>
+    <span class="fl">Current Month(s)</span>
+    <div class="cl-dropdown" id="clCurWrap" style="min-width:160px">
+      <button class="cl-dropdown-btn" id="clCurBtn" onclick="toggleCurDrop(event)" style="min-width:160px">
+        <span id="clCurLabel">Select months…</span>
+        <span style="font-size:10px">▼</span>
+      </button>
+      <div class="cl-dropdown-menu" id="clCurMenu" style="display:none;min-width:180px">
+        <div style="padding:5px 8px;border-bottom:1px solid var(--br);font-size:9px;color:var(--mu);font-weight:700">Select 1 or more current-period months</div>
+        <div id="clCurList" style="max-height:180px;overflow-y:auto;padding:4px 0"></div>
+      </div>
+    </div>
     <span class="fl">vs</span>
     <!-- Multi-month compare: checkboxes dropdown -->
     <div class="cl-dropdown" id="clPrevWrap" style="min-width:160px">
@@ -660,10 +677,6 @@ function pF(){
   document.getElementById('fOf').innerHTML='<option value="">All</option>'+os.map(o=>'<option>'+o+'</option>').join('');
   CL_ALL=[...new Set(A.map(r=>r.city).filter(Boolean))].sort();
   clBuildList(CL_ALL,CL_ALL.slice());
-  // populate year + month selectors after data loads
-  const years=[...new Set(A.filter(r=>r.date).map(r=>r.date.getFullYear()))].sort((a,b)=>b-a);
-  const yearSel=document.getElementById('clYearSel');
-  if(yearSel)yearSel.innerHTML='<option value="">All years</option>'+years.map(y=>'<option value="'+y+'">'+y+'</option>').join('');
 }
 function clBuildList(all,selected){
   const list=document.getElementById('clList');if(!list)return;
@@ -686,56 +699,79 @@ function clUpdateLabel(){
 }
 function toggleClDrop(e){e.stopPropagation();const m=document.getElementById('clDropMenu');m.style.display=m.style.display==='none'?'block':'none';}
 function togglePrevDrop(e){e.stopPropagation();const m=document.getElementById('clPrevMenu');if(m)m.style.display=m.style.display==='none'?'block':'none';}
+function toggleYearDrop(e){e.stopPropagation();const m=document.getElementById('clYearMenu');if(m)m.style.display=m.style.display==='none'?'block':'none';}
+function toggleCurDrop(e){e.stopPropagation();const m=document.getElementById('clCurMenu');if(m)m.style.display=m.style.display==='none'?'block':'none';}
 document.addEventListener('click',function(e){
   const w=document.getElementById('clDropWrap');if(w&&!w.contains(e.target)){const m=document.getElementById('clDropMenu');if(m)m.style.display='none';}
   const w2=document.getElementById('clPrevWrap');if(w2&&!w2.contains(e.target)){const m2=document.getElementById('clPrevMenu');if(m2)m2.style.display='none';}
+  const w3=document.getElementById('clYearWrap');if(w3&&!w3.contains(e.target)){const m3=document.getElementById('clYearMenu');if(m3)m3.style.display='none';}
+  const w4=document.getElementById('clCurWrap');if(w4&&!w4.contains(e.target)){const m4=document.getElementById('clCurMenu');if(m4)m4.style.display='none';}
 });
+
+function clGetYears(){return[...document.querySelectorAll('#clYearList input[type=checkbox]:checked')].map(c=>c.value);}
+function clGetCurMonths(){return[...document.querySelectorAll('#clCurList input[type=checkbox]:checked')].map(c=>c.value);}
+function clGetPrevMonths(){return[...document.querySelectorAll('#clPrevList input[type=checkbox]:checked')].map(c=>c.value);}
+
+function clUpdateYearLabel(){
+  const sel=clGetYears();const allYears=[...document.querySelectorAll('#clYearList input[type=checkbox]')].map(c=>c.value);
+  const lbl=document.getElementById('clYearLabel');if(!lbl)return;
+  lbl.textContent=sel.length===0||sel.length===allYears.length?'All years':sel.length+' year'+(sel.length>1?'s':'')+' selected';
+}
+function clUpdateCurLabel(){
+  const sel=clGetCurMonths();const lbl=document.getElementById('clCurLabel');if(!lbl)return;
+  lbl.textContent=sel.length===0?'Select months…':sel.length===1?(document.querySelector('#clCurList input[value="'+sel[0]+'"]')?.closest('label')?.textContent?.trim()||sel[0]):sel.length+' months selected';
+}
+function clUpdatePrevLabel(){
+  const sel=clGetPrevMonths();const lbl=document.getElementById('clPrevLabel');if(!lbl)return;
+  lbl.textContent=sel.length===0?'Select months…':sel.length===1?(document.querySelector('#clPrevList input[value="'+sel[0]+'"]')?.closest('label')?.textContent?.trim()||sel[0]):sel.length+' months selected';
+}
+
+function clOnYearChange(){clUpdateYearLabel();clPopulateMonths();rCluster();}
 
 function clPopulateMonths(){
   const src=F.filter(r=>r.date&&r.hr);
-  const yearSel=document.getElementById('clYearSel');
-  const selYear=yearSel?parseInt(yearSel.value):null;
-  // All months in selected year (or all)
   const mk={};
   src.forEach(r=>{const y=r.date.getFullYear(),mo=r.date.getMonth(),k=y+'-'+mo;
     if(!mk[k])mk[k]={y,mo,k,lbl:new Date(y,mo,1).toLocaleString('en',{month:'short',year:'2-digit'}).replace(' ',"'")};});
   const allMonths=Object.values(mk).sort((a,b)=>b.y!==a.y?b.y-a.y:b.mo-a.mo);
-  // Year dropdown
   const years=[...new Set(allMonths.map(m=>m.y))].sort((a,b)=>b-a);
-  if(yearSel){
-    const prevY=yearSel.value;
-    yearSel.innerHTML='<option value="">All years</option>'+years.map(y=>'<option value="'+y+'"'+(y==prevY?' selected':'')+'>'+y+'</option>').join('');
+
+  // Year checkbox list (only rebuild options if list is empty — preserve checks otherwise)
+  const yearList=document.getElementById('clYearList');
+  if(yearList&&yearList.children.length===0){
+    yearList.innerHTML=years.map(y=>'<label class="cl-item"><input type="checkbox" value="'+y+'" onchange="clOnYearChange()">'+y+'</label>').join('');
   }
-  const filtered=selYear?allMonths.filter(m=>m.y===selYear):allMonths;
-  // Current month dropdown
-  const curDD=document.getElementById('clCurM');
-  const prevCur=curDD?curDD.value:'';
-  if(curDD){
-    curDD.innerHTML=filtered.map(m=>'<option value="'+m.k+'">'+m.lbl+'</option>').join('');
-    if(prevCur&&filtered.find(m=>m.k===prevCur))curDD.value=prevCur;
-    else if(filtered.length)curDD.value=filtered[0].k;
+  const selYears=clGetYears().map(Number);
+  const filtered=selYears.length?allMonths.filter(m=>selYears.includes(m.y)):allMonths;
+
+  // Current month checkbox list
+  const curList=document.getElementById('clCurList');
+  if(curList){
+    const checkedCur=clGetCurMonths();
+    curList.innerHTML=filtered.map(m=>'<label class="cl-item"><input type="checkbox" value="'+m.k+'" '+(checkedCur.includes(m.k)?'checked':'')+' onchange="clUpdateCurLabel();rCluster()">'+m.lbl+'</label>').join('');
+    if(!checkedCur.length&&filtered.length){
+      const cb=curList.querySelector('input[value="'+filtered[0].k+'"]');
+      if(cb)cb.checked=true;
+    }
   }
-  // Prev months multi-select list
+  // Prev months checkbox list
   const prevList=document.getElementById('clPrevList');
   if(prevList){
-    const checkedVals=clGetPrevMonths();
-    prevList.innerHTML=filtered.map(m=>'<label class="cl-item"><input type="checkbox" value="'+m.k+'" '+(checkedVals.includes(m.k)?'checked':'')+' onchange="clUpdatePrevLabel();rCluster()">'+m.lbl+'</label>').join('');
-    // Default: check second latest
-    if(!checkedVals.length&&filtered.length>1){
+    const checkedPrev=clGetPrevMonths();
+    prevList.innerHTML=filtered.map(m=>'<label class="cl-item"><input type="checkbox" value="'+m.k+'" '+(checkedPrev.includes(m.k)?'checked':'')+' onchange="clUpdatePrevLabel();rCluster()">'+m.lbl+'</label>').join('');
+    if(!checkedPrev.length&&filtered.length>1){
       const cb=prevList.querySelector('input[value="'+filtered[1].k+'"]');
       if(cb)cb.checked=true;
     }
   }
-  clUpdatePrevLabel();
-}
-function clGetPrevMonths(){return[...document.querySelectorAll('#clPrevList input[type=checkbox]:checked')].map(c=>c.value);}
-function clUpdatePrevLabel(){
-  const sel=clGetPrevMonths();const lbl=document.getElementById('clPrevLabel');
-  if(lbl)lbl.textContent=sel.length===0?'Select months…':sel.length===1?document.querySelector('#clPrevList input[value="'+sel[0]+'"]')?.closest('label')?.textContent?.trim()||sel[0]:sel.length+' months selected';
+  clUpdateYearLabel();clUpdateCurLabel();clUpdatePrevLabel();
 }
 function clResetFilters(){
   document.getElementById('bktSel').value='all';
   clToggleAll(true);
+  document.querySelectorAll('#clYearList input[type=checkbox]').forEach(c=>c.checked=false);
+  document.querySelectorAll('#clCurList input[type=checkbox]').forEach(c=>c.checked=false);
+  document.querySelectorAll('#clPrevList input[type=checkbox]').forEach(c=>c.checked=false);
   clPopulateMonths();
   rCluster();
 }
@@ -1505,13 +1541,21 @@ function rCluster(){
   const bktVal=document.getElementById('bktSel').value;
   if(bktVal!=='all')rows=rows.filter(r=>getBkt(r.kw)===bktVal);
 
-  // Get current month from dropdown
-  const curDD=document.getElementById('clCurM');
-  const curMK=curDD?curDD.value:'';
+  // Year multi-filter
+  const selYears=clGetYears().map(Number);
+  if(selYears.length)rows=rows.filter(r=>selYears.includes(r.date.getFullYear()));
+
+  // Build available months from filtered rows
   const mk={};rows.forEach(r=>{const y=r.date.getFullYear(),mo=r.date.getMonth(),k=y+'-'+mo;if(!mk[k])mk[k]={y,mo,k,lbl:new Date(y,mo,1).toLocaleString('en',{month:'short',year:'2-digit'}).replace(' ',"'")};});
   const allMonths=Object.values(mk).sort((a,b)=>b.y!==a.y?b.y-a.y:b.mo-a.mo);
-  const curM=allMonths.find(m=>m.k===curMK)||allMonths[0];
-  if(!curM){document.getElementById('clBdg').textContent='No data';return;}
+  if(!allMonths.length){document.getElementById('clBdg').textContent='No data';return;}
+
+  // Get current-period months (multi-select) — combine into one pool
+  const curMKs=clGetCurMonths();
+  const curMs=curMKs.length>0
+    ?curMKs.map(k=>allMonths.find(m=>m.k===k)).filter(Boolean)
+    :[allMonths[0]];
+  if(!curMs.length){document.getElementById('clBdg').textContent='No data';return;}
 
   // Get comparison months (multi-select)
   const prevMKs=clGetPrevMonths();
@@ -1519,9 +1563,10 @@ function rCluster(){
     ?prevMKs.map(k=>allMonths.find(m=>m.k===k)).filter(Boolean)
     :(allMonths[1]?[allMonths[1]]:[]);
 
-  const curLbl=curM.lbl;
+  const curLbl=curMs.length===1?curMs[0].lbl:curMs.map(m=>m.lbl).join(', ');
   const prevLbl=prevMs.length===1?prevMs[0].lbl:prevMs.map(m=>m.lbl).join(', ');
-  const curRows=rows.filter(r=>r.date.getFullYear()===curM.y&&r.date.getMonth()===curM.mo);
+  // Combined current rows (union of all selected current months)
+  const curRows=curMs.flatMap(m=>rows.filter(r=>r.date.getFullYear()===m.y&&r.date.getMonth()===m.mo));
   // Combined prev rows (union of all selected prev months)
   const prevRows=prevMs.flatMap(m=>rows.filter(r=>r.date.getFullYear()===m.y&&r.date.getMonth()===m.mo));
 
