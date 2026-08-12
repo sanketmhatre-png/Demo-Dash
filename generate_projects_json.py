@@ -783,6 +783,8 @@ with gzip.open('data.csv.gz', 'rt', encoding='utf-8', errors='replace') as f:
         except: amt = 0
         try: qty = float(row['qty']) if row['qty'].strip() else 0
         except: qty = 0
+        try: rate = float(row['rate']) if row.get('rate','').strip() else 0
+        except: rate = 0
 
         raw_cat   = row['item_category'].strip()
         item_code = row['item_code'].strip()
