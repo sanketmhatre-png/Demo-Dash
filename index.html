@@ -1244,7 +1244,7 @@ function processLiveRows(rawRows){
           id, city, state, offer, phase, revenue:rev, kw, date,
           hasRevenue: rev>0,
           // cost buckets
-          module:0, inverter:0, prefab:0, cables:0, ickit:0,
+          module:0, moduleLc:0, inverter:0, prefab:0, cables:0, ickit:0,
           conduit:0, earthing:0, jbox:0, tinShed:0, safety:0,
           icAcc:0, weldedMms:0, ssNbw:0, elecbos:0, dataLogger:0,
           metering:0, welcomeKit:0, ladder:0, civilWork:0, acCable:0,
@@ -1639,11 +1639,11 @@ function aggregateRows(rows, filterCtx){
   const fyArr=Object.values(byFY).sort((a,b)=>a.fy<b.fy?-1:1)
     .map(f=>({...f,gm:f.revenue-f.cogs,gm_pct:f.revenue?(f.revenue-f.cogs)/f.revenue*100:0}));
 
-  const costItems=['module','inverter','prefab','cables','elecbos','earthing','conduit','jbox','ickit',
+  const costItems=['module','moduleLc','inverter','prefab','cables','elecbos','earthing','conduit','jbox','ickit',
     'weldedMms','tinShed','ssNbw','civilWork','icAcc','handRail','safety',
     'cableTray','walkway','frpWalkway','dataLogger','metering','acCable','otherItems'];
   const costNames={
-    module:'Module', inverter:'Inverter', prefab:'Prefab MMS', cables:'Cables',
+    module:'Module', moduleLc:'Module LC', inverter:'Inverter', prefab:'Prefab MMS', cables:'Cables',
     elecbos:'Electrical BoS', earthing:'Earthing / LA', conduit:'Conduit Pipe',
     jbox:'Junction Box', ickit:'IC Kit',
     weldedMms:'Welded MMS', tinShed:'Tin Shed MMS', ssNbw:'SS NBW',
@@ -1804,7 +1804,7 @@ function aggregateRows(rows, filterCtx){
   revRows.forEach(r=>{
     if(!r.offer) return;
     if(!offerWpMetrics[r.offer]) offerWpMetrics[r.offer]={offer:r.offer,revenue:0,cogs:0,wp:0,count:0,
-      module:0,inverter:0,prefab:0,cables:0,elecbos:0,earthing:0,conduit:0,jbox:0,ickit:0,
+      module:0,moduleLc:0,inverter:0,prefab:0,cables:0,elecbos:0,earthing:0,conduit:0,jbox:0,ickit:0,
       weldedMms:0,tinShed:0,ssNbw:0,civilWork:0,icAcc:0,handRail:0,safety:0,
       cableTray:0,walkway:0,frpWalkway:0,dataLogger:0,metering:0,acCable:0,otherItems:0};
     const wp=getWpR(r);
@@ -3540,7 +3540,7 @@ function buildOfferWpPanel(){
   const minCostWp=Math.min(...data.map(o=>o.costWp));
 
   const CK=[
-    ['module','Module'],['inverter','Inverter'],['prefab','Prefab MMS'],['cables','Cables'],
+    ['module','Module'],['moduleLc','Module LC'],['inverter','Inverter'],['prefab','Prefab MMS'],['cables','Cables'],
     ['elecbos','Electrical BoS'],['earthing','Earthing/LA'],['conduit','Conduit Pipe'],
     ['jbox','Junction Box'],['ickit','IC Kit'],['weldedMms','Welded MMS'],['tinShed','Tin Shed MMS'],
     ['ssNbw','SS NBW'],['civilWork','Civil Work'],['icAcc','IC Accessories'],['handRail','Hand Rail'],
@@ -4478,7 +4478,7 @@ function buildIdCard(r, cityAvgMap){
   }
 
   const costFields=[
-    {key:'module',label:'Module'},{key:'inverter',label:'Inverter'},
+    {key:'module',label:'Module'},{key:'moduleLc',label:'Module LC'},{key:'inverter',label:'Inverter'},
     {key:'prefab',label:'Prefab MMS'},{key:'cables',label:'Cables'},
     {key:'elecbos',label:'Elec. BoS'},{key:'earthing',label:'Earthing/LA'},
     {key:'conduit',label:'Conduit'},{key:'jbox',label:'Junction Box'},{key:'ickit',label:'IC Kit'},
@@ -5554,7 +5554,7 @@ function renderDailyPulse(){
     const gzRev=sum(gz,'revenue'), gzCogs=sum(gz,'cogs');
     const nzRev=sum(nz,'revenue'), nzCogs=sum(nz,'cogs');
     const wp=kw*1000;
-    const modT=sum(rows,'module'),  invT=sum(rows,'inverter'), prfT=sum(rows,'prefab');
+    const modT=sum(rows,'module'),  mlcT=sum(rows,'moduleLc'), invT=sum(rows,'inverter'), prfT=sum(rows,'prefab');
     const cabT=sum(rows,'cables'),  ickT=sum(rows,'ickit'),    mtrT=sum(rows,'metering');
     const earT=sum(rows,'earthing'),jbxT=sum(rows,'jbox'),     dlgT=sum(rows,'dataLogger');
     const safT=sum(rows,'safety'),  onmT=sum(rows,'onm'),      qhsT=sum(rows,'qhs');
