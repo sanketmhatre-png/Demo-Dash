@@ -987,7 +987,7 @@ for sse, p in project_map.items():
     p.pop('_inv_phase', None)
     cogs = round(p['mod']+p['inv']+p['prf']+p['cab']+p['ick']+p['con']+p['ear']+
                  p['jbx']+p['tsh']+p['saf']+p['ica']+p['wel']+p['ssn']+p['ebo']+
-                 p['dlg']+p['mtr']+p['wkt']+p['lad'], 2)
+                 p['dlg']+p['mtr']+p['wkt']+p['lad']+p.get('mlc',0), 2)
 
     out = {**p, 'cogs': cogs}
 
