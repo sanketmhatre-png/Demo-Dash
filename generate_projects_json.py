@@ -94,6 +94,7 @@ NM_RATES = {
     'Chennai':     (2763, 5011),
     'Agra':        (1350, 4350),
     'Coimbatore':  (2763, 5011),
+    'Salem':       (2763, 5011),
     # Additional mapped cities
     'Raipur':      (0, 0),
     'Mysuru':      (3250, 6376),
@@ -146,6 +147,7 @@ GM_RATES = {
     'Chennai':     (0, 0),
     'Agra':        (0, 0),
     'Coimbatore':  (0, 0),
+    'Salem':       (0, 0),
     # Additional mapped cities
     'Raipur':      (0, 0),
     'Mysuru':      (0, 0),
@@ -327,6 +329,8 @@ CELL_CITY_STATE = {
     'Speed Order Gurgaon':{'c':'Gurgaon','s':'Delhi'},
     'Latur Expansion':{'c':'Latur','s':'MH East'},
     'Ahmednagar Expansion':{'c':'Ahmednagar','s':'MH West'},
+    'Noida Thunders':{'c':'Noida','s':'Uttar Pradesh'},
+    'Salem Spartans':{'c':'Salem','s':'Tamil Nadu'},
 }
 
 def detect_inverter_type(item_name):
@@ -692,6 +696,20 @@ CAT_KEY = {
     'Safety':'saf','I&C Accessories':'ica','Welded MMS':'wel','SS NBW':'ssn',
     'Electrical BoS':'ebo','Data Logger':'dlg','Metering':'mtr','Welcome Kit and Board':'wkt',
     'Ladder':'lad',
+    # Raw DN category aliases (no ERP file → fall through to raw category)
+    'MMS':'prf',             # Raw 'MMS' → Prefab MMS
+    'AC Cable':'cab',        # AC Cable → Cables
+    'DC Cable':'cab',        # DC Cable → Cables
+    'ACDB':'ebo',            # ACDB panel → Electrical BoS
+    'Walkway':'saf',         # Walkway → Safety
+    'FRP Walkway':'saf',     # FRP Walkway → Safety
+    'Cable Tray':'ebo',      # Cable Tray → Electrical BoS
+    'Marketing':'wkt',       # Marketing → Welcome Kit and Board
+    'Water Pipeline':'con',  # Water Pipeline → Conduit Pipe
+    'Inverter Cluster':'inv',# Inverter variant
+    'Hybrid Inverter':'inv', # Inverter variant
+    'AMC Accessories':'ica', # AMC → I&C Accessories
+    'Spare Breaker Panel':'ebo', # Breaker Panel → Electrical BoS
 }
 
 # ── Name shortening for dashboard display ─────────────────────────────────────
@@ -748,6 +766,7 @@ proj_mms_items = defaultdict(lambda: defaultdict(lambda: defaultdict(lambda: {'q
 proj_cable_items = defaultdict(lambda: defaultdict(lambda: {'qty':0,'amt':0,'cases':0}))  # sse → subcat → {qty, amt, cases}
 proj_onm_amt = defaultdict(float)   # sse → total ONM amount
 proj_qhse_amt = defaultdict(float)  # sse → total QHSE amount
+erp_mms_overrides = defaultdict(lambda: {'resolved_cat':'','amt':0.0,'rows':0,'sses':set(),'item_name':''})  # diagnostic
 
 with gzip.open('data.csv.gz', 'rt', encoding='utf-8', errors='replace') as f:
     reader = csv.DictReader(f)
@@ -772,6 +791,15 @@ with gzip.open('data.csv.gz', 'rt', encoding='utf-8', errors='replace') as f:
         parent_dn = row.get('parent', '').strip()
         uom = row.get('uom', '').strip()
         cat = resolve_cat(item_code, raw_cat, item_subcat)
+
+        # ── DIAGNOSTIC: ERP overrides reclassifying Prefab MMS → different category ──
+        if raw_cat == 'Prefab MMS' and cat != 'Prefab MMS':
+            d = erp_mms_overrides[item_code]
+            d['resolved_cat'] = cat
+            d['amt'] += amt
+            d['rows'] += 1
+            d['sses'].add(sse)
+            if not d['item_name']: d['item_name'] = item_name
 
         # Track parent-based ONM and QHSE amounts
         if parent_dn:
@@ -811,7 +839,7 @@ with gzip.open('data.csv.gz', 'rt', encoding='utf-8', errors='replace') as f:
                 'cohort': cohort,
                 'mod':0,'inv':0,'prf':0,'cab':0,'ick':0,'con':0,'ear':0,'jbx':0,
                 'tsh':0,'saf':0,'ica':0,'wel':0,'ssn':0,'ebo':0,'dlg':0,'mtr':0,'wkt':0,'lad':0,
-                'mt':'','mq':0,'it':'','iq':0,
+                'mt':'','mq':0,'it':'','iq':0,'mlc':0,
             }
 
         if cat == 'EXCLUDE':
@@ -827,6 +855,23 @@ with gzip.open('data.csv.gz', 'rt', encoding='utf-8', errors='replace') as f:
         if cat == 'Module' and item_name:
             if not p['mt']: p['mt'] = item_name; p['mq'] = qty
             elif p['mt'] == item_name: p['mq'] += qty
+            # Module LC: landed cost contribution
+            _iname = item_name.strip()
+            _lc_wp = 0
+            if _iname == '540 Wp Mono Bifacial DCR-PREMIER':
+                if rate != 11055:
+                    _lc_wp = 540
+            elif _iname == '610 Wp Mono Bifacial Topcon N-Type DCR-PREMIER':
+                if rate <= 13041.8:
+                    _lc_wp = 610
+            if _lc_wp > 0:
+                # factor: 0.50 from Jul 2026 onwards, else 0.75
+                try:
+                    _dt = datetime.strptime(p['dt'], '%Y-%m-%d')
+                    _factor = 0.50 if (_dt.year > 2026 or (_dt.year == 2026 and _dt.month >= 7)) else 0.75
+                except Exception:
+                    _factor = 0.75
+                p['mlc'] = round(p.get('mlc', 0) + _lc_wp * qty * _factor, 2)
         if cat == 'Inverter' and item_name:
             if not p['it']:
                 p['it'] = item_name; p['iq'] = qty
@@ -867,6 +912,16 @@ if unmapped_cats:
     print(f"\n⚠  WARNING: {len(unmapped_cats)} categories not in CAT_KEY (not counted in COGS):")
     for cat, cnt in sorted(unmapped_cats.items(), key=lambda x: -x[1])[:20]:
         print(f"    '{cat}': {cnt:,} rows")
+
+if erp_mms_overrides:
+    total_lost = sum(d['amt'] for d in erp_mms_overrides.values())
+    print(f"\n⚠  ERP OVERRIDE ALERT: {len(erp_mms_overrides)} item_code(s) have raw_cat='Prefab MMS'")
+    print(f"   but ERP file maps them differently — causing dashboard vs GMB sheet delta!")
+    print(f"   Total reclassified away from prf: ₹{total_lost:,.0f}  ({total_lost/1e7:.4f} Cr)")
+    for code, d in sorted(erp_mms_overrides.items(), key=lambda x: -x[1]['amt']):
+        print(f"     {code:<20}  → ERP='{d['resolved_cat']}'  ₹{d['amt']:>10,.0f}  ({len(d['sses'])} projects)")
+else:
+    print("\n✓ No ERP overrides reclassify Prefab MMS (delta is data-lag only)")
 
 # ── Backend metering injection (formula-based, dual-phase) ────────────────────
 # metering = NM_rate(city, inv_phase) + GM_rate(city, sanction_phase) + DN_dump_items
