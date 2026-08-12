@@ -768,9 +768,6 @@ proj_onm_amt = defaultdict(float)   # sse → total ONM amount
 proj_qhse_amt = defaultdict(float)  # sse → total QHSE amount
 erp_mms_overrides = defaultdict(lambda: {'resolved_cat':'','amt':0.0,'rows':0,'sses':set(),'item_name':''})  # diagnostic
 
-_mlc_hits  = defaultdict(int)  # diagnostic: how many rows contributed to mlc
-_mlc_skips = defaultdict(int)  # diagnostic: how many 540/610 rows were skipped
-
 with gzip.open('data.csv.gz', 'rt', encoding='utf-8', errors='replace') as f:
     reader = csv.DictReader(f)
     for i, row in enumerate(reader):
@@ -870,16 +867,12 @@ with gzip.open('data.csv.gz', 'rt', encoding='utf-8', errors='replace') as f:
                 if rate <= 13041.8:
                     _lc_wp = 610
             if _lc_wp > 0:
-                # factor: 0.50 from Jul 2026 onwards, else 0.75
                 try:
                     _dt = datetime.strptime(p['dt'], '%Y-%m-%d')
                     _factor = 0.50 if (_dt.year > 2026 or (_dt.year == 2026 and _dt.month >= 7)) else 0.75
                 except Exception:
                     _factor = 0.75
                 p['mlc'] = round(p.get('mlc', 0) + _lc_wp * qty * _factor, 2)
-                _mlc_hits[_iname] += 1
-            else:
-                _mlc_skips[f"{_iname}|rate={rate}"] += 1
         if cat == 'Inverter' and item_name:
             if not p['it']:
                 p['it'] = item_name; p['iq'] = qty
@@ -909,15 +902,6 @@ with gzip.open('data.csv.gz', 'rt', encoding='utf-8', errors='replace') as f:
             proj_cable_items[sse][short_cable]['cases'] += 1
 
 print(f"Built {len(project_map):,} projects")
-print("\n── Module LC Diagnostic ──")
-if _mlc_hits:
-    for k,v in sorted(_mlc_hits.items()): print(f"  LC hits   [{k}]: {v:,} rows")
-else:
-    print("  ⚠ NO mlc hits — all 540/610 rows skipped")
-if _mlc_skips:
-    from collections import Counter
-    top = Counter(_mlc_skips).most_common(5)
-    for k,v in top: print(f"  LC skip   [{k}]: {v:,} rows")
 print(f"  Excluded rows (dongles, Safety Lifeline, Civil Work): {excluded_count:,}")
 
 if unmapped_cells:
