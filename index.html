@@ -476,6 +476,7 @@ td:first-child{text-align:left;font-weight:500;color:var(--navy)}
   </div>
   <div class="topbar-right">
     <div class="live-badge"><span class="live-dot"></span><span id="lastUpdated">Loading…</span></div>
+    <button id="btnDownloadCSV" onclick="downloadFilteredCSV()" style="background:#1E3A5F;color:#CBD5E1;border:1px solid #334E68;border-radius:4px;padding:3px 10px;font-size:10px;font-weight:600;cursor:pointer;letter-spacing:0.3px;font-family:inherit">⬇ Export CSV</button>
     <button class="btn-refresh" id="btnRefresh" onclick="refreshFromGitHub()">⟳ Refresh</button>
   </div>
 </div>
@@ -1305,16 +1306,9 @@ function processLiveRows(rawRows){
       }
     }
 
-    // Second pass: apply rate-table override to module, compute COGS per project
+    // Second pass: compute COGS per project using raw DN module cost (no rate override)
     const projects = Object.values(projectMap).map(p => {
-      let moduleCost = p.module;
-      if(p.moduleType && p.moduleQty > 0) {
-        const overrideRate = getModuleOverrideRate(p.moduleType, p.date);
-        if(overrideRate !== null) {
-          moduleCost = overrideRate * p.moduleQty;
-          p._rateOverridden = true;
-        }
-      }
+      const moduleCost = p.module; // Use raw DN amount directly
       const cogs = moduleCost + p.inverter + p.cables + p.prefab +
                    p.conduit + p.elecbos + p.earthing + p.ssNbw +
                    p.icAcc + p.jbox + p.tinShed + p.metering +
@@ -1326,7 +1320,7 @@ function processLiveRows(rawRows){
         cogs, gm: p.revenue - cogs,
         moduleRate: 0,
         handRail: 0, otherItems: 0,
-        _moduleRateOverridden: p._rateOverridden,
+        _moduleRateOverridden: false,
         _icTotal: 0, _gsheetModule: p.module, _moduleTotalVal: p.module,
       };
     });
@@ -1338,8 +1332,7 @@ function processLiveRows(rawRows){
     // On this fallback CSV path, only DN-category metering items are captured in p.metering.
     // To get full metering accuracy, ensure projects.json.gz is up-to-date.
 
-    const overrides = projects.filter(p=>p._rateOverridden).length;
-    console.log(`[processLiveRows] DN-dump: ${rawRows.length} line-items → ${projects.length} projects | rate-overrides=${overrides}`);
+    console.log(`[processLiveRows] DN-dump: ${rawRows.length} line-items → ${projects.length} projects | using raw DN module cost`);
     return projects;
   }
 
@@ -1400,12 +1393,7 @@ function processLiveRows(rawRows){
     const zed=N(r['zed']||r['ZED']||0);
     const welcomeKit=N(r['welcome_kit_and_board']||r['Welcome_Kit_and_Board']||r['welcome_kit']||0);
     const ladder=N(r['ladder']||r['Ladder']||r['lad']||0);
-    let moduleCost = moduleTotalVal || gsheetModule;
-    let rateOverridden = false;
-    if(moduleType && moduleQty > 0){
-      const overrideRate = getModuleOverrideRate(moduleType, date);
-      if(overrideRate !== null){ moduleCost = overrideRate * moduleQty; rateOverridden = true; }
-    }
+    const moduleCost = moduleTotalVal || gsheetModule; // Use raw DN cost directly
     const cogs = moduleCost+inverter+cables+prefab+conduit+elecbos+earthing+ssNbw+
                  icAcc+jbox+tinShed+metering+weldedMms+ickit+safety+civilWork+
                  dataLogger+zed+welcomeKit+ladder;
@@ -1416,7 +1404,7 @@ function processLiveRows(rawRows){
       jbox,ickit,weldedMms,tinShed,ssNbw,civilWork,icAcc,handRail,safety,
       cableTray,walkway,frpWalkway,dataLogger,metering,acCable,otherItems,ladder,
       moduleType,inverterType,moduleQty,inverterQty,moduleRate,
-      _moduleRateOverridden:rateOverridden,_icTotal:icTotal,
+      _moduleRateOverridden:false,_icTotal:icTotal,
       _gsheetModule:gsheetModule,_moduleTotalVal:moduleTotalVal,
     };
   });
@@ -1426,9 +1414,7 @@ function processLiveRows(rawRows){
     const bm=SSE_METER_BACKEND[r.id]||0;
     if(bm>0){r.metering+=bm;r.cogs+=bm;r.gm=r.revenue-r.cogs;}
   });
-  const overrideCount=rows.filter(r=>r._moduleRateOverridden===true).length;
-  console.log(`[processLiveRows] legacy: ${rows.length} rows | overrides=${overrideCount}`);
-  if(Object.keys(_MODULE_UNMATCHED).length) console.warn('[ModuleRate] Unmatched:',Object.keys(_MODULE_UNMATCHED));
+  console.log(`[processLiveRows] legacy: ${rows.length} rows | using raw DN module cost`);
   return final;
 }
 
@@ -2208,6 +2194,7 @@ function applyFilters(){
     FILTERED=buildEmptyData();renderAll();return;
   }
   const filterCtx={fOffer,fPhase,fState,fCity,fFY,fQtr,fDateFrom,fDateTo,selectedCities:SELECTED_CITIES};
+  window._lastFilteredRows = filtered;
   FILTERED=aggregateRows(filtered,filterCtx);
   renderAll();
 }
@@ -2221,6 +2208,7 @@ function clearAllFilters(){
   document.querySelectorAll('.qtr-pill').forEach(p=>p.classList.remove('active'));
   const allPill=document.querySelector('.qtr-pill[data-qtr=""]');
   if(allPill)allPill.classList.add('active');
+  window._lastFilteredRows = LIVE_ROWS;
   FILTERED=aggregateRows(LIVE_ROWS,{});
   document.getElementById('filterStatus').textContent='No filters active';
   document.getElementById('rowInfo').textContent=`${LIVE_ROWS.length.toLocaleString()} installs`;
@@ -5347,31 +5335,18 @@ async function refreshFromGitHub(){
       console.log(`[projects.json.gz] ${projects.length} projects`);
 
       // Map compact keys → full row objects the dashboard expects
-      // Apply MODULE_RATE_TABLE overrides on the fast path too (same logic as legacy path)
-      let _fpOverrides = 0;
+      // Module cost is taken directly from DN dump (p.mod) — no rate override applied here.
+      // Module LC (p.mlc) is a separate calculated field and kept independent.
       LIVE_ROWS_LOCAL = projects.map(p => {
         const dt = p.dt ? parseDate(p.dt) : null;
-        let moduleCost = p.mod;
-        let cogs = p.cogs;
-        let rateOverridden = false;
         const mt = (p.mt||'').trim();
         const mq = p.mq||0;
-        if(mt && mq > 0){
-          const overrideRate = getModuleOverrideRate(mt, dt);
-          if(overrideRate !== null){
-            const newModCost = overrideRate * mq;
-            cogs = cogs - p.mod + newModCost;
-            moduleCost = newModCost;
-            rateOverridden = true;
-            _fpOverrides++;
-          }
-        }
         return {
         id: p.id, city: p.c, state: p.s, offer: p.o, phase: p.ph,
-        kw: p.kw, revenue: p.rev, cogs: cogs, gm: p.rev - cogs,
+        kw: p.kw, revenue: p.rev, cogs: p.cogs, gm: p.rev - p.cogs,
         date: dt,
         hasRevenue: p.rev > 0,
-        module: moduleCost, inverter: p.inv, prefab: p.prf, cables: p.cab,
+        module: p.mod, inverter: p.inv, prefab: p.prf, cables: p.cab,
         moduleLc: p.mlc||0,
         ickit: p.ick, conduit: p.con, earthing: p.ear, jbox: p.jbx,
         tinShed: p.tsh, safety: p.saf, icAcc: p.ica, weldedMms: p.wel,
@@ -5380,7 +5355,7 @@ async function refreshFromGitHub(){
         walkway: 0, frpWalkway: 0, otherItems: 0, handRail: 0,
         moduleType: mt, moduleQty: mq,
         inverterType: p.it||'', inverterQty: p.iq||0,
-        moduleRate: 0, _moduleRateOverridden: rateOverridden,
+        moduleRate: 0, _moduleRateOverridden: false,
         _icTotal: 0, _gsheetModule: p.mod, _moduleTotalVal: p.mod,
         // New fields from pipeline
         onm: p.onm||0, qhs: p.qhs||0,
@@ -5393,8 +5368,7 @@ async function refreshFromGitHub(){
           return q ? assignCohortFromQcd(q) : '';
         })(),
       }});
-      console.log(`[fast path] ${LIVE_ROWS_LOCAL.length} rows ready | rate-overrides=${_fpOverrides}`);
-      console.log(`[fast path] ${LIVE_ROWS_LOCAL.length} rows ready`);
+      console.log(`[fast path] ${LIVE_ROWS_LOCAL.length} rows ready | using raw DN module cost, Module LC separate`);
 
     }catch(e){
       console.warn('[fast path] projects.json.gz not available:', e.message, '— falling back to raw CSV');
@@ -6032,6 +6006,62 @@ setInterval(() => {
     refreshFromGitHub();
   }
 }, 5 * 60 * 1000);
+
+function downloadFilteredCSV(){
+  const rows = FILTERED.costs ? (window._filteredRows || LIVE_ROWS) : LIVE_ROWS;
+  // Use the actual filtered rows stored during applyFilters
+  const src = window._lastFilteredRows || LIVE_ROWS;
+  if(!src || !src.length){ alert('No data to export'); return; }
+
+  const cols = [
+    {h:'SSE ID',          f:r=>r.id},
+    {h:'Date',            f:r=>r.date?r.date.toISOString().slice(0,10):''},
+    {h:'City',            f:r=>r.city||''},
+    {h:'State',           f:r=>r.state||''},
+    {h:'Offer',           f:r=>r.offer||''},
+    {h:'Phase',           f:r=>r.phase||''},
+    {h:'kW',              f:r=>(r.kw||0).toFixed(3)},
+    {h:'Revenue',         f:r=>Math.round(r.revenue||0)},
+    {h:'COGS',            f:r=>Math.round(r.cogs||0)},
+    {h:'GM',              f:r=>Math.round((r.revenue||0)-(r.cogs||0))},
+    {h:'GM%',             f:r=>r.revenue>0?(((r.revenue-r.cogs)/r.revenue)*100).toFixed(2):''},
+    {h:'Module',          f:r=>Math.round(r.module||0)},
+    {h:'Module LC',       f:r=>Math.round(r.moduleLc||0)},
+    {h:'Inverter',        f:r=>Math.round(r.inverter||0)},
+    {h:'Prefab MMS',      f:r=>Math.round(r.prefab||0)},
+    {h:'Cables',          f:r=>Math.round(r.cables||0)},
+    {h:'Electrical BoS',  f:r=>Math.round(r.elecbos||0)},
+    {h:'Earthing & LA',   f:r=>Math.round(r.earthing||0)},
+    {h:'Conduit Pipe',    f:r=>Math.round(r.conduit||0)},
+    {h:'Junction Box',    f:r=>Math.round(r.jbox||0)},
+    {h:'IC Kit',          f:r=>Math.round(r.ickit||0)},
+    {h:'Tin Shed MMS',    f:r=>Math.round(r.tinShed||0)},
+    {h:'Welded MMS',      f:r=>Math.round(r.weldedMms||0)},
+    {h:'SS NBW',          f:r=>Math.round(r.ssNbw||0)},
+    {h:'IC Accessories',  f:r=>Math.round(r.icAcc||0)},
+    {h:'Safety',          f:r=>Math.round(r.safety||0)},
+    {h:'Metering',        f:r=>Math.round(r.metering||0)},
+    {h:'Data Logger',     f:r=>Math.round(r.dataLogger||0)},
+    {h:'Welcome Kit',     f:r=>Math.round(r.welcomeKit||0)},
+    {h:'Ladder',          f:r=>Math.round(r.ladder||0)},
+    {h:'ONM',             f:r=>Math.round(r.onm||0)},
+    {h:'QHSE',            f:r=>Math.round(r.qhs||0)},
+    {h:'Module Type',     f:r=>r.moduleType||''},
+    {h:'Module Qty',      f:r=>r.moduleQty||0},
+    {h:'Cohort',          f:r=>r.cohort||''},
+    {h:'QCD',             f:r=>r.qcd||''},
+  ];
+
+  const esc = v => { const s=String(v); return s.includes(',')||s.includes('"')||s.includes('\n') ? '"'+s.replace(/"/g,'""')+'"' : s; };
+  const lines = [cols.map(c=>c.h).join(',')];
+  src.forEach(r=>{ lines.push(cols.map(c=>esc(c.f(r))).join(',')); });
+  const blob = new Blob([lines.join('\n')], {type:'text/csv;charset=utf-8;'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  const dateStr = new Date().toISOString().slice(0,10);
+  a.href=url; a.download=`gm_dashboard_export_${dateStr}.csv`; a.click();
+  URL.revokeObjectURL(url);
+}
 </script>
 </body>
 </html>
