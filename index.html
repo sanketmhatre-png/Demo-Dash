@@ -5467,10 +5467,12 @@ function renderDailyPulse(){
   const _fState = document.getElementById('fState')?.value    || '';
   const _selCities = (typeof SELECTED_CITIES!=='undefined') ? SELECTED_CITIES : [];
 
+  const _parseLd = s => { const[y,m,d]=s.split('-').map(Number); return new Date(y,m-1,d); };
+  const _parseLdEnd = s => { const[y,m,d]=s.split('-').map(Number); return new Date(y,m-1,d,23,59,59,999); };
   const filteredRows = LIVE_ROWS.filter(r => {
     if(!r.date || !r.hasRevenue) return false;
-    if(_fFrom && r.date < new Date(_fFrom)) return false;
-    if(_fTo   && r.date > new Date(_fTo+'T23:59:59')) return false;
+    if(_fFrom && r.date < _parseLd(_fFrom)) return false;
+    if(_fTo   && r.date > _parseLdEnd(_fTo)) return false;
     if(_fOffer && r.offer!==_fOffer) return false;
     if(_fPhase && r.phase!==_fPhase) return false;
     if(_fState && r.state!==_fState) return false;
@@ -5608,8 +5610,8 @@ function renderDailyPulse(){
   // Cohort rows: same date/dimension filters but includes rows without revenue
   const cohortRows = LIVE_ROWS.filter(r => {
     if(!r.date) return false;
-    if(_fFrom && r.date < new Date(_fFrom)) return false;
-    if(_fTo   && r.date > new Date(_fTo+'T23:59:59')) return false;
+    if(_fFrom && r.date < _parseLd(_fFrom)) return false;
+    if(_fTo   && r.date > _parseLdEnd(_fTo)) return false;
     if(_fPhase && r.phase!==_fPhase) return false;
     if(_fState && r.state!==_fState) return false;
     if(_selCities.length && !_selCities.includes(r.city)) return false;
@@ -6015,7 +6017,7 @@ function downloadFilteredCSV(){
 
   const cols = [
     {h:'SSE ID',          f:r=>r.id},
-    {h:'Date',            f:r=>r.date?r.date.toISOString().slice(0,10):''},
+    {h:'Date',            f:r=>r.date?`${r.date.getFullYear()}-${String(r.date.getMonth()+1).padStart(2,'0')}-${String(r.date.getDate()).padStart(2,'0')}`:''},
     {h:'City',            f:r=>r.city||''},
     {h:'State',           f:r=>r.state||''},
     {h:'Offer',           f:r=>r.offer||''},
