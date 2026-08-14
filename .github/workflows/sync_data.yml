@@ -1166,8 +1166,6 @@ jobs:
           PASSWORD         = "Metabasedevika123"
           OMS_CARD_ID      = 2154
           DN_CARD_ID       = 2106
-          RATE_545_NON_DCR = 8134.52
-          RATE_540_DCR     = 12065.00
           ERP_B64          = os.environ.get("ERP_B64", "")
 
           OMS_COLS = {
@@ -1242,17 +1240,6 @@ jobs:
                   if erp:
                       row["item_category"]    = erp["item_category"]
                       row["item_subcategory"] = erp.get("item_subcategory","")
-              try:
-                  q = float(row.get("qty","") or 0)
-                  n = row.get("item_name","")
-                  if "545 Wp Mono Bifacial Non DCR-PREMIER" in n:
-                      row["rate"] = str(RATE_545_NON_DCR)
-                      row["amount"] = str(round(q*RATE_545_NON_DCR,2))
-                  elif "540 Wp Mono Bifacial DCR-PREMIER" in n:
-                      row["rate"] = str(RATE_540_DCR)
-                      row["amount"] = str(round(q*RATE_540_DCR,2))
-              except Exception: pass
-              return row
 
           http    = make_http()
           session = get_session(http)
