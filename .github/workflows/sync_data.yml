@@ -1240,6 +1240,7 @@ jobs:
                   if erp:
                       row["item_category"]    = erp["item_category"]
                       row["item_subcategory"] = erp.get("item_subcategory","")
+              return row
 
           http    = make_http()
           session = get_session(http)
